@@ -1,27 +1,27 @@
 {
-	"name": "checkstyle-server",
-	"description": "Checkstyle Server.",
-	"version": "0.0.1",
-	"author": "Sheng Chen",
-	"license": "MIT",
-	"engines": {
-		"node": "*"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/jdneo/vscode-checkstyle"
-	},
-	"dependencies": {
-		"vscode-languageserver": "^3.4.2",
-		"vscode-uri": "^1.0.1",
-		"xml-parser": "^1.2.1"
-	},
-	"scripts": {
-		"installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
-		"compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-		"watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
-	},
-	"devDependencies": {
-		"@types/xml-parser": "^1.2.29"
-	}
+    "name": "checkstyle-server",
+    "description": "Checkstyle Server.",
+    "version": "0.0.1",
+    "author": "Sheng Chen",
+    "license": "MIT",
+    "engines": {
+        "node": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jdneo/vscode-checkstyle"
+    },
+    "dependencies": {
+        "vscode-languageserver": "^3.4.2",
+        "vscode-uri": "^1.0.1",
+        "xml-parser": "^1.2.1"
+    },
+    "scripts": {
+        "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
+        "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+        "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
+    },
+    "devDependencies": {
+        "@types/xml-parser": "^1.2.29"
+    }
 }
