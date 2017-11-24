@@ -1,23 +1,27 @@
 {
-	"name": "vscode-scheckstyle",
-	"description": "",
-	"author": "Sheng Chen",
-	"license": "MIT",
+	"name": "vscode-checkstyle",
 	"version": "0.0.1",
-	"publisher": "sheche",
+	"description": "The umbrella project for the checkstyle client and server",
+	"author": "Sheng Chen",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jdneo/vscode-checkstyle"
+	},
 	"scripts": {
 		"postinstall": "cd server && npm install && cd ../client && npm install && cd ..",
 		"compile": "tsc -p client/tsconfig.json && cd server && npm run installServer && cd .. && tsc -p server/tsconfig.json",
 		"compile:client": "tsc -p client/tsconfig.json",
 		"watch:client": "tsc -w -p client/tsconfig.json",
 		"compile:server": "cd server && npm run installServer && cd .. && tsc -p server/tsconfig.json",
-		"watch:server": "cd server && npm run installServer && cd .. && tsc -w -p server/tsconfig.json"
+		"watch:server": "cd server && npm run installServer && cd .. && tsc -w -p server/tsconfig.json",
+		"lint": "tslint -c tslint.json 'server/src/**/*.ts' 'client/src/**/*.ts'"
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^6.0.88",
+		"tslint": "^5.8.0",
+		"tslint-microsoft-contrib": "^5.0.1",
 		"typescript": "^2.5.2"
 	},
-	"dependencies": {
-	}
+	"dependencies": {}
 }

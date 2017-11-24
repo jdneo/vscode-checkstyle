@@ -4,79 +4,135 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
+import * as path from 'path';
 import {
-	IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,InitializeResult, Diagnostic, DiagnosticSeverity
+    ClientCapabilities,
+    createConnection,
+    Diagnostic,
+    DiagnosticSeverity,
+    DidChangeConfigurationParams,
+    InitializeParams,
+    MessageType,
+    Proposed,
+    ProposedFeatures,
+    ShowMessageNotification,
+    TextDocument,
+    TextDocumentChangeEvent,
+    TextDocuments
 } from 'vscode-languageserver';
-import Uri from 'vscode-uri'
-import { checkStyleCli } from './checkStyleCli';
-import { parseOutput, CheckProblem } from './utils/parser';
+import URI from 'vscode-uri';
+import { checker } from './checker';
+import { ICheckProblem, parseOutput } from './parser';
 
-let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+// tslint:disable-next-line:typedef
+const connection = createConnection(ProposedFeatures.all);
 
-let documents: TextDocuments = new TextDocuments();
+const documents: TextDocuments = new TextDocuments();
+
+let hasConfigurationCapability: boolean = false;
+let hasWorkspaceFolderCapability: boolean = false;
+
+connection.onInitialize((params: InitializeParams) => {
+    const capabilities: ClientCapabilities = params.capabilities;
+
+    hasWorkspaceFolderCapability = (<Proposed.WorkspaceFoldersClientCapabilities>capabilities).workspace && !!(<Proposed.WorkspaceFoldersClientCapabilities>capabilities).workspace.workspaceFolders;
+    hasConfigurationCapability = (<Proposed.ConfigurationClientCapabilities>capabilities).workspace && !!(<Proposed.ConfigurationClientCapabilities>capabilities).workspace.configuration;
+
+    return {
+        capabilities: {
+            textDocumentSync: documents.syncKind
+        }
+    };
+});
+
+connection.onInitialized(() => {
+    if (hasWorkspaceFolderCapability) {
+        connection.workspace.onDidChangeWorkspaceFolders(() => {
+            connection.console.log('Workspace folder change event received');
+        });
+    }
+});
+
+interface ICheckStyleSettings {
+    jarPath: string;
+    configPath: string;
+}
+
+const defaultSettings: ICheckStyleSettings = {
+    jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.4.jar'),
+    configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml')
+};
+let globalSettings: ICheckStyleSettings = defaultSettings;
+
+const documentSettings: Map<string, Thenable<ICheckStyleSettings>> = new Map();
+
+connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
+    if (hasConfigurationCapability) {
+        documentSettings.clear();
+    } else {
+        globalSettings = <ICheckStyleSettings>(change.settings.checkstyle || defaultSettings);
+    }
+    documents.all().forEach(checkstyle);
+});
+
+function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
+    if (!hasConfigurationCapability) {
+        return Promise.resolve(globalSettings);
+    }
+    let result: Thenable<ICheckStyleSettings> = documentSettings.get(resource);
+    if (!result) {
+        result = connection.workspace.getConfiguration({ scopeUri: resource });
+        documentSettings.set(resource, result);
+    }
+    return result;
+}
+
+documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
+
+documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document));
+documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document));
+
+async function checkstyle(textDocument: TextDocument): Promise<void> {
+    const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
+    try {
+        const result: string = await checker.exec(
+            '-jar',
+            settings.jarPath,
+            '-c',
+            settings.configPath,
+            '-f',
+            'xml',
+            URI.parse(textDocument.uri).fsPath
+        );
+        const checkProblems: ICheckProblem[] = await parseOutput(result);
+        const diagnostics: Diagnostic[] = [];
+        for (const problem of checkProblems) {
+            diagnostics.push({
+                severity: problem.problemType === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
+                range: {
+                    start: { line: problem.lineNum - 1, character: problem.colNum },
+                    end: { line: problem.lineNum - 1, character: Number.MAX_VALUE }
+                },
+                message: problem.message,
+                source: 'Checkstyle'
+            });
+        }
+        connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+    } catch (error) {
+        const errorMessage: string = getErrorMessage(error);
+        connection.console.error(errorMessage);
+        connection.sendNotification(ShowMessageNotification.type, {type: MessageType.Error, message: errorMessage});
+    }
+}
+
 documents.listen(connection);
 
-connection.onInitialize((): InitializeResult => {
-	return {
-		capabilities: {
-			textDocumentSync: documents.syncKind,
-			completionProvider: {
-				resolveProvider: true
-			}
-		}
-	}
-});
-
-documents.onDidChangeContent((change) => {
-	validateTextDocument(change.document);
-});
-
-interface Settings {
-	lspSample: ExampleSettings;
-}
-
-interface ExampleSettings {
-	maxNumberOfProblems: number;
-}
-
-let maxNumberOfProblems: number = 100;
-connection.onDidChangeConfiguration((change) => {
-	let settings = <Settings>change.settings;
-	maxNumberOfProblems = settings.lspSample.maxNumberOfProblems || 100;
-	documents.all().forEach(validateTextDocument);
-});
-
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	const result: string = await checkStyle(Uri.parse(textDocument.uri).fsPath);
-	const checkProblems: CheckProblem[] = await parseOutput(result);
-	let diagnostics: Diagnostic[] = [];
-	let problems = 0;
-	for (let i = 0; i < checkProblems.length && problems < maxNumberOfProblems; i++) {
-		diagnostics.push({
-			severity: checkProblems[i].type === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
-			range: {
-				start: { line: checkProblems[i].lineNum - 1, character: checkProblems[i].colNum },
-				end: { line: checkProblems[i].lineNum - 1, character: Number.MAX_VALUE }
-			},
-			message: checkProblems[i].message,
-			source: 'checkstyle'
-		});
-		problems++;
-	}
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-}
-
-async function checkStyle(sourceFile: string): Promise<string> {
-	const result: string = await checkStyleCli.exec(
-		'-jar', 
-		'D:\\Tools\\checkstyle\\checkstyle-8.0-all.jar', 
-		'-c', 
-		'D:\\work\\java_tooling\\repo\\azure-tools-for-java\\Utils\\check-tools\\src\\main\\resources\\checkstyle.xml',
-		'-f',
-		'xml',
-		sourceFile
-	);
-	return result;
-}
-
 connection.listen();
+
+function getErrorMessage(err: Error): string {
+    let errorMessage: string = 'unknown error';
+    if (typeof err.message === 'string') {
+        errorMessage = <string>err.message;
+    }
+    return `Checkstyle: Cannot read tslint configuration - '${errorMessage}'`;
+}

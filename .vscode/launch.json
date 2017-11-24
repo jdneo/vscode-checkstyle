@@ -7,14 +7,10 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}/client"
-			],
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}/client" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceRoot}/client/out/**/*.js"
-			],
+			"outFiles": [ "${workspaceRoot}/client/out/src/**/*.js" ],
 			"preLaunchTask": "watch:client"
 		},
 		{
@@ -23,9 +19,7 @@
 			"request": "attach",
 			"port": 6009,
 			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceRoot}/client/server/**/*.js"
-			],
+			"outFiles": [ "${workspaceRoot}/client/server/**/*.js" ],
 			"preLaunchTask": "watch:server"
 		}
 	]
