@@ -130,5 +130,5 @@ function getErrorMessage(err: Error): string {
     if (typeof err.message === 'string') {
         errorMessage = <string>err.message;
     }
-    return `Checkstyle: Cannot read tslint configuration - '${errorMessage}'`;
+    return `Checkstyle Error: - '${errorMessage}'`;
 }

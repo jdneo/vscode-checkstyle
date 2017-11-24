@@ -16,14 +16,13 @@ export namespace checker {
             childProc.stderr.on('data', (data: string | Buffer) => error += data.toString());
 
             childProc.on('close', (code: number) => {
-                if (code !== 0) {
-                    reject(new Error(`Command failed with exit code: ${code}. Stderr: ${error}`));
-                } else {
+                if (result) {
+                    result = result.slice(result.indexOf('<?xml'), result.lastIndexOf('</checkstyle>') + '</checkstyle>'.length);
                     resolve(result);
+                } else {
+                    reject(new Error(`Command failed with exit code: ${code}. Stderr: ${error}`));
                 }
             });
-
-            childProc.on('error', reject);
         });
     }
 }
