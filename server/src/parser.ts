@@ -9,10 +9,13 @@ export async function parseOutput(output: string): Promise<ICheckProblem[]> {
         .replace(/&lt;/g, '<')
         .replace(/&amp;/g, '&');
     const report: parse.Document = parse(escapedOutput);
-    const children: parse.Node[] = report.root.children;
     const problems: ICheckProblem[] = [];
+    if (!report.root || !report.root.children) {
+        return problems;
+    }
+    const children: parse.Node[] = report.root.children;
     for (const node of children) {
-        if (node.name === 'file') {
+        if (node.name === 'file' && node.children) {
             for (const issue of node.children) {
                 problems.push({
                     lineNum: Number(issue.attributes.line),

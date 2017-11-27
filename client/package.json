@@ -6,6 +6,7 @@
     "version": "0.0.1",
     "publisher": "shengchen",
     "icon": "resources/icon_checkstyle.png",
+    "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
     "repository": {
         "type": "git",
         "url": "https://github.com/jdneo/vscode-checkstyle"
