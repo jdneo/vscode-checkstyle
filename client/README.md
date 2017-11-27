@@ -1,7 +1,5 @@
 # Checkstyle extension for Visual Studio Code
 
-[![Travis CI](https://travis-ci.org/jdneo/vscode-checkstyle.svg?branch=master)](https://travis-ci.org/jdneo/vscode-checkstyle)
-
 ## Prerequisites
 
 * Please make sure ```Java``` is in system ```PATH```
