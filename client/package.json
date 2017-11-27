@@ -5,6 +5,7 @@
     "license": "MIT",
     "version": "0.0.1",
     "publisher": "shengchen",
+    "icon": "resources/icon_checkstyle.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/jdneo/vscode-checkstyle"

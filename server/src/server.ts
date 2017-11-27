@@ -104,7 +104,7 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
         const diagnostics: Diagnostic[] = [];
         for (const problem of checkProblems) {
             diagnostics.push({
-                severity: problem.problemType === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
+                severity: problem.problemType === 'error' ? DiagnosticSeverity.Warning : DiagnosticSeverity.Information,
                 range: {
                     start: { line: problem.lineNum - 1, character: problem.colNum },
                     end: { line: problem.lineNum - 1, character: Number.MAX_VALUE }
