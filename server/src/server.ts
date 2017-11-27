@@ -89,8 +89,9 @@ documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.documen
 documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document));
 
 async function checkstyle(textDocument: TextDocument): Promise<void> {
-    const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
+    const diagnostics: Diagnostic[] = [];
     try {
+        const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
         const result: string = await checker.exec(
             '-jar',
             settings.jarPath,
@@ -101,7 +102,6 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
             URI.parse(textDocument.uri).fsPath
         );
         const checkProblems: ICheckProblem[] = await parseOutput(result);
-        const diagnostics: Diagnostic[] = [];
         for (const problem of checkProblems) {
             diagnostics.push({
                 severity: problem.problemType === 'error' ? DiagnosticSeverity.Warning : DiagnosticSeverity.Information,
@@ -113,12 +113,12 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
                 source: 'Checkstyle'
             });
         }
-        connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
     } catch (error) {
         const errorMessage: string = getErrorMessage(error);
         connection.console.error(errorMessage);
         connection.sendNotification(ShowMessageNotification.type, {type: MessageType.Error, message: errorMessage});
     }
+    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
 documents.listen(connection);
