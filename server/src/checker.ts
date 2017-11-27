@@ -16,7 +16,7 @@ export namespace checker {
             childProc.stderr.on('data', (data: string | Buffer) => error += data.toString());
 
             childProc.on('close', (code: number) => {
-                if (result) {
+                if (result && !error) {
                     result = result.slice(result.indexOf('<?xml'), result.lastIndexOf('</checkstyle>') + '</checkstyle>'.length);
                     resolve(result);
                 } else {

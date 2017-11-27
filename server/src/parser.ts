@@ -9,15 +9,15 @@ export async function parseOutput(output: string): Promise<ICheckProblem[]> {
         .replace(/&lt;/g, '<')
         .replace(/&amp;/g, '&');
     const report: parse.Document = parse(escapedOutput);
-    const children: parse.Node[] = report.root.children;
-    let fileName: string;
     const problems: ICheckProblem[] = [];
+    if (!report.root || !report.root.children) {
+        return problems;
+    }
+    const children: parse.Node[] = report.root.children;
     for (const node of children) {
-        if (node.name === 'file') {
-            fileName = node.attributes.name;
+        if (node.name === 'file' && node.children) {
             for (const issue of node.children) {
                 problems.push({
-                    file: fileName,
                     lineNum: Number(issue.attributes.line),
                     colNum: issue.attributes.column ? Number(issue.attributes.column) : 0,
                     problemType: issue.name,
@@ -30,7 +30,6 @@ export async function parseOutput(output: string): Promise<ICheckProblem[]> {
 }
 
 export interface ICheckProblem {
-    file: string;
     lineNum: number;
     colNum: number;
     problemType: string;
