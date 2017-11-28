@@ -18,7 +18,7 @@ import {
 } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { checker } from './checker';
-import { ICheckProblem, parseOutput } from './parser';
+import { IDiagnosticProblem, parseOutput } from './parser';
 
 // tslint:disable-next-line:typedef
 const connection = createConnection(ProposedFeatures.all);
@@ -101,10 +101,10 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
             'xml',
             URI.parse(textDocument.uri).fsPath
         );
-        const checkProblems: ICheckProblem[] = await parseOutput(result);
+        const checkProblems: IDiagnosticProblem[] = await parseOutput(result);
         for (const problem of checkProblems) {
             diagnostics.push({
-                severity: problem.problemType === 'error' ? DiagnosticSeverity.Warning : DiagnosticSeverity.Information,
+                severity: problem.problemType === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
                 range: {
                     start: { line: problem.lineNum - 1, character: problem.colNum },
                     end: { line: problem.lineNum - 1, character: Number.MAX_VALUE }
