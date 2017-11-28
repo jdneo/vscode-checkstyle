@@ -52,11 +52,13 @@ connection.onInitialized(() => {
 interface ICheckStyleSettings {
     jarPath: string;
     configPath: string;
+    propertiesPath: string;
 }
 
 const defaultSettings: ICheckStyleSettings = {
     jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.4.jar'),
-    configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml')
+    configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml'),
+    propertiesPath: undefined
 };
 let globalSettings: ICheckStyleSettings = defaultSettings;
 
@@ -89,18 +91,24 @@ documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.documen
 documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document));
 
 async function checkstyle(textDocument: TextDocument): Promise<void> {
+    const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
+
+    const checkstyleParams: string[] = [
+        '-jar',
+        settings.jarPath,
+        '-c',
+        settings.configPath,
+        '-f',
+        'xml'
+    ];
+    if (settings.propertiesPath) {
+        checkstyleParams.push('-p', settings.propertiesPath);
+    }
+    checkstyleParams.push(URI.parse(textDocument.uri).fsPath);
+
     const diagnostics: Diagnostic[] = [];
     try {
-        const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
-        const result: string = await checker.exec(
-            '-jar',
-            settings.jarPath,
-            '-c',
-            settings.configPath,
-            '-f',
-            'xml',
-            URI.parse(textDocument.uri).fsPath
-        );
+        const result: string = await checker.exec(...checkstyleParams);
         const checkProblems: IDiagnosticProblem[] = await parseOutput(result);
         for (const problem of checkProblems) {
             diagnostics.push({

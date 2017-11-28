@@ -27,6 +27,7 @@ import {
 interface ICheckStyleSettings {
     jarPath: string;
     configPath: string;
+    propertiesPath: string;
 }
 
 let client: LanguageClient;
@@ -53,7 +54,8 @@ namespace Configuration {
             }
             result.push({
                 jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.4.jar'),
-                configPath: config.get<string>('configPath') || path.join(__dirname, '..', '..', 'resources', 'google_checks.xml')
+                configPath: config.get<string>('configPath') || path.join(__dirname, '..', '..', 'resources', 'google_checks.xml'),
+                propertiesPath: config.get<string>('propertiesPath')
             });
         }
         return result;

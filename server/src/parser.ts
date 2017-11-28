@@ -10,22 +10,24 @@ export async function parseOutput(output: string): Promise<IDiagnosticProblem[]>
         .replace(/&amp;/g, '&');
     return await new Promise((resolve: (problems: IDiagnosticProblem[]) => void, reject: (e: Error) => void): void => {
         // tslint:disable-next-line:no-any
-        xml2js.parseString(escapedOutput, {explicitArray: false}, (err: any, result: any): void => {
+        xml2js.parseString(escapedOutput, (err: any, result: any): void => {
             if (err) {
                 reject(err);
             } else {
                 // tslint:disable-next-line:no-string-literal no-unsafe-any
-                if (result && result['checkstyle'] && result['checkstyle']['file'] && result['checkstyle']['file']['error']) {
+                if (result && result['checkstyle'] && result['checkstyle']['file'] && result['checkstyle']['file'][0]) {
                     // tslint:disable-next-line:no-string-literal
-                    const errors: ICheckStyleError[] = result['checkstyle']['file']['error'];
+                    const errors: ICheckStyleError[] = result['checkstyle']['file'][0]['error'];
                     const problems: IDiagnosticProblem[] = [];
-                    for (const error of errors) {
-                        problems.push({
-                            lineNum: Number(error.$.line),
-                            colNum: error.$.column ? Number(error.$.column) : 0,
-                            problemType: error.$.servity,
-                            message: error.$.message
-                        });
+                    if (errors) {
+                        for (const error of errors) {
+                            problems.push({
+                                lineNum: Number(error.$.line),
+                                colNum: error.$.column ? Number(error.$.column) : 0,
+                                problemType: error.$.serverity,
+                                message: error.$.message
+                            });
+                        }
                     }
                     resolve(problems);
                 } else {
@@ -48,7 +50,7 @@ interface ICheckStyleError {
         line: string;
         column: string;
         message: string;
-        servity: string;
+        serverity: string;
         source: string;
     };
 }

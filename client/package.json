@@ -37,7 +37,13 @@
                     "scope": "resource",
                     "type": "string",
                     "default": "",
-                    "description": "The xml.jar file path of the checkstyle rule file."
+                    "description": "The xml file path of the checkstyle rule file."
+                },
+                "checkstyle.propertiesPath": {
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "",
+                    "description": "The properties file path of the checkstyle."
                 },
                 "checkstyle.trace.server": {
                     "scope": "window",
