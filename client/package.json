@@ -19,10 +19,26 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:java"
+        "onLanguage:java",
+        "onCommand:checkstyle.checkCodeWithCheckstyle"
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "commands": [
+            {
+                "command": "checkstyle.checkCodeWithCheckstyle",
+                "title": "Check code with Checkstyle",
+                "category": "Checkstyle"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "resourceExtname == .java"
+                }
+            ]
+        },
         "configuration": {
             "type": "object",
             "title": "Checkstyle configuration",

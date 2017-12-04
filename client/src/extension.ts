@@ -1,10 +1,12 @@
 'use strict';
 
 import * as path from 'path';
-
 import {
+    commands,
     Disposable,
     ExtensionContext,
+    TextEditor,
+    window,
     workspace,
     WorkspaceConfiguration
 } from 'vscode';
@@ -16,7 +18,9 @@ import {
     Middleware,
     Proposed,
     ProposedFeatures,
+    RequestType,
     ServerOptions,
+    TextDocumentIdentifier,
     TransportKind
 } from 'vscode-languageclient';
 
@@ -25,6 +29,14 @@ interface ICheckStyleSettings {
     jarPath: string;
     configPath: string;
     propertiesPath: string;
+}
+
+interface ICheckstyleParams {
+    readonly textDocument: TextDocumentIdentifier;
+}
+
+namespace CheckStyleRequest {
+    export const requestType: RequestType<ICheckstyleParams, void, void, void> = new RequestType<ICheckstyleParams, void, void, void>('textDocument/checkstyle');
 }
 
 let client: LanguageClient;
@@ -98,7 +110,19 @@ export function activate(context: ExtensionContext): void {
         Configuration.initialize();
     });
 
-    client.start();
+    function checkCodeWithCheckstyle(): void {
+        const textEditor: TextEditor = window.activeTextEditor;
+        if (!textEditor) {
+            return;
+        }
+        const uri: string = textEditor.document.uri.toString();
+        client.sendRequest(CheckStyleRequest.requestType, { textDocument: { uri } });
+    }
+
+    context.subscriptions.push(
+        client.start(),
+        commands.registerCommand('checkstyle.checkCodeWithCheckstyle', checkCodeWithCheckstyle)
+    );
 }
 
 export function deactivate(): Thenable<void> {
