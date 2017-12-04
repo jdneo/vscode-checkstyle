@@ -8,10 +8,8 @@ import {
     DiagnosticSeverity,
     DidChangeConfigurationParams,
     InitializeParams,
-    MessageType,
     Proposed,
     ProposedFeatures,
-    ShowMessageNotification,
     TextDocument,
     TextDocumentChangeEvent,
     TextDocuments
@@ -50,12 +48,14 @@ connection.onInitialized(() => {
 });
 
 interface ICheckStyleSettings {
+    enable: boolean;
     jarPath: string;
     configPath: string;
     propertiesPath: string;
 }
 
 const defaultSettings: ICheckStyleSettings = {
+    enable: true,
     jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.4.jar'),
     configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml'),
     propertiesPath: undefined
@@ -92,6 +92,9 @@ documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.documen
 
 async function checkstyle(textDocument: TextDocument): Promise<void> {
     const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
+    if (!settings.enable) {
+        return;
+    }
 
     const checkstyleParams: string[] = [
         '-jar',
@@ -124,7 +127,6 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
     } catch (error) {
         const errorMessage: string = getErrorMessage(error);
         connection.console.error(errorMessage);
-        connection.sendNotification(ShowMessageNotification.type, {type: MessageType.Error, message: errorMessage});
     }
     connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }

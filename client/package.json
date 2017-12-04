@@ -27,6 +27,12 @@
             "type": "object",
             "title": "Checkstyle configuration",
             "properties": {
+                "checkstyle.enable": {
+                    "scope": "resource",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Specify the enable/disable status of checkstyle extension."
+                },
                 "checkstyle.jarPath": {
                     "scope": "resource",
                     "type": "string",
