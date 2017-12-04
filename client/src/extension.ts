@@ -5,7 +5,6 @@ import * as path from 'path';
 import {
     Disposable,
     ExtensionContext,
-    window,
     workspace,
     WorkspaceConfiguration
 } from 'vscode';
@@ -14,17 +13,15 @@ import {
     DidChangeConfigurationNotification,
     LanguageClient,
     LanguageClientOptions,
-    MessageType,
     Middleware,
     Proposed,
     ProposedFeatures,
     ServerOptions,
-    ShowMessageNotification,
-    ShowMessageParams,
     TransportKind
 } from 'vscode-languageclient';
 
 interface ICheckStyleSettings {
+    enable: boolean;
     jarPath: string;
     configPath: string;
     propertiesPath: string;
@@ -53,6 +50,7 @@ namespace Configuration {
                 config = workspace.getConfiguration('checkstyle');
             }
             result.push({
+                enable: config.get<boolean>('enable'),
                 jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.4.jar'),
                 configPath: config.get<string>('configPath') || path.join(__dirname, '..', '..', 'resources', 'google_checks.xml'),
                 propertiesPath: config.get<string>('propertiesPath')
@@ -98,18 +96,6 @@ export function activate(context: ExtensionContext): void {
     client.registerProposedFeatures();
     client.onReady().then(() => {
         Configuration.initialize();
-        client.onNotification(ShowMessageNotification.type, (param: ShowMessageParams) => {
-            switch (param.type) {
-                case MessageType.Error:
-                    window.showErrorMessage(param.message);
-                    break;
-                case MessageType.Warning:
-                    window.showWarningMessage(param.message);
-                    break;
-                default:
-                    window.showInformationMessage(param.message);
-            }
-        });
     });
 
     client.start();
