@@ -1,5 +1,6 @@
 {
     "name": "vscode-checkstyle",
+    "displayName": "Checkstyle",
     "description": "Checkstyle for Visual Studio Code",
     "author": "Sheng Chen",
     "license": "MIT",
@@ -19,7 +20,10 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:java"
+        "onLanguage:java",
+        "onCommand:checkstyle.checkCodeWithCheckstyle",
+        "onCommand:checkstyle.setJarPath",
+        "onCommand:checkstyle.setConfigPath"
     ],
     "main": "./out/src/extension",
     "contributes": {
