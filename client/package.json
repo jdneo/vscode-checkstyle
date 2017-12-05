@@ -1,5 +1,6 @@
 {
     "name": "vscode-checkstyle",
+    "displayName": "Checkstyle",
     "description": "Checkstyle for Visual Studio Code",
     "author": "Sheng Chen",
     "license": "MIT",
@@ -20,7 +21,9 @@
     ],
     "activationEvents": [
         "onLanguage:java",
-        "onCommand:checkstyle.checkCodeWithCheckstyle"
+        "onCommand:checkstyle.checkCodeWithCheckstyle",
+        "onCommand:checkstyle.setJarPath",
+        "onCommand:checkstyle.setConfigPath"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -28,6 +31,16 @@
             {
                 "command": "checkstyle.checkCodeWithCheckstyle",
                 "title": "Check code with Checkstyle",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setJarPath",
+                "title": "Set Checkstyle jar file path",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setConfigPath",
+                "title": "Set Checkstyle configuration file path",
                 "category": "Checkstyle"
             }
         ],
@@ -90,6 +103,7 @@
     },
     "dependencies": {
         "vscode": "^1.1.5",
+        "vscode-azureextensionui": "^0.3.0",
         "vscode-languageclient": "^3.4.2"
     }
 }

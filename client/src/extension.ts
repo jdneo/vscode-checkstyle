@@ -5,8 +5,6 @@ import {
     commands,
     Disposable,
     ExtensionContext,
-    TextEditor,
-    window,
     workspace,
     WorkspaceConfiguration
 } from 'vscode';
@@ -18,25 +16,17 @@ import {
     Middleware,
     Proposed,
     ProposedFeatures,
-    RequestType,
     ServerOptions,
-    TextDocumentIdentifier,
     TransportKind
 } from 'vscode-languageclient';
+import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
+import { setCheckstyleConfig, setCheckstyleJar } from './command/userSettings';
 
 interface ICheckStyleSettings {
     enable: boolean;
     jarPath: string;
     configPath: string;
     propertiesPath: string;
-}
-
-interface ICheckstyleParams {
-    readonly textDocument: TextDocumentIdentifier;
-}
-
-namespace CheckStyleRequest {
-    export const requestType: RequestType<ICheckstyleParams, void, void, void> = new RequestType<ICheckstyleParams, void, void, void>('textDocument/checkstyle');
 }
 
 let client: LanguageClient;
@@ -89,7 +79,7 @@ export function activate(context: ExtensionContext): void {
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
     const serverOptions: ServerOptions = {
-        run : { module: serverModule, transport: TransportKind.ipc },
+        run: { module: serverModule, transport: TransportKind.ipc },
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
     };
 
@@ -100,7 +90,7 @@ export function activate(context: ExtensionContext): void {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{scheme: 'file', language: 'java'}],
+        documentSelector: [{ scheme: 'file', language: 'java' }],
         middleware: <Middleware>middleware
     };
 
@@ -110,18 +100,11 @@ export function activate(context: ExtensionContext): void {
         Configuration.initialize();
     });
 
-    function checkCodeWithCheckstyle(): void {
-        const textEditor: TextEditor = window.activeTextEditor;
-        if (!textEditor) {
-            return;
-        }
-        const uri: string = textEditor.document.uri.toString();
-        client.sendRequest(CheckStyleRequest.requestType, { textDocument: { uri } });
-    }
-
     context.subscriptions.push(
         client.start(),
-        commands.registerCommand('checkstyle.checkCodeWithCheckstyle', checkCodeWithCheckstyle)
+        commands.registerCommand('checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client)),
+        commands.registerCommand('checkstyle.setJarPath', setCheckstyleJar),
+        commands.registerCommand('checkstyle.setConfigPath', setCheckstyleConfig)
     );
 }
 

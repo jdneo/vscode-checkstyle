@@ -9,6 +9,8 @@
 ## Commands
 This extension provides several commands in the Command Palette (F1 or Ctrl + Shift + P) for working with *.java files:
 * **Checkstyle: Check code with Checkstyle**: Check current active Java file with Checkstyle.
+* **Checkstyle: Set Checkstyle jar file path**: Set the jar file for Checkstyle.
+* **Checkstyle: Set Checkstyle configuration file path**: Set the configuration file for Checkstyle.
 
 ## Options
 ```
