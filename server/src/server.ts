@@ -10,8 +10,10 @@ import {
     InitializeParams,
     Proposed,
     ProposedFeatures,
+    RequestType,
     TextDocument,
     TextDocumentChangeEvent,
+    TextDocumentIdentifier,
     TextDocuments
 } from 'vscode-languageserver';
 import URI from 'vscode-uri';
@@ -47,6 +49,17 @@ connection.onInitialized(() => {
     }
 });
 
+interface ICheckstyleParams {
+    readonly textDocument: TextDocumentIdentifier;
+}
+
+namespace CheckStyleRequest {
+    // tslint:disable-next-line:export-name
+    export const requestType: RequestType<ICheckstyleParams, void, void, void> = new RequestType<ICheckstyleParams, void, void, void>('textDocument/checkstyle');
+}
+connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) => checkstyle(params.textDocument.uri, true));
+connection.listen();
+
 interface ICheckStyleSettings {
     enable: boolean;
     jarPath: string;
@@ -70,7 +83,7 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
     } else {
         globalSettings = <ICheckStyleSettings>(change.settings.checkstyle || defaultSettings);
     }
-    documents.all().forEach(checkstyle);
+    documents.all().forEach((doc: TextDocument) => checkstyle(doc.uri));
 });
 
 function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
@@ -86,13 +99,13 @@ function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
 }
 
 documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
+documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
+documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
+documents.listen(connection);
 
-documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document));
-documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document));
-
-async function checkstyle(textDocument: TextDocument): Promise<void> {
-    const settings: ICheckStyleSettings = await getDocumentSettings(textDocument.uri);
-    if (!settings.enable) {
+async function checkstyle(textDocumentUri: string, force?: boolean): Promise<void> {
+    const settings: ICheckStyleSettings = await getDocumentSettings(textDocumentUri);
+    if (!settings.enable && !force) {
         return;
     }
 
@@ -107,7 +120,7 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
     if (settings.propertiesPath) {
         checkstyleParams.push('-p', settings.propertiesPath);
     }
-    checkstyleParams.push(URI.parse(textDocument.uri).fsPath);
+    checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
 
     const diagnostics: Diagnostic[] = [];
     try {
@@ -128,12 +141,8 @@ async function checkstyle(textDocument: TextDocument): Promise<void> {
         const errorMessage: string = getErrorMessage(error);
         connection.console.error(errorMessage);
     }
-    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+    connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
 }
-
-documents.listen(connection);
-
-connection.listen();
 
 function getErrorMessage(err: Error): string {
     let errorMessage: string = 'unknown error';

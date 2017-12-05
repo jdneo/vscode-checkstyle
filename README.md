@@ -6,6 +6,10 @@
 
 * Please make sure ```Java``` is in system ```PATH```
 
+## Commands
+This extension provides several commands in the Command Palette (F1 or Ctrl + Shift + P) for working with *.java files:
+* **Checkstyle: Check code with Checkstyle**: Check current active Java file with Checkstyle.
+
 ## Options
 ```
 {
