@@ -61,15 +61,15 @@ connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) 
 connection.listen();
 
 interface ICheckStyleSettings {
-    enable: boolean;
+    autocheck: boolean;
     jarPath: string;
     configPath: string;
     propertiesPath: string;
 }
 
 const defaultSettings: ICheckStyleSettings = {
-    enable: true,
-    jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.4.jar'),
+    autocheck: true,
+    jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.5-all.jar'),
     configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml'),
     propertiesPath: undefined
 };
@@ -105,7 +105,7 @@ documents.listen(connection);
 
 async function checkstyle(textDocumentUri: string, force?: boolean): Promise<void> {
     const settings: ICheckStyleSettings = await getDocumentSettings(textDocumentUri);
-    if (!settings.enable && !force) {
+    if (!settings.autocheck && !force) {
         return;
     }
 

@@ -23,7 +23,7 @@ import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
 import { setCheckstyleConfig, setCheckstyleJar } from './command/userSettings';
 
 interface ICheckStyleSettings {
-    enable: boolean;
+    autocheck: boolean;
     jarPath: string;
     configPath: string;
     propertiesPath: string;
@@ -52,8 +52,8 @@ namespace Configuration {
                 config = workspace.getConfiguration('checkstyle');
             }
             result.push({
-                enable: config.get<boolean>('enable'),
-                jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.4.jar'),
+                autocheck: config.get<boolean>('autocheck'),
+                jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.5-all.jar'),
                 configPath: config.get<string>('configPath') || path.join(__dirname, '..', '..', 'resources', 'google_checks.xml'),
                 propertiesPath: config.get<string>('propertiesPath')
             });
