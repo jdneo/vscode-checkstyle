@@ -23,7 +23,7 @@
         "onLanguage:java",
         "onCommand:checkstyle.checkCodeWithCheckstyle",
         "onCommand:checkstyle.setJarPath",
-        "onCommand:checkstyle.setConfigPath"
+        "onCommand:checkstyle.setConfigurationFile"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -39,8 +39,8 @@
                 "category": "Checkstyle"
             },
             {
-                "command": "checkstyle.setConfigPath",
-                "title": "Set Checkstyle configuration file path",
+                "command": "checkstyle.setConfigurationFile",
+                "title": "Set Checkstyle configuration file",
                 "category": "Checkstyle"
             }
         ],
@@ -68,11 +68,11 @@
                     "default": "",
                     "description": "The *.jar file path of the checkstyle jar."
                 },
-                "checkstyle.configPath": {
+                "checkstyle.configurationFile": {
                     "scope": "resource",
                     "type": "string",
-                    "default": "",
-                    "description": "The xml file path of the checkstyle rule file."
+                    "default": "google_checks",
+                    "description": "The xml file path of the checkstyle rules."
                 },
                 "checkstyle.propertiesPath": {
                     "scope": "resource",

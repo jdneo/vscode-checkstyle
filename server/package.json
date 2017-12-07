@@ -12,6 +12,7 @@
         "url": "https://github.com/jdneo/vscode-checkstyle"
     },
     "dependencies": {
+        "fs-extra": "^4.0.3",
         "vscode-languageserver": "^3.4.2",
         "vscode-uri": "^1.0.1",
         "xml2js": "^0.4.19"
@@ -22,6 +23,7 @@
         "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
     },
     "devDependencies": {
+        "@types/fs-extra": "^4.0.5",
         "@types/xml2js": "^0.4.2"
     }
 }
