@@ -11,19 +11,19 @@
         "type": "git",
         "url": "https://github.com/jdneo/vscode-checkstyle"
     },
-    "dependencies": {
-        "fs-extra": "^4.0.3",
-        "vscode-languageserver": "^3.4.2",
-        "vscode-uri": "^1.0.1",
-        "xml2js": "^0.4.19"
-    },
     "scripts": {
         "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
         "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
         "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
     },
+    "dependencies": {
+        "vscode-languageserver": "^3.4.2",
+        "vscode-uri": "^1.0.1",
+        "xml2js": "^0.4.19",
+        "fs-extra": "^4.0.3"
+    },
     "devDependencies": {
-        "@types/fs-extra": "^4.0.5",
-        "@types/xml2js": "^0.4.2"
+        "@types/xml2js": "^0.4.2",
+        "@types/fs-extra": "^4.0.5"
     }
 }

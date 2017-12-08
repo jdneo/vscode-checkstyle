@@ -1,10 +1,14 @@
 'use strict';
 
+import { pathExists } from 'fs-extra';
 import * as path from 'path';
 import {
     commands,
     Disposable,
     ExtensionContext,
+    extensions,
+    OutputChannel,
+    window,
     workspace,
     WorkspaceConfiguration
 } from 'vscode';
@@ -21,6 +25,7 @@ import {
 } from 'vscode-languageclient';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
 import { setCheckstyleConfig, setCheckstyleJar } from './command/userSettings';
+import { downloadCheckstyle } from './utils/downloadCheckstyle';
 
 interface ICheckStyleSettings {
     autocheck: boolean;
@@ -53,7 +58,7 @@ namespace Configuration {
             }
             result.push({
                 autocheck: config.get<boolean>('autocheck'),
-                jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.5-all.jar'),
+                jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.0-all.jar'),
                 configurationFile: config.get<string>('configurationFile'),
                 propertiesPath: config.get<string>('propertiesPath')
             });
@@ -74,7 +79,9 @@ namespace Configuration {
     }
 }
 
-export function activate(context: ExtensionContext): void {
+export async function activate(context: ExtensionContext): Promise<void> {
+    const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
+    await ensureDefaultJarInstalled(outputChannel);
     const serverModule: string = context.asAbsolutePath(path.join('server', 'server.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
@@ -114,4 +121,15 @@ export function deactivate(): Thenable<void> {
     }
     Configuration.dispose();
     return client.stop();
+}
+
+async function ensureDefaultJarInstalled(outputChannel: OutputChannel, version: string = '8.0'): Promise<void> {
+    const extPath: string = extensions.getExtension('shengchen.vscode-checkstyle').extensionPath;
+    if (await pathExists(path.join(extPath, 'resources', `checkstyle-${version}-all.jar`))) {
+        return;
+    } else {
+        outputChannel.show();
+        outputChannel.appendLine('Cannot find Checkstyle, start to download...');
+        await downloadCheckstyle(outputChannel, path.join(extPath, 'resources'), version);
+    }
 }
