@@ -1,5 +1,6 @@
 'use strict';
 
+import { pathExists } from 'fs-extra';
 import * as path from 'path';
 import {
     ClientCapabilities,
@@ -63,14 +64,19 @@ connection.listen();
 interface ICheckStyleSettings {
     autocheck: boolean;
     jarPath: string;
-    configPath: string;
+    configurationFile: string;
     propertiesPath: string;
+}
+
+enum ConfigurationType {
+    GoogleChecks = 'google_checks',
+    SunChecks = 'sun_checks'
 }
 
 const defaultSettings: ICheckStyleSettings = {
     autocheck: true,
     jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.5-all.jar'),
-    configPath: path.join(__dirname, '..', 'resources', 'google_checks.xml'),
+    configurationFile: ConfigurationType.GoogleChecks,
     propertiesPath: undefined
 };
 let globalSettings: ICheckStyleSettings = defaultSettings;
@@ -98,6 +104,20 @@ function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
     return result;
 }
 
+async function ensureConfigurationFileParam(config: string): Promise<string> {
+    switch (config.toLowerCase()) {
+        case ConfigurationType.GoogleChecks:
+        case ConfigurationType.SunChecks:
+            return `/${config.toLowerCase()}.xml`;
+        default:
+            if (await pathExists(config)) {
+                return config;
+            } else {
+                throw new Error(`The configuration file ${config} does not exist`);
+            }
+    }
+}
+
 documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
 documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
 documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
@@ -109,21 +129,21 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
         return;
     }
 
-    const checkstyleParams: string[] = [
-        '-jar',
-        settings.jarPath,
-        '-c',
-        settings.configPath,
-        '-f',
-        'xml'
-    ];
-    if (settings.propertiesPath) {
-        checkstyleParams.push('-p', settings.propertiesPath);
-    }
-    checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
-
     const diagnostics: Diagnostic[] = [];
     try {
+        const configPath: string = await ensureConfigurationFileParam(settings.configurationFile);
+        const checkstyleParams: string[] = [
+            '-jar',
+            settings.jarPath,
+            '-c',
+            configPath,
+            '-f',
+            'xml'
+        ];
+        if (settings.propertiesPath) {
+            checkstyleParams.push('-p', settings.propertiesPath);
+        }
+        checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
         const result: string = await checker.exec(...checkstyleParams);
         const checkProblems: IDiagnosticProblem[] = await parseOutput(result);
         for (const problem of checkProblems) {

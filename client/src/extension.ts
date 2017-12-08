@@ -25,7 +25,7 @@ import { setCheckstyleConfig, setCheckstyleJar } from './command/userSettings';
 interface ICheckStyleSettings {
     autocheck: boolean;
     jarPath: string;
-    configPath: string;
+    configurationFile: string;
     propertiesPath: string;
 }
 
@@ -54,7 +54,7 @@ namespace Configuration {
             result.push({
                 autocheck: config.get<boolean>('autocheck'),
                 jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.5-all.jar'),
-                configPath: config.get<string>('configPath') || path.join(__dirname, '..', '..', 'resources', 'google_checks.xml'),
+                configurationFile: config.get<string>('configurationFile'),
                 propertiesPath: config.get<string>('propertiesPath')
             });
         }
@@ -104,7 +104,7 @@ export function activate(context: ExtensionContext): void {
         client.start(),
         commands.registerCommand('checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client)),
         commands.registerCommand('checkstyle.setJarPath', setCheckstyleJar),
-        commands.registerCommand('checkstyle.setConfigPath', setCheckstyleConfig)
+        commands.registerCommand('checkstyle.setConfigurationFile', setCheckstyleConfig)
     );
 }
 

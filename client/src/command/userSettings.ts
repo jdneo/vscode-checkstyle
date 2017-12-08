@@ -7,29 +7,35 @@ import {
     WorkspaceConfiguration,
     WorkspaceFolder
 } from 'vscode';
-import { IUserInterface, PickWithData } from '../IUserInterface';
+import { IUserInterface, Pick, PickWithData } from '../IUserInterface';
 import { VSCodeUI } from '../VSCodeUI';
 
+enum ConfigurationType {
+    GoogleChecks = 'google_checks',
+    SunChecks = 'sun_checks',
+    Customized = '$(file-directory) Browse...'
+}
+
 export async function setCheckstyleJar(ui: IUserInterface = new VSCodeUI()): Promise<void> {
-    await updateSetting(SettingType.JarPath, 'jarPath', ui);
+    const result: string = await ui.showFolderDialog({ Jar: ['jar'] });
+    await updateSetting('jarPath', result, ui);
 }
 
 export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): Promise<void> {
-    await updateSetting(SettingType.ConfigPath, 'configPath', ui);
+    const configPicks: Pick[] = [
+        new Pick(ConfigurationType.GoogleChecks),
+        new Pick(ConfigurationType.SunChecks),
+        new Pick(ConfigurationType.Customized)
+    ];
+    let config: string = (await ui.showQuickPick(configPicks, 'Select the Checkstyle configuration')).label;
+    if (config === ConfigurationType.Customized) {
+        config = await ui.showFolderDialog({ XML: ['xml'] });
+    }
+
+    await updateSetting('configurationFile', config, ui);
 }
 
-async function updateSetting(settingType: SettingType, key: string, ui: IUserInterface): Promise<void> {
-    let result: string | undefined;
-    switch (settingType) {
-        case SettingType.JarPath:
-            result = await ui.showFolderDialog({ Jar: ['jar'] });
-            break;
-        case SettingType.ConfigPath:
-            result = await ui.showFolderDialog({ XML: ['xml'] });
-            break;
-        default:
-            break;
-    }
+async function updateSetting(key: string, value: string, ui: IUserInterface): Promise<void> {
     let settingTargets: PickWithData<ConfigurationTarget>[] = [
         new PickWithData<ConfigurationTarget>(ConfigurationTarget.Global, 'Application', 'User Settings')
     ];
@@ -50,10 +56,5 @@ async function updateSetting(settingType: SettingType, key: string, ui: IUserInt
             config = workspace.getConfiguration('checkstyle', folderUri);
         }
     }
-    config.update(key, result, target);
-}
-
-enum SettingType {
-    JarPath,
-    ConfigPath
+    config.update(key, value, target);
 }
