@@ -10,20 +10,25 @@ import {
 import { IUserInterface, Pick, PickWithData } from '../IUserInterface';
 import { VSCodeUI } from '../VSCodeUI';
 
+enum ConfigurationType {
+    GoogleChecks = 'google_checks',
+    SunChecks = 'sun_checks',
+    Customized = '$(file-directory) Browse...'
+}
+
 export async function setCheckstyleJar(ui: IUserInterface = new VSCodeUI()): Promise<void> {
     const result: string = await ui.showFolderDialog({ Jar: ['jar'] });
     await updateSetting('jarPath', result, ui);
 }
 
 export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): Promise<void> {
-    const browse: string = '$(file-directory) Browse...';
     const configPicks: Pick[] = [
-        new Pick('google_checks'),
-        new Pick('sun_checks'),
-        new Pick(browse)
+        new Pick(ConfigurationType.GoogleChecks),
+        new Pick(ConfigurationType.SunChecks),
+        new Pick(ConfigurationType.Customized)
     ];
     let config: string = (await ui.showQuickPick(configPicks, 'Select the Checkstyle configuration')).label;
-    if (config === browse) {
+    if (config === ConfigurationType.Customized) {
         config = await ui.showFolderDialog({ XML: ['xml'] });
     }
 
