@@ -6,7 +6,6 @@ import {
     ClientCapabilities,
     createConnection,
     Diagnostic,
-    DiagnosticSeverity,
     DidChangeConfigurationParams,
     InitializeParams,
     Proposed,
@@ -19,7 +18,7 @@ import {
 } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { checker } from './checker';
-import { IDiagnosticProblem, parseOutput } from './parser';
+import { parser } from './parser';
 
 // tslint:disable-next-line:typedef
 const connection = createConnection(ProposedFeatures.all);
@@ -129,39 +128,25 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
         return;
     }
 
-    const diagnostics: Diagnostic[] = [];
     try {
         const configPath: string = await ensureConfigurationFileParam(settings.configurationFile);
         const checkstyleParams: string[] = [
             '-jar',
             settings.jarPath,
             '-c',
-            configPath,
-            '-f',
-            'xml'
+            configPath
         ];
         if (settings.propertiesPath) {
             checkstyleParams.push('-p', settings.propertiesPath);
         }
         checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
         const result: string = await checker.exec(...checkstyleParams);
-        const checkProblems: IDiagnosticProblem[] = await parseOutput(result);
-        for (const problem of checkProblems) {
-            diagnostics.push({
-                severity: problem.problemType === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,
-                range: {
-                    start: { line: problem.lineNum - 1, character: problem.colNum },
-                    end: { line: problem.lineNum - 1, character: Number.MAX_VALUE }
-                },
-                message: problem.message,
-                source: 'Checkstyle'
-            });
-        }
+        const diagnostics: Diagnostic[] = parser.parseOutput(result);
+        connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
     } catch (error) {
         const errorMessage: string = getErrorMessage(error);
         connection.console.error(errorMessage);
     }
-    connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
 }
 
 function getErrorMessage(err: Error): string {
