@@ -136,16 +136,14 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             '-jar',
             settings.jarPath,
             '-c',
-            configPath,
-            '-f',
-            'xml'
+            configPath
         ];
         if (settings.propertiesPath) {
             checkstyleParams.push('-p', settings.propertiesPath);
         }
         checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
         const result: string = await checker.exec(...checkstyleParams);
-        const checkProblems: IDiagnosticProblem[] = await parseOutput(result);
+        const checkProblems: IDiagnosticProblem[] = parseOutput(result);
         for (const problem of checkProblems) {
             diagnostics.push({
                 severity: problem.problemType === 'error' ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning,

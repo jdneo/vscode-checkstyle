@@ -17,7 +17,7 @@ export async function downloadCheckstyle(outputChannel: OutputChannel, downloadP
     outputChannel.appendLine(`Fetching the download link for ${checkstyleJar}...`);
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
     const barLength: number = 20;
-    let lastCompleteness: number = -1;
+    let lastCompleteness: number;
     await new Promise((resolve: () => void, reject: (e: Error) => void): void => {
         progress(request(downloadLink))
         // tslint:disable-next-line:no-any
