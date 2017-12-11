@@ -1,56 +1,32 @@
 'use strict';
 
-import * as xml2js from 'xml2js';
+import {
+    Diagnostic,
+    DiagnosticSeverity
+} from 'vscode-languageserver';
 
-export async function parseOutput(output: string): Promise<IDiagnosticProblem[]> {
-    const escapedOutput: string = output.replace(/&apos;/g, '\'')
-        .replace(/&quot;/g, '"')
-        .replace(/&gt;/g, '>')
-        .replace(/&lt;/g, '<')
-        .replace(/&amp;/g, '&');
-    return await new Promise((resolve: (problems: IDiagnosticProblem[]) => void, reject: (e: Error) => void): void => {
-        // tslint:disable-next-line:no-any
-        xml2js.parseString(escapedOutput, (err: any, result: any): void => {
-            if (err) {
-                reject(err);
-            } else {
-                // tslint:disable-next-line:no-string-literal no-unsafe-any
-                if (result && result['checkstyle'] && result['checkstyle']['file'] && result['checkstyle']['file'][0]) {
-                    // tslint:disable-next-line:no-string-literal
-                    const errors: ICheckStyleError[] = result['checkstyle']['file'][0]['error'];
-                    const problems: IDiagnosticProblem[] = [];
-                    if (errors) {
-                        for (const error of errors) {
-                            problems.push({
-                                lineNum: Number(error.$.line),
-                                colNum: error.$.column ? Number(error.$.column) : 0,
-                                problemType: error.$.serverity,
-                                message: error.$.message
-                            });
-                        }
-                    }
-                    resolve(problems);
-                } else {
-                    reject(new Error('Cannot parse the output xml from checkstyle.'));
-                }
+export namespace parser {
+    export function parseOutput(output: string): Diagnostic[] {
+        const regex: RegExp = /^(?:\[[A-Z]*?\] )?(.*\.java):(\d+)(?::([\w \-]+))?: (warning:|)(.+)/;
+        const lines: string[] = output.split(/\r?\n/);
+        const diagnostics: Diagnostic[] = [];
+        for (const line of lines) {
+            const match: string[] = line.match(regex);
+            if (match) {
+                const [rowNum, colNum, , message] = match.slice(2, 6);
+                const row: number = Number(rowNum);
+                const column: number = isNaN(Number(colNum)) ? 1 : Number(colNum);
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Warning,
+                    range: {
+                        start: { line: row - 1, character: colNum ? column - 1 : 0 },
+                        end: { line: row - 1, character: colNum ? column : Number.MAX_VALUE }
+                    },
+                    message: message,
+                    source: 'Checkstyle'
+                });
             }
-        });
-    });
-}
-
-export interface IDiagnosticProblem {
-    lineNum: number;
-    colNum: number;
-    problemType: string;
-    message: string;
-}
-
-interface ICheckStyleError {
-    $: {
-        line: string;
-        column: string;
-        message: string;
-        serverity: string;
-        source: string;
-    };
+        }
+        return diagnostics;
+    }
 }
