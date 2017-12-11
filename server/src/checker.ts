@@ -17,7 +17,6 @@ export namespace checker {
 
             childProc.on('close', (code: number) => {
                 if (result && !error) {
-                    result = result.slice(result.indexOf('<?xml'), result.lastIndexOf('</checkstyle>') + '</checkstyle>'.length);
                     resolve(result);
                 } else {
                     reject(new Error(`Command failed with exit code: ${code}. Stderr: ${error}`));
