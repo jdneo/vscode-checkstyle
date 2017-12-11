@@ -36,15 +36,16 @@ export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): 
 }
 
 async function updateSetting(key: string, value: string, ui: IUserInterface): Promise<void> {
-    let settingTargets: PickWithData<ConfigurationTarget>[] = [
+    const settingTargets: PickWithData<ConfigurationTarget>[] = [
         new PickWithData<ConfigurationTarget>(ConfigurationTarget.Global, 'Application', 'User Settings')
     ];
     if (workspace.workspaceFolders) {
-        settingTargets = settingTargets.concat(
-            new PickWithData<ConfigurationTarget>(ConfigurationTarget.Workspace, 'Workspace', 'Workspace Settings'),
-            new PickWithData<ConfigurationTarget>(ConfigurationTarget.WorkspaceFolder, 'Workspace Folder', 'Workspace Folder Settings')
-        );
+        settingTargets.push(new PickWithData<ConfigurationTarget>(ConfigurationTarget.Workspace, 'Workspace', 'Workspace Settings'));
     }
+    if (workspace.workspaceFolders.length > 1) {
+        settingTargets.push(new PickWithData<ConfigurationTarget>(ConfigurationTarget.WorkspaceFolder, 'Workspace Folder', 'Workspace Folder Settings'));
+    }
+
     const target: ConfigurationTarget = settingTargets.length === 1 ? settingTargets[0].data : (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
     let config: WorkspaceConfiguration = workspace.getConfiguration('checkstyle');
     if (target === ConfigurationTarget.WorkspaceFolder) {
