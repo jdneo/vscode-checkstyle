@@ -15,12 +15,12 @@ export namespace parser {
             if (match) {
                 const [rowNum, colNum, , message] = match.slice(2, 6);
                 const row: number = Number(rowNum);
-                const column: number = isNaN(Number(colNum)) ? 0 : Number(colNum);
+                const column: number = isNaN(Number(colNum)) ? 1 : Number(colNum);
                 diagnostics.push({
                     severity: DiagnosticSeverity.Warning,
                     range: {
-                        start: { line: row - 1, character: column },
-                        end: { line: row - 1, character: Number.MAX_VALUE }
+                        start: { line: row - 1, character: colNum ? column - 1 : 0 },
+                        end: { line: row - 1, character: colNum ? column : Number.MAX_VALUE }
                     },
                     message: message,
                     source: 'Checkstyle'
