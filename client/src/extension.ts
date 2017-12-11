@@ -6,7 +6,6 @@ import {
     commands,
     Disposable,
     ExtensionContext,
-    extensions,
     OutputChannel,
     window,
     workspace,
@@ -81,7 +80,7 @@ namespace Configuration {
 
 export async function activate(context: ExtensionContext): Promise<void> {
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
-    await ensureDefaultJarInstalled(outputChannel);
+    await ensureDefaultJarInstalled(outputChannel, context.extensionPath);
     const serverModule: string = context.asAbsolutePath(path.join('server', 'server.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
@@ -123,13 +122,10 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-async function ensureDefaultJarInstalled(outputChannel: OutputChannel, version: string = '8.0'): Promise<void> {
-    const extPath: string = extensions.getExtension('shengchen.vscode-checkstyle').extensionPath;
-    if (await pathExists(path.join(extPath, 'resources', `checkstyle-${version}-all.jar`))) {
-        return;
-    } else {
+async function ensureDefaultJarInstalled(outputChannel: OutputChannel, extensionPath: string, version: string = '8.0'): Promise<void> {
+    if (!(await pathExists(path.join(extensionPath, 'resources', `checkstyle-${version}-all.jar`)))) {
         outputChannel.show();
         outputChannel.appendLine('Cannot find Checkstyle, start to download...');
-        await downloadCheckstyle(outputChannel, path.join(extPath, 'resources'), version);
+        await downloadCheckstyle(outputChannel, path.join(extensionPath, 'resources'), version);
     }
 }
