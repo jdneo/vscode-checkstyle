@@ -1,4 +1,5 @@
 out
 node_modules
+client/resources/*.jar
 client/server
 *.vsix
