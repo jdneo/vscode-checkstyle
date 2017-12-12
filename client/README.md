@@ -25,7 +25,7 @@ This extension provides several commands in the Command Palette (F1 or Ctrl + Sh
 * ```checkstyle.configurationFile``` - Specify the checkstyle configuration file. Entering ```google_checks``` will use [google_checks.xml](https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml). Entering ```sun_checks``` will use [sun_checks.xml](https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml). Or you can specify the configuration file path in your local machine. By default, the extension will use ```google_checks```.
 * ```checkstyle.propertiesPath``` - Path to the checkstyle properties file. By default is empty. If a property file is specified, the system properties are ignored. See the [-p option in checkstyle document](http://checkstyle.sourceforge.net/cmdline.html#Command_line_usage)
 
-_If you want to use customized checkstyle config, please make sure the config rules are aligned with the checkstyle version._
+_If you want to use customized checkstyle configuration file, please make sure the checkstyle rules are aligned with the checkstyle version._
 
 ## License
 MIT
