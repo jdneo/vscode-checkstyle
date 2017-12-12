@@ -1,6 +1,6 @@
 {
     "name": "vscode-checkstyle",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "The umbrella project for the checkstyle client and server",
     "author": "Sheng Chen",
     "repository": {

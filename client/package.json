@@ -4,7 +4,7 @@
     "description": "Checkstyle for Visual Studio Code",
     "author": "Sheng Chen",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "shengchen",
     "icon": "resources/icon_checkstyle.png",
     "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
