@@ -27,5 +27,8 @@ This extension provides several commands in the Command Palette (F1 or Ctrl + Sh
 
 _If you want to use customized checkstyle configuration file, please make sure the checkstyle rules are aligned with the checkstyle version._
 
+## Release Notes
+Refer to [CHANGELOG](CHANGELOG.md)
+
 ## License
 MIT
