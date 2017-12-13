@@ -11,6 +11,7 @@ import {
     workspace,
     WorkspaceConfiguration
 } from 'vscode';
+import { UserCancelledError } from 'vscode-azureextensionui';
 import {
     CancellationToken,
     DidChangeConfigurationNotification,
@@ -106,12 +107,21 @@ export async function activate(context: ExtensionContext): Promise<void> {
         Configuration.initialize();
     });
 
+    initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
+    initCommand(context, outputChannel, 'checkstyle.setJarPath', setCheckstyleJar);
+    initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
+
     context.subscriptions.push(
-        client.start(),
-        commands.registerCommand('checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client)),
-        commands.registerCommand('checkstyle.setJarPath', setCheckstyleJar),
-        commands.registerCommand('checkstyle.setConfigurationFile', setCheckstyleConfig)
+        client.start()
     );
+}
+
+async function ensureDefaultJarInstalled(outputChannel: OutputChannel, extensionPath: string, version: string = '8.0'): Promise<void> {
+    if (!(await pathExists(path.join(extensionPath, 'resources', `checkstyle-${version}-all.jar`)))) {
+        outputChannel.show();
+        outputChannel.appendLine('Cannot find Checkstyle, start to download...');
+        await downloadCheckstyle(outputChannel, path.join(extensionPath, 'resources'), version);
+    }
 }
 
 export function deactivate(): Thenable<void> {
@@ -122,10 +132,26 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-async function ensureDefaultJarInstalled(outputChannel: OutputChannel, extensionPath: string, version: string = '8.0'): Promise<void> {
-    if (!(await pathExists(path.join(extensionPath, 'resources', `checkstyle-${version}-all.jar`)))) {
-        outputChannel.show();
-        outputChannel.appendLine('Cannot find Checkstyle, start to download...');
-        await downloadCheckstyle(outputChannel, path.join(extensionPath, 'resources'), version);
+function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: () => void): void {
+    context.subscriptions.push(commands.registerCommand(commandId, async() => {
+        try {
+            await callback();
+        } catch (error) {
+            if (error instanceof UserCancelledError) {
+                // do nothing here
+            } else {
+                const errMsg: string = getErrorMessage(error);
+                outputChannel.appendLine(errMsg);
+                window.showErrorMessage(errMsg);
+            }
+        }
+    }));
+}
+
+function getErrorMessage(err: Error): string {
+    let errorMessage: string = 'unknown error';
+    if (typeof err.message === 'string') {
+        errorMessage = <string>err.message;
     }
+    return `Checkstyle Error: - '${errorMessage}'`;
 }
