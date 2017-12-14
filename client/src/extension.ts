@@ -27,7 +27,8 @@ import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
 import {
     setAutoCheckStatus,
     setCheckstyleConfig,
-    setCheckstyleJar
+    setCheckstyleJar,
+    setCheckstyleProperties
 } from './command/userSettings';
 import { downloadCheckstyle } from './utils/downloadCheckstyle';
 
@@ -114,6 +115,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
     initCommand(context, outputChannel, 'checkstyle.setJarPath', setCheckstyleJar);
     initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
+    initCommand(context, outputChannel, 'checkstyle.setPropertyFile', setCheckstyleProperties);
     initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
 
     context.subscriptions.push(

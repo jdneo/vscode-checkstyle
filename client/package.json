@@ -24,6 +24,7 @@
         "onCommand:checkstyle.checkCodeWithCheckstyle",
         "onCommand:checkstyle.setJarPath",
         "onCommand:checkstyle.setConfigurationFile",
+        "onCommand:checkstyle.setPropertyFile",
         "onCommand:checkstyle.setAutocheck"
     ],
     "main": "./out/src/extension",
@@ -42,6 +43,11 @@
             {
                 "command": "checkstyle.setConfigurationFile",
                 "title": "Set Checkstyle configuration file",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setPropertyFile",
+                "title": "Set Checkstyle properties file",
                 "category": "Checkstyle"
             },
             {
