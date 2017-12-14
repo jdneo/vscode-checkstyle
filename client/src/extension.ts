@@ -132,10 +132,12 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: () => void): void {
-    context.subscriptions.push(commands.registerCommand(commandId, async() => {
+// tslint:disable-next-line:no-any
+function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: (...args: any[]) => any): void {
+    // tslint:disable-next-line:no-any
+    context.subscriptions.push(commands.registerCommand(commandId, async(...args: any[]) => {
         try {
-            await callback();
+            await callback(...args);
         } catch (error) {
             if (error instanceof UserCancelledError) {
                 // do nothing here
