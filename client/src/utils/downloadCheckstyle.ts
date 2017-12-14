@@ -20,7 +20,6 @@ export async function downloadCheckstyle(outputChannel: OutputChannel, downloadP
     let lastCompleteness: number;
     await new Promise((resolve: () => void, reject: (e: Error) => void): void => {
         progress(request(downloadLink))
-        // tslint:disable-next-line:no-any
         .on('progress', (state: any) => {
             // tslint:disable-next-line:no-string-literal
             const completeness: number = Math.floor(state['percent'] * 100 / 5);

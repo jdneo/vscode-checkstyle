@@ -23,7 +23,8 @@
         "onLanguage:java",
         "onCommand:checkstyle.checkCodeWithCheckstyle",
         "onCommand:checkstyle.setJarPath",
-        "onCommand:checkstyle.setConfigurationFile"
+        "onCommand:checkstyle.setConfigurationFile",
+        "onCommand:checkstyle.setAutocheck"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -41,6 +42,11 @@
             {
                 "command": "checkstyle.setConfigurationFile",
                 "title": "Set Checkstyle configuration file",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setAutocheck",
+                "title": "Turn on/off checking code with Checkstyle automatically",
                 "category": "Checkstyle"
             }
         ],
