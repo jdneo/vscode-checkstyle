@@ -21,6 +21,11 @@ export async function setCheckstyleJar(ui: IUserInterface = new VSCodeUI()): Pro
     await updateSetting('jarPath', result, ui);
 }
 
+export async function setCheckstyleProperties(ui: IUserInterface = new VSCodeUI()): Promise<void> {
+    const result: string = await ui.showFolderDialog();
+    await updateSetting('propertiesPath', result, ui);
+}
+
 export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): Promise<void> {
     const configPicks: Pick[] = [
         new Pick(ConfigurationType.GoogleChecks),

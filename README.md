@@ -11,6 +11,7 @@ This extension provides several commands in the Command Palette (F1 or Ctrl + Sh
 * **Checkstyle: Check code with Checkstyle**: Check current active Java file with Checkstyle.
 * **Checkstyle: Set Checkstyle jar file path**: Set the jar file for Checkstyle.
 * **Checkstyle: Set Checkstyle configuration file path**: Set the configuration file for Checkstyle.
+* **Checkstyle: Set Checkstyle properties file**: Set the properties file for Checkstyle.
 * **Checkstyle: Turn on/off checking code with Checkstyle automatically**: Set whether the extension will run Checkstyle automatically.
 
 ## Options
