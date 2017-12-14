@@ -73,7 +73,7 @@ enum ConfigurationType {
 }
 
 const defaultSettings: ICheckStyleSettings = {
-    autocheck: true,
+    autocheck: false,
     jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.0-all.jar'),
     configurationFile: ConfigurationType.GoogleChecks,
     propertiesPath: undefined

@@ -86,7 +86,7 @@ namespace Configuration {
 
 export async function activate(context: ExtensionContext): Promise<void> {
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
-    await ensureDefaultJarInstalled(outputChannel, context.extensionPath);
+    await ensureDefaultJarInstalled(context.extensionPath);
     const serverModule: string = context.asAbsolutePath(path.join('server', 'server.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
@@ -123,11 +123,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     );
 }
 
-async function ensureDefaultJarInstalled(outputChannel: OutputChannel, extensionPath: string, version: string = '8.0'): Promise<void> {
+async function ensureDefaultJarInstalled(extensionPath: string, version: string = '8.0'): Promise<void> {
     if (!(await pathExists(path.join(extensionPath, 'resources', `checkstyle-${version}-all.jar`)))) {
-        outputChannel.show();
-        outputChannel.appendLine('Cannot find Checkstyle, start to download...');
-        await downloadCheckstyle(outputChannel, path.join(extensionPath, 'resources'), version);
+        await downloadCheckstyle(path.join(extensionPath, 'resources'), version);
     }
 }
 
