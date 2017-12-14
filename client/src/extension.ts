@@ -24,7 +24,11 @@ import {
     TransportKind
 } from 'vscode-languageclient';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
-import { setCheckstyleConfig, setCheckstyleJar } from './command/userSettings';
+import {
+    setAutoCheckStatus,
+    setCheckstyleConfig,
+    setCheckstyleJar
+} from './command/userSettings';
 import { downloadCheckstyle } from './utils/downloadCheckstyle';
 
 interface ICheckStyleSettings {
@@ -110,6 +114,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
     initCommand(context, outputChannel, 'checkstyle.setJarPath', setCheckstyleJar);
     initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
+    initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
 
     context.subscriptions.push(
         client.start()
@@ -132,9 +137,7 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-// tslint:disable-next-line:no-any
 function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: (...args: any[]) => any): void {
-    // tslint:disable-next-line:no-any
     context.subscriptions.push(commands.registerCommand(commandId, async(...args: any[]) => {
         try {
             await callback(...args);

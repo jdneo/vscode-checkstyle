@@ -13,7 +13,7 @@ import { VSCodeUI } from '../VSCodeUI';
 enum ConfigurationType {
     GoogleChecks = 'google_checks',
     SunChecks = 'sun_checks',
-    Customized = '$(file-directory) Browse...'
+    Customized = '$(file) Browse...'
 }
 
 export async function setCheckstyleJar(ui: IUserInterface = new VSCodeUI()): Promise<void> {
@@ -35,7 +35,16 @@ export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): 
     await updateSetting('configurationFile', config, ui);
 }
 
-async function updateSetting(key: string, value: string, ui: IUserInterface): Promise<void> {
+export async function setAutoCheckStatus(ui: IUserInterface = new VSCodeUI()): Promise<void> {
+    const statusPicks: PickWithData<boolean>[] = [
+        new PickWithData<boolean>(true, '$(check) On'),
+        new PickWithData<boolean>(false, '$(x) Off')
+    ];
+    const status: boolean = (await ui.showQuickPick(statusPicks, 'Select the autocheck status')).data;
+    await updateSetting('autocheck', status, ui);
+}
+
+async function updateSetting(key: string, value: any, ui: IUserInterface): Promise<void> {
     const settingTargets: PickWithData<ConfigurationTarget>[] = [
         new PickWithData<ConfigurationTarget>(ConfigurationTarget.Global, 'Application', 'User Settings')
     ];
