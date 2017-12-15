@@ -71,7 +71,7 @@
                 "checkstyle.autocheck": {
                     "scope": "resource",
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Specify whether the checkstyle extension will check Java files automatically."
                 },
                 "checkstyle.jarPath": {
