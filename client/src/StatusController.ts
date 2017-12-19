@@ -4,8 +4,11 @@ import {
     StatusBarAlignment,
     StatusBarItem,
     TextDocument,
+    TextDocumentChangeEvent,
     TextEditor,
-    window
+    Uri,
+    window,
+    workspace
 } from 'vscode';
 import { State as ClientState, StateChangeEvent } from 'vscode-languageclient';
 import { IStatusParams, Status } from './notifications';
@@ -17,8 +20,9 @@ export class StatusController {
 
     constructor() {
         this._statusbar = window.createStatusBarItem(StatusBarAlignment.Right, 0);
-        this._statusbar.text = 'Checkstyle';
+        this._statusbar.text = '$(pencil) Checkstyle';
         this._statusbar.command = 'checkstyle.checkCodeWithCheckstyle';
+        this._statusbar.tooltip = 'Check code with Checkstyle';
         this._serverRunning = false;
         this._statusMap = new Map();
     }
@@ -56,16 +60,23 @@ export class StatusController {
 
     public onDidChangeState(event: StateChangeEvent): void {
         if (event.newState === ClientState.Running) {
-            this._statusbar.tooltip = 'Checkstyle is running.';
             this._serverRunning = true;
         } else {
-            this._statusbar.tooltip = 'Checkstyle has stopped.';
             this._serverRunning = false;
         }
         this.updateStatusBar(window.activeTextEditor);
     }
 
-    public onCloseEditor(editor: TextDocument): void {
+    public onDidChangeTextDocument(event: TextDocumentChangeEvent): void {
+        const uri: Uri = event.document.uri;
+        const autocheck: boolean = workspace.getConfiguration('checkstyle', uri).get<boolean>('autocheck');
+        if (!autocheck) {
+            this._statusMap.delete(uri.toString());
+            this.updateStatusBar(window.activeTextEditor);
+        }
+    }
+
+    public onDidCloseTextDocument(editor: TextDocument): void {
         this._statusMap.delete(editor.uri.toString());
     }
 

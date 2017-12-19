@@ -26,7 +26,6 @@ import {
     Proposed,
     ProposedFeatures,
     ServerOptions,
-    StateChangeEvent,
     TransportKind
 } from 'vscode-languageclient';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
@@ -109,7 +108,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
     });
 
     window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController);
-    workspace.onDidCloseTextDocument(statusController.onCloseEditor, statusController);
+    workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController);
+    workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController);
 
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
     initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
@@ -171,7 +171,7 @@ function initializeClient(context: ExtensionContext): void {
 
     client = new LanguageClient('checkstyle', 'Checkstyle', serverOptions, clientOptions);
     client.registerProposedFeatures();
-    client.onDidChangeState((event: StateChangeEvent) => statusController.onDidChangeState(event));
+    client.onDidChangeState(statusController.onDidChangeState, statusController);
 }
 
 function registerClientListener(): void {
