@@ -1,22 +1,8 @@
 'use strict';
 
-import {
-    TextEditor,
-    window
-} from 'vscode';
-import {
-    LanguageClient,
-    RequestType,
-    TextDocumentIdentifier
-} from 'vscode-languageclient';
-
-namespace CheckStyleRequest {
-    export const requestType: RequestType<ICheckstyleParams, void, void, void> = new RequestType<ICheckstyleParams, void, void, void>('textDocument/checkstyle');
-}
-
-interface ICheckstyleParams {
-    readonly textDocument: TextDocumentIdentifier;
-}
+import { TextEditor, window } from 'vscode';
+import { LanguageClient } from 'vscode-languageclient';
+import { CheckStyleRequest } from '../requests';
 
 export function checkCodeWithCheckstyle(client: LanguageClient): void {
     const textEditor: TextEditor = window.activeTextEditor;
