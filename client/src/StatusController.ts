@@ -42,7 +42,7 @@ export class StatusController {
                     this._statusbar.text = '$(alert) Checkstyle';
                     break;
                 default:
-                break;
+                    break;
             }
         } else {
             this._statusbar.text = '$(pencil) Checkstyle';
