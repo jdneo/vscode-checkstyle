@@ -1,12 +1,17 @@
 'use strict';
 
-import { pathExists } from 'fs-extra';
+import * as fse from 'fs-extra';
+import * as os from 'os';
 import * as path from 'path';
 import {
     commands,
     Disposable,
     ExtensionContext,
+    MessageItem,
     OutputChannel,
+    Progress,
+    ProgressLocation,
+    Uri,
     window,
     workspace,
     WorkspaceConfiguration
@@ -27,17 +32,19 @@ import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
 import {
     setAutoCheckStatus,
     setCheckstyleConfig,
-    setCheckstyleJar,
-    setCheckstyleProperties
+    setCheckstyleProperties,
+    setCheckstyleVersion
 } from './command/userSettings';
-import { downloadCheckstyle } from './utils/downloadCheckstyle';
-
-interface ICheckStyleSettings {
-    autocheck: boolean;
-    jarPath: string;
-    configurationFile: string;
-    propertiesPath: string;
-}
+import { DialogResponses } from './DialogResponses';
+import { ICheckStyleSettings } from './ICheckStyleSettings';
+import {
+    DownloadStartRequest,
+    DownloadStatus,
+    DownloadStatusRequest,
+    IDownloadParams,
+    IUpdateSettingParams,
+    UpdateSettingParamsRequest
+} from './requests';
 
 let client: LanguageClient;
 
@@ -62,9 +69,9 @@ namespace Configuration {
                 config = workspace.getConfiguration('checkstyle');
             }
             result.push({
-                autocheck: config.get<boolean>('autocheck'),
-                jarPath: config.get<string>('jarPath') || path.join(__dirname, '..', '..', 'resources', 'checkstyle-8.0-all.jar'),
-                configurationFile: config.get<string>('configurationFile'),
+                autocheck: config.get<boolean>('autocheck', false),
+                version: config.get<string>('version', '8.0'),
+                configurationFile: config.get<string>('configurationFile', 'google_checks'),
                 propertiesPath: config.get<string>('propertiesPath')
             });
         }
@@ -84,9 +91,10 @@ namespace Configuration {
     }
 }
 
+const resourcesPath: string = path.join(os.homedir(), '.vscode-checkstyle', 'resources');
 export async function activate(context: ExtensionContext): Promise<void> {
+    await fse.ensureDir(resourcesPath);
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
-    await ensureDefaultJarInstalled(context.extensionPath);
     const serverModule: string = context.asAbsolutePath(path.join('server', 'server.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
@@ -110,10 +118,40 @@ export async function activate(context: ExtensionContext): Promise<void> {
     client.registerProposedFeatures();
     client.onReady().then(() => {
         Configuration.initialize();
+        client.onRequest(DownloadStartRequest.requestType, () => {
+            window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
+                return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
+                    p.report({ message: 'Fetching the download link...' });
+                    client.onRequest(DownloadStatusRequest.requestType, (param: IDownloadParams) => {
+                        switch (param.downloadStatus) {
+                            case DownloadStatus.downloading:
+                                p.report({ message: `Downloading checkstyle... ${param.percent}%` });
+                                break;
+                            case DownloadStatus.finished:
+                                resolve();
+                                break;
+                            case DownloadStatus.error:
+                                reject(param.error);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                });
+            });
+        });
+
+        client.onRequest(UpdateSettingParamsRequest.requestType, async (param: IUpdateSettingParams) => {
+            const message: string = 'The Checkstyle version setting is invalid. Update it?';
+            const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.cancel);
+            if (result === DialogResponses.yes) {
+                commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
+            }
+        });
     });
 
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
-    initCommand(context, outputChannel, 'checkstyle.setJarPath', setCheckstyleJar);
+    initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
     initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
     initCommand(context, outputChannel, 'checkstyle.setPropertyFile', setCheckstyleProperties);
     initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
@@ -121,12 +159,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
         client.start()
     );
-}
-
-async function ensureDefaultJarInstalled(extensionPath: string, version: string = '8.0'): Promise<void> {
-    if (!(await pathExists(path.join(extensionPath, 'resources', `checkstyle-${version}-all.jar`)))) {
-        await downloadCheckstyle(path.join(extensionPath, 'resources'), version);
-    }
 }
 
 export function deactivate(): Thenable<void> {
@@ -138,7 +170,7 @@ export function deactivate(): Thenable<void> {
 }
 
 function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: (...args: any[]) => any): void {
-    context.subscriptions.push(commands.registerCommand(commandId, async(...args: any[]) => {
+    context.subscriptions.push(commands.registerCommand(commandId, async (...args: any[]) => {
         try {
             await callback(...args);
         } catch (error) {

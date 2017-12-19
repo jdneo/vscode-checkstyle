@@ -22,7 +22,7 @@
     "activationEvents": [
         "onLanguage:java",
         "onCommand:checkstyle.checkCodeWithCheckstyle",
-        "onCommand:checkstyle.setJarPath",
+        "onCommand:checkstyle.setVersion",
         "onCommand:checkstyle.setConfigurationFile",
         "onCommand:checkstyle.setPropertyFile",
         "onCommand:checkstyle.setAutocheck"
@@ -36,8 +36,8 @@
                 "category": "Checkstyle"
             },
             {
-                "command": "checkstyle.setJarPath",
-                "title": "Set Checkstyle jar file path",
+                "command": "checkstyle.setVersion",
+                "title": "Set the Checkstyle version or specify *.jar file path of the checkstyle jar",
                 "category": "Checkstyle"
             },
             {
@@ -74,11 +74,11 @@
                     "default": false,
                     "description": "Specify whether the checkstyle extension will check Java files automatically."
                 },
-                "checkstyle.jarPath": {
+                "checkstyle.version": {
                     "scope": "resource",
                     "type": "string",
-                    "default": "",
-                    "description": "The *.jar file path of the checkstyle jar."
+                    "default": "8.0",
+                    "description": "The Checkstyle version or you can specify *.jar file path of the checkstyle jar."
                 },
                 "checkstyle.configurationFile": {
                     "scope": "resource",
