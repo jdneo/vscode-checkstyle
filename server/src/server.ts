@@ -1,7 +1,5 @@
 'use strict';
 
-import { pathExists } from 'fs-extra';
-import * as path from 'path';
 import {
     ClientCapabilities,
     createConnection,
@@ -10,18 +8,31 @@ import {
     InitializeParams,
     Proposed,
     ProposedFeatures,
-    RequestType,
     TextDocument,
     TextDocumentChangeEvent,
-    TextDocumentIdentifier,
     TextDocuments
 } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { checker } from './checker';
+import { DEFAULT_SETTINGS, ICheckStyleSettings } from './checkstyleSetting';
+import { downloadCheckstyle } from './downloadCheckstyle';
+import { InvalidVersionError, VersionNotExistError } from './errors';
 import { parser } from './parser';
+import {
+    CheckStyleRequest,
+    ICheckstyleParams,
+    UpdateSettingParamsRequest
+} from './serverRequests';
 
-// tslint:disable-next-line:typedef
-const connection = createConnection(ProposedFeatures.all);
+enum ServerStatus {
+    Downloading = 1,
+    Running = 2,
+    Stopped = 3
+}
+
+let status: ServerStatus = ServerStatus.Stopped;
+
+const connection: any = createConnection(ProposedFeatures.all);
 
 const documents: TextDocuments = new TextDocuments();
 
@@ -47,38 +58,13 @@ connection.onInitialized(() => {
             connection.console.log('Workspace folder change event received');
         });
     }
+    status = ServerStatus.Running;
 });
 
-interface ICheckstyleParams {
-    readonly textDocument: TextDocumentIdentifier;
-}
-
-namespace CheckStyleRequest {
-    // tslint:disable-next-line:export-name
-    export const requestType: RequestType<ICheckstyleParams, void, void, void> = new RequestType<ICheckstyleParams, void, void, void>('textDocument/checkstyle');
-}
 connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) => checkstyle(params.textDocument.uri, true));
 connection.listen();
 
-interface ICheckStyleSettings {
-    autocheck: boolean;
-    jarPath: string;
-    configurationFile: string;
-    propertiesPath: string;
-}
-
-enum ConfigurationType {
-    GoogleChecks = 'google_checks',
-    SunChecks = 'sun_checks'
-}
-
-const defaultSettings: ICheckStyleSettings = {
-    autocheck: false,
-    jarPath: path.join(__dirname, '..', 'resources', 'checkstyle-8.0-all.jar'),
-    configurationFile: ConfigurationType.GoogleChecks,
-    propertiesPath: undefined
-};
-let globalSettings: ICheckStyleSettings = defaultSettings;
+let globalSettings: ICheckStyleSettings = DEFAULT_SETTINGS;
 
 const documentSettings: Map<string, Thenable<ICheckStyleSettings>> = new Map();
 
@@ -86,7 +72,7 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
     if (hasConfigurationCapability) {
         documentSettings.clear();
     } else {
-        globalSettings = <ICheckStyleSettings>(change.settings.checkstyle || defaultSettings);
+        globalSettings = <ICheckStyleSettings>(change.settings.checkstyle || DEFAULT_SETTINGS);
     }
     documents.all().forEach((doc: TextDocument) => checkstyle(doc.uri));
 });
@@ -103,49 +89,37 @@ function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
     return result;
 }
 
-async function ensureConfigurationFileParam(config: string): Promise<string> {
-    switch (config.toLowerCase()) {
-        case ConfigurationType.GoogleChecks:
-        case ConfigurationType.SunChecks:
-            return `/${config.toLowerCase()}.xml`;
-        default:
-            if (await pathExists(config)) {
-                return config;
-            } else {
-                throw new Error(`The configuration file ${config} does not exist`);
-            }
-    }
-}
-
 documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
 documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
 documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
 documents.listen(connection);
 
 async function checkstyle(textDocumentUri: string, force?: boolean): Promise<void> {
-    const settings: ICheckStyleSettings = await getDocumentSettings(textDocumentUri);
-    if (!settings.autocheck && !force) {
+    if (status !== ServerStatus.Running) {
         return;
     }
-
+    const settings: ICheckStyleSettings = await getDocumentSettings(textDocumentUri);
+    let result: string;
     try {
-        const configPath: string = await ensureConfigurationFileParam(settings.configurationFile);
-        const checkstyleParams: string[] = [
-            '-jar',
-            settings.jarPath,
-            '-c',
-            configPath
-        ];
-        if (settings.propertiesPath) {
-            checkstyleParams.push('-p', settings.propertiesPath);
-        }
-        checkstyleParams.push(URI.parse(textDocumentUri).fsPath);
-        const result: string = await checker.exec(...checkstyleParams);
-        const diagnostics: Diagnostic[] = parser.parseOutput(result);
-        connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
+        result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
     } catch (error) {
-        const errorMessage: string = getErrorMessage(error);
-        connection.console.error(errorMessage);
+        if (error instanceof VersionNotExistError) {
+            status = ServerStatus.Downloading;
+            if (await downloadCheckstyle(connection, checker.resourcesPath, error.version, textDocumentUri)) {
+                result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
+            }
+        } else if (error instanceof InvalidVersionError) {
+            connection.sendRequest(UpdateSettingParamsRequest.requestType, { uri: textDocumentUri });
+        } else {
+            const errorMessage: string = getErrorMessage(error);
+            connection.console.error(errorMessage);
+        }
+    } finally {
+        if (result) {
+            const diagnostics: Diagnostic[] = parser.parseOutput(result);
+            connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
+        }
+        status = ServerStatus.Running;
     }
 }
 
