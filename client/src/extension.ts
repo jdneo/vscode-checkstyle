@@ -26,6 +26,7 @@ import {
     Proposed,
     ProposedFeatures,
     ServerOptions,
+    StateChangeEvent,
     TransportKind
 } from 'vscode-languageclient';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
@@ -37,6 +38,7 @@ import {
 } from './command/userSettings';
 import { DialogResponses } from './DialogResponses';
 import { ICheckStyleSettings } from './ICheckStyleSettings';
+import { IStatusParams, StatusNotification } from './notifications';
 import {
     DownloadStartRequest,
     DownloadStatus,
@@ -45,8 +47,10 @@ import {
     IUpdateSettingParams,
     UpdateSettingParamsRequest
 } from './requests';
+import { StatusController } from './StatusController';
 
 let client: LanguageClient;
+let statusController: StatusController;
 
 namespace Configuration {
 
@@ -95,12 +99,17 @@ const resourcesPath: string = path.join(os.homedir(), '.vscode-checkstyle', 'res
 export async function activate(context: ExtensionContext): Promise<void> {
     await fse.ensureDir(resourcesPath);
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
+    statusController = new StatusController();
+
     initializeClient(context);
 
     client.onReady().then(() => {
         Configuration.initialize();
         registerClientListener();
     });
+
+    window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController);
+    workspace.onDidCloseTextDocument(statusController.onCloseEditor, statusController);
 
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
     initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
@@ -118,6 +127,9 @@ export function deactivate(): Thenable<void> {
         return undefined;
     }
     Configuration.dispose();
+    if (statusController) {
+        statusController.dispose();
+    }
     return client.stop();
 }
 
@@ -159,6 +171,7 @@ function initializeClient(context: ExtensionContext): void {
 
     client = new LanguageClient('checkstyle', 'Checkstyle', serverOptions, clientOptions);
     client.registerProposedFeatures();
+    client.onDidChangeState((event: StateChangeEvent) => statusController.onDidChangeState(event));
 }
 
 function registerClientListener(): void {
@@ -191,6 +204,10 @@ function registerClientListener(): void {
         if (result === DialogResponses.yes) {
             commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
         }
+    });
+
+    client.onNotification(StatusNotification.notificationType, (params: IStatusParams) => {
+        statusController.updateStatusBar(window.activeTextEditor, params);
     });
 }
 
