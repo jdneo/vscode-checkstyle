@@ -10,13 +10,16 @@ import {
     window,
     workspace
 } from 'vscode';
-import { State as ClientState, StateChangeEvent } from 'vscode-languageclient';
-import { IStatusParams, Status } from './notifications';
+import {
+    CheckStatus,
+    ICheckStatusParams,
+    ServerStatus
+} from './notifications';
 
 export class StatusController {
     private _statusbar: StatusBarItem;
     private _serverRunning: boolean;
-    private _statusMap: Map<string, Status>;
+    private _statusMap: Map<string, CheckStatus>;
 
     constructor() {
         this._statusbar = window.createStatusBarItem(StatusBarAlignment.Right, 0);
@@ -27,7 +30,7 @@ export class StatusController {
         this._statusMap = new Map();
     }
 
-    public updateStatusBar(editor: TextEditor | undefined, status?: IStatusParams): void {
+    public updateStatusBar(editor: TextEditor | undefined, status?: ICheckStatusParams): void {
         if (status) {
             this._statusMap.set(status.uri, status.state);
         }
@@ -39,10 +42,10 @@ export class StatusController {
 
         if (this._statusMap.has(editor.document.uri.toString())) {
             switch (this._statusMap.get(editor.document.uri.toString())) {
-                case Status.ok:
+                case CheckStatus.ok:
                     this._statusbar.text = '$(check) Checkstyle';
                     break;
-                case Status.warn:
+                case CheckStatus.warn:
                     this._statusbar.text = '$(alert) Checkstyle';
                     break;
                 default:
@@ -58,8 +61,8 @@ export class StatusController {
         );
     }
 
-    public onDidChangeState(event: StateChangeEvent): void {
-        if (event.newState === ClientState.Running) {
+    public onServerStatusDidChange(status: ServerStatus): void {
+        if (status === ServerStatus.Running) {
             this._serverRunning = true;
         } else {
             this._serverRunning = false;
