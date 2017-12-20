@@ -17,6 +17,7 @@ import { checker } from './checker';
 import { DEFAULT_SETTINGS, ICheckStyleSettings } from './checkstyleSetting';
 import { downloadCheckstyle } from './downloadCheckstyle';
 import { InvalidVersionError, VersionNotExistError } from './errors';
+import { Status, StatusNotification } from './notifications';
 import { parser } from './parser';
 import {
     CheckStyleRequest,
@@ -117,6 +118,11 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
     } finally {
         if (result) {
             const diagnostics: Diagnostic[] = parser.parseOutput(result);
+            if (diagnostics.length === 0) {
+                connection.sendNotification(StatusNotification.notificationType, { uri: textDocumentUri, state: Status.ok });
+            } else {
+                connection.sendNotification(StatusNotification.notificationType, { uri: textDocumentUri, state: Status.warn });
+            }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }
         status = ServerStatus.Running;
