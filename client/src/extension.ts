@@ -37,7 +37,12 @@ import {
 } from './command/userSettings';
 import { DialogResponses } from './DialogResponses';
 import { ICheckStyleSettings } from './ICheckStyleSettings';
-import { IStatusParams, StatusNotification } from './notifications';
+import {
+    CheckStatusNotification,
+    ICheckStatusParams,
+    IServerStatusParams,
+    ServerStatusNotification
+} from './notifications';
 import {
     DownloadStartRequest,
     DownloadStatus,
@@ -171,7 +176,6 @@ function initializeClient(context: ExtensionContext): void {
 
     client = new LanguageClient('checkstyle', 'Checkstyle', serverOptions, clientOptions);
     client.registerProposedFeatures();
-    client.onDidChangeState(statusController.onDidChangeState, statusController);
 }
 
 function registerClientListener(): void {
@@ -206,8 +210,12 @@ function registerClientListener(): void {
         }
     });
 
-    client.onNotification(StatusNotification.notificationType, (params: IStatusParams) => {
+    client.onNotification(CheckStatusNotification.notificationType, (params: ICheckStatusParams) => {
         statusController.updateStatusBar(window.activeTextEditor, params);
+    });
+
+    client.onNotification(ServerStatusNotification.notificationType, (params: IServerStatusParams) => {
+        statusController.onServerStatusDidChange(params.status);
     });
 }
 

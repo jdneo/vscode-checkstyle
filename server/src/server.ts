@@ -17,19 +17,18 @@ import { checker } from './checker';
 import { DEFAULT_SETTINGS, ICheckStyleSettings } from './checkstyleSetting';
 import { downloadCheckstyle } from './downloadCheckstyle';
 import { InvalidVersionError, VersionNotExistError } from './errors';
-import { Status, StatusNotification } from './notifications';
+import {
+    CheckStatus,
+    CheckStatusNotification,
+    ServerStatus,
+    ServerStatusNotification
+} from './notifications';
 import { parser } from './parser';
 import {
     CheckStyleRequest,
     ICheckstyleParams,
     UpdateSettingParamsRequest
 } from './serverRequests';
-
-enum ServerStatus {
-    Downloading = 1,
-    Running = 2,
-    Stopped = 3
-}
 
 let status: ServerStatus = ServerStatus.Stopped;
 
@@ -59,7 +58,7 @@ connection.onInitialized(() => {
             connection.console.log('Workspace folder change event received');
         });
     }
-    status = ServerStatus.Running;
+    updateServerStatus(ServerStatus.Running);
 });
 
 connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) => checkstyle(params.textDocument.uri, true));
@@ -105,7 +104,7 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
         result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
     } catch (error) {
         if (error instanceof VersionNotExistError) {
-            status = ServerStatus.Downloading;
+            updateServerStatus(ServerStatus.Downloading);
             if (await downloadCheckstyle(connection, checker.resourcesPath, error.version, textDocumentUri)) {
                 result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
             }
@@ -119,13 +118,20 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
         if (result) {
             const diagnostics: Diagnostic[] = parser.parseOutput(result);
             if (diagnostics.length === 0) {
-                connection.sendNotification(StatusNotification.notificationType, { uri: textDocumentUri, state: Status.ok });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.ok });
             } else {
-                connection.sendNotification(StatusNotification.notificationType, { uri: textDocumentUri, state: Status.warn });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.warn });
             }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }
-        status = ServerStatus.Running;
+        updateServerStatus(ServerStatus.Running);
+    }
+}
+
+function updateServerStatus(newStatus: ServerStatus): void {
+    if (status !== newStatus) {
+        status = newStatus;
+        connection.sendNotification(ServerStatusNotification.notificationType, { status: status });
     }
 }
 

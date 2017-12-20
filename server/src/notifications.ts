@@ -2,16 +2,30 @@
 
 import { NotificationType } from 'vscode-languageserver';
 
-export enum Status {
+export enum CheckStatus {
     ok = 1,
     warn = 2
 }
 
-interface IStatusParams {
+interface ICheckStatusParams {
     uri: string;
-    state: Status;
+    state: CheckStatus;
 }
 
-export namespace StatusNotification {
-    export const notificationType: NotificationType<IStatusParams, void> = new NotificationType<IStatusParams, void>('checkstyle/status');
+export namespace CheckStatusNotification {
+    export const notificationType: NotificationType<ICheckStatusParams, void> = new NotificationType<ICheckStatusParams, void>('checkstyle/status');
+}
+
+export enum ServerStatus {
+    Downloading = 1,
+    Running = 2,
+    Stopped = 3
+}
+
+export namespace ServerStatusNotification {
+    export const notificationType: NotificationType<IServerStatusParams, void> = new NotificationType<IServerStatusParams, void>('checkstyle/serverstatus');
+}
+
+interface IServerStatusParams {
+    readonly status: ServerStatus;
 }
