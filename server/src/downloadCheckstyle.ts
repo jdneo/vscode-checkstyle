@@ -46,8 +46,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
                 );
                 resolve(false);
             })
-            .on('end', () => {
-                rename(tempFilePath, path.join(downloadPath, checkstyleJar));
+            .on('end', async () => {
+                await rename(tempFilePath, path.join(downloadPath, checkstyleJar));
                 connection.sendRequest(
                     DownloadStatusRequest.requestType,
                     {
