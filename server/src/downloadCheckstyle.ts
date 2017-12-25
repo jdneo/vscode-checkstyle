@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as request from 'request';
 // tslint:disable-next-line:no-require-imports no-var-requires typedef
 const progress = require('request-progress');
-import { IncomingMessage } from 'http';
+import { DownloadCheckstyleError } from './errors';
 import { UpdateSettingParamsRequest } from './serverRequests';
 import { DownloadStartRequest, DownloadStatus, DownloadStatusRequest } from './serverRequests';
 
@@ -36,12 +36,13 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
                     }
                 );
             })
-            .on('error', (err: Error) => {
+            .on('error', (err: any) => {
                 connection.sendRequest(
                     DownloadStatusRequest.requestType,
                     {
                         downloadStatus: DownloadStatus.error,
-                        err
+                        // tslint:disable-next-line:no-string-literal
+                        error: new DownloadCheckstyleError(`Download Checkstyle fail: ${err['code'] || err.toString()}`)
                     }
                 );
                 resolve(false);
@@ -61,12 +62,14 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
 
 async function isValidVersionNumber(url: string): Promise<boolean> {
     return await new Promise((resolve: (ret: boolean) => void): void => {
-        request({
-            method: 'GET',
-            uri: url,
-            followRedirect: false
-        })
-            .on('response', (response: IncomingMessage) => {
+        request(
+            {
+                method: 'GET',
+                uri: url,
+                followRedirect: false,
+                timeout: 10 * 1000 /*wait for 10 seconds*/
+            },
+            (_error: any, response: request.RequestResponse, _body: any): void => {
                 if (response.statusCode === 302) {
                     resolve(true);
                 } else {

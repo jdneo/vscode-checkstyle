@@ -15,3 +15,12 @@ export class VersionNotExistError extends Error {
         return this._version;
     }
 }
+
+export class DownloadCheckstyleError extends Error {
+    public message: string;
+
+    constructor(message: string) {
+        super();
+        this.message = message;
+    }
+}

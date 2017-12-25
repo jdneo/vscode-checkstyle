@@ -192,6 +192,7 @@ function registerClientListener(): void {
                             resolve();
                             break;
                         case DownloadStatus.error:
+                            window.showWarningMessage(getErrorMessage(param.error));
                             reject(param.error);
                             break;
                         default:
@@ -223,6 +224,8 @@ function getErrorMessage(err: Error): string {
     let errorMessage: string = 'unknown error';
     if (typeof err.message === 'string') {
         errorMessage = <string>err.message;
+    } else {
+        errorMessage = err.toString();
     }
     return `Checkstyle Error: - '${errorMessage}'`;
 }

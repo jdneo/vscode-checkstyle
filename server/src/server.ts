@@ -30,19 +30,16 @@ import {
     UpdateSettingParamsRequest
 } from './serverRequests';
 
-let status: ServerStatus = ServerStatus.Stopped;
-
 const connection: any = createConnection(ProposedFeatures.all);
-
 const documents: TextDocuments = new TextDocuments();
-
+const documentSettings: Map<string, Thenable<ICheckStyleSettings>> = new Map();
+let status: ServerStatus = ServerStatus.Stopped;
 let hasConfigurationCapability: boolean = false;
-let hasWorkspaceFolderCapability: boolean = false;
+let globalSettings: ICheckStyleSettings = DEFAULT_SETTINGS;
 
 connection.onInitialize((params: InitializeParams) => {
     const capabilities: ClientCapabilities = params.capabilities;
 
-    hasWorkspaceFolderCapability = (<Proposed.WorkspaceFoldersClientCapabilities>capabilities).workspace && !!(<Proposed.WorkspaceFoldersClientCapabilities>capabilities).workspace.workspaceFolders;
     hasConfigurationCapability = (<Proposed.ConfigurationClientCapabilities>capabilities).workspace && !!(<Proposed.ConfigurationClientCapabilities>capabilities).workspace.configuration;
 
     return {
@@ -52,21 +49,9 @@ connection.onInitialize((params: InitializeParams) => {
     };
 });
 
-connection.onInitialized(() => {
-    if (hasWorkspaceFolderCapability) {
-        connection.workspace.onDidChangeWorkspaceFolders(() => {
-            connection.console.log('Workspace folder change event received');
-        });
-    }
-    updateServerStatus(ServerStatus.Running);
-});
+connection.onInitialized(() => updateServerStatus(ServerStatus.Running));
 
 connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) => checkstyle(params.textDocument.uri, true));
-connection.listen();
-
-let globalSettings: ICheckStyleSettings = DEFAULT_SETTINGS;
-
-const documentSettings: Map<string, Thenable<ICheckStyleSettings>> = new Map();
 
 connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
     if (hasConfigurationCapability) {
@@ -76,6 +61,13 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
     }
     documents.all().forEach((doc: TextDocument) => checkstyle(doc.uri));
 });
+
+connection.listen();
+
+documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
+documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
+documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
+documents.listen(connection);
 
 function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
     if (!hasConfigurationCapability) {
@@ -88,11 +80,6 @@ function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
     }
     return result;
 }
-
-documents.onDidClose((event: TextDocumentChangeEvent) => documentSettings.delete(event.document.uri));
-documents.onDidOpen((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
-documents.onDidSave((event: TextDocumentChangeEvent) => checkstyle(event.document.uri));
-documents.listen(connection);
 
 async function checkstyle(textDocumentUri: string, force?: boolean): Promise<void> {
     if (status !== ServerStatus.Running) {
@@ -139,6 +126,8 @@ function getErrorMessage(err: Error): string {
     let errorMessage: string = 'unknown error';
     if (typeof err.message === 'string') {
         errorMessage = <string>err.message;
+    } else {
+        errorMessage = err.toString();
     }
     return `Checkstyle Error: - '${errorMessage}'`;
 }
