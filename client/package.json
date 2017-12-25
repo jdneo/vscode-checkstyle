@@ -37,7 +37,7 @@
             },
             {
                 "command": "checkstyle.setVersion",
-                "title": "Set the Checkstyle version or specify *.jar file path of the checkstyle jar",
+                "title": "Set the Checkstyle version",
                 "category": "Checkstyle"
             },
             {
@@ -78,13 +78,13 @@
                     "scope": "resource",
                     "type": "string",
                     "default": "8.0",
-                    "description": "The Checkstyle version or you can specify *.jar file path of the checkstyle jar."
+                    "description": "The Checkstyle version or you can specify *.jar file path of the checkstyle."
                 },
                 "checkstyle.configurationFile": {
                     "scope": "resource",
                     "type": "string",
                     "default": "google_checks",
-                    "description": "The xml file path of the checkstyle rules."
+                    "description": "The checkstyle configuration file. You can use bundled 'google_checks' or 'sun_checks', or specify the local path to the configuration file."
                 },
                 "checkstyle.propertiesPath": {
                     "scope": "resource",
