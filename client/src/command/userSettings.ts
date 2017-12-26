@@ -87,9 +87,9 @@ async function updateSetting(key: string, value: any, ui: IUserInterface, uri?: 
         ];
         if (workspace.workspaceFolders) {
             settingTargets.push(new PickWithData<ConfigurationTarget>(ConfigurationTarget.Workspace, 'Workspace', 'Workspace Settings'));
-        }
-        if (workspace.workspaceFolders.length > 1) {
-            settingTargets.push(new PickWithData<ConfigurationTarget>(ConfigurationTarget.WorkspaceFolder, 'Workspace Folder', 'Workspace Folder Settings'));
+            if (workspace.workspaceFolders.length > 1) {
+                settingTargets.push(new PickWithData<ConfigurationTarget>(ConfigurationTarget.WorkspaceFolder, 'Workspace Folder', 'Workspace Folder Settings'));
+            }
         }
 
         const target: ConfigurationTarget = settingTargets.length === 1 ? settingTargets[0].data : (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
