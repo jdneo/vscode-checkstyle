@@ -47,7 +47,7 @@ export async function setCheckstyleVersion(resourcesPath: string, uri?: Uri, ui:
             result = choice;
             break;
     }
-    await updateSettings(new Map([['version', result]]), ui);
+    await updateSettings(new Map([['version', result]]), ui, uri);
 }
 
 export async function setCheckstyleProperties(ui: IUserInterface = new VSCodeUI()): Promise<void> {
