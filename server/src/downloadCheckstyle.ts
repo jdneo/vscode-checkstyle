@@ -6,14 +6,18 @@ import * as request from 'request';
 // tslint:disable-next-line:no-require-imports no-var-requires typedef
 const progress = require('request-progress');
 import { DownloadCheckstyleError } from './errors';
-import { UpdateSettingParamsRequest } from './serverRequests';
-import { DownloadStartRequest, DownloadStatus, DownloadStatusRequest } from './serverRequests';
+import {
+    DownloadStartNotification,
+    DownloadStatus,
+    DownloadStatusNotification,
+    VersionInvalidNotification
+} from './notifications';
 
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
     if (!(await isValidVersionNumber(downloadLink))) {
-        connection.sendRequest(UpdateSettingParamsRequest.requestType, { uri: textDocumentUri });
+        connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
         return false;
     }
 
@@ -24,11 +28,11 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
     }
 
     return await new Promise((resolve: (res: boolean) => void, _reject: (e: Error) => void): void => {
-        connection.sendRequest(DownloadStartRequest.requestType);
-        progress(request(downloadLink, { timeout: 10 * 1000 /*wait for 10 seconds*/ }))
+        connection.sendNotification(DownloadStartNotification.notificationType);
+        progress(request(downloadLink, { timeout: 20 * 1000 /*wait for 20 seconds*/ }))
             .on('progress', (state: any) => {
-                connection.sendRequest(
-                    DownloadStatusRequest.requestType,
+                connection.sendNotification(
+                    DownloadStatusNotification.notificationType,
                     {
                         downloadStatus: DownloadStatus.downloading,
                         // tslint:disable-next-line:no-string-literal
@@ -37,8 +41,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
                 );
             })
             .on('error', (err: any) => {
-                connection.sendRequest(
-                    DownloadStatusRequest.requestType,
+                connection.sendNotification(
+                    DownloadStatusNotification.notificationType,
                     {
                         downloadStatus: DownloadStatus.error,
                         // tslint:disable-next-line:no-string-literal
@@ -49,8 +53,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
             })
             .on('end', async () => {
                 await rename(tempFilePath, path.join(downloadPath, checkstyleJar));
-                connection.sendRequest(
-                    DownloadStatusRequest.requestType,
+                connection.sendNotification(
+                    DownloadStatusNotification.notificationType,
                     {
                         downloadStatus: DownloadStatus.finished
                     }
