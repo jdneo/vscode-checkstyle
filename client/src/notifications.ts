@@ -29,3 +29,31 @@ export namespace ServerStatusNotification {
 export interface IServerStatusParams {
     readonly status: ServerStatus;
 }
+
+export interface IVersionInvalidParams {
+    readonly uri: string;
+}
+
+export namespace VersionInvalidNotification {
+    export const notificationType: NotificationType<IVersionInvalidParams, void> = new NotificationType<IVersionInvalidParams, void>('checkstyle/versioninvalid');
+}
+
+export namespace DownloadStartNotification {
+    export const notificationType: NotificationType<void, void> = new NotificationType<void, void>('checkstyle/downloadstart');
+}
+
+export enum DownloadStatus {
+    downloading = 1,
+    finished = 2,
+    error = 3
+}
+
+export namespace DownloadStatusNotification {
+    export const notificationType: NotificationType<IDownloadParams, void> = new NotificationType<IDownloadParams, void>('checkstyle/downloadstatus');
+}
+
+export interface IDownloadParams {
+    readonly downloadStatus: DownloadStatus;
+    readonly percent?: number;
+    readonly error?: Error;
+}

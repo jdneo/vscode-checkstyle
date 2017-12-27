@@ -14,6 +14,10 @@ import {
 } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { checker } from './checker';
+import {
+    CheckStyleRequest,
+    ICheckstyleParams
+} from './CheckStyleRequest';
 import { DEFAULT_SETTINGS, ICheckStyleSettings } from './checkstyleSetting';
 import { downloadCheckstyle } from './downloadCheckstyle';
 import { InvalidVersionError, VersionNotExistError } from './errors';
@@ -21,14 +25,10 @@ import {
     CheckStatus,
     CheckStatusNotification,
     ServerStatus,
-    ServerStatusNotification
+    ServerStatusNotification,
+    VersionInvalidNotification
 } from './notifications';
 import { parser } from './parser';
-import {
-    CheckStyleRequest,
-    ICheckstyleParams,
-    UpdateSettingParamsRequest
-} from './serverRequests';
 
 const connection: any = createConnection(ProposedFeatures.all);
 const documents: TextDocuments = new TextDocuments();
@@ -96,7 +96,7 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
                 result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
             }
         } else if (error instanceof InvalidVersionError) {
-            connection.sendRequest(UpdateSettingParamsRequest.requestType, { uri: textDocumentUri });
+            connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
         } else {
             const errorMessage: string = getErrorMessage(error);
             connection.console.error(errorMessage);

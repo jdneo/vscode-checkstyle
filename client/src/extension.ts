@@ -39,18 +39,16 @@ import { DialogResponses } from './DialogResponses';
 import { ICheckStyleSettings } from './ICheckStyleSettings';
 import {
     CheckStatusNotification,
-    ICheckStatusParams,
-    IServerStatusParams,
-    ServerStatusNotification
-} from './notifications';
-import {
-    DownloadStartRequest,
+    DownloadStartNotification,
     DownloadStatus,
-    DownloadStatusRequest,
+    DownloadStatusNotification,
+    ICheckStatusParams,
     IDownloadParams,
-    IUpdateSettingParams,
-    UpdateSettingParamsRequest
-} from './requests';
+    IServerStatusParams,
+    IVersionInvalidParams,
+    ServerStatusNotification,
+    VersionInvalidNotification
+} from './notifications';
 import { StatusController } from './StatusController';
 
 let client: LanguageClient;
@@ -179,11 +177,11 @@ function initializeClient(context: ExtensionContext): void {
 }
 
 function registerClientListener(): void {
-    client.onRequest(DownloadStartRequest.requestType, () => {
+    client.onNotification(DownloadStartNotification.notificationType, () => {
         window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
             return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
                 p.report({ message: 'Fetching the download link...' });
-                client.onRequest(DownloadStatusRequest.requestType, (param: IDownloadParams) => {
+                client.onNotification(DownloadStatusNotification.notificationType, (param: IDownloadParams) => {
                     switch (param.downloadStatus) {
                         case DownloadStatus.downloading:
                             p.report({ message: `Downloading checkstyle... ${param.percent}%` });
@@ -203,8 +201,8 @@ function registerClientListener(): void {
         });
     });
 
-    client.onRequest(UpdateSettingParamsRequest.requestType, async (param: IUpdateSettingParams) => {
-        const message: string = 'The Checkstyle version setting is invalid. Update it?';
+    client.onNotification(VersionInvalidNotification.notificationType, async (param: IVersionInvalidParams) => {
+        const message: string = 'The Checkstyle version does not exist on download server. Would you like to update it?';
         const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.cancel);
         if (result === DialogResponses.yes) {
             commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
