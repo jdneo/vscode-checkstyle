@@ -106,8 +106,8 @@ async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface
             config = workspace.getConfiguration('checkstyle');
         }
     }
-    settingPairs.forEach((value: any, key: string) => {
-        config.update(key, value, target);
+    settingPairs.forEach(async (value: any, key: string) => {
+        await config.update(key, value, target);
     });
 }
 
