@@ -47,12 +47,12 @@ export async function setCheckstyleVersion(resourcesPath: string, uri?: Uri, ui:
             result = choice;
             break;
     }
-    await updateSetting('version', result, ui, uri);
+    await updateSettings(new Map([['version', result]]), ui, uri);
 }
 
 export async function setCheckstyleProperties(ui: IUserInterface = new VSCodeUI()): Promise<void> {
     const result: string = await ui.showFolderDialog();
-    await updateSetting('propertiesPath', result, ui);
+    await updateSettings(new Map([['propertiesPath', result]]), ui);
 }
 
 export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): Promise<void> {
@@ -65,8 +65,7 @@ export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): 
     if (config === ConfigurationType.Customized) {
         config = await ui.showFolderDialog({ XML: ['xml'] });
     }
-
-    await updateSetting('configurationFile', config, ui);
+    await updateSettings(new Map([['configurationFile', config]]), ui);
 }
 
 export async function setAutoCheckStatus(ui: IUserInterface = new VSCodeUI()): Promise<void> {
@@ -75,12 +74,14 @@ export async function setAutoCheckStatus(ui: IUserInterface = new VSCodeUI()): P
         new PickWithData<boolean>(false, '$(x) Off')
     ];
     const status: boolean = (await ui.showQuickPick(statusPicks, 'Select the autocheck status')).data;
-    await updateSetting('autocheck', status, ui);
+    await updateSettings(new Map([['autocheck', status]]), ui);
 }
 
-async function updateSetting(key: string, value: any, ui: IUserInterface, uri?: Uri): Promise<void> {
+async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface, uri?: Uri): Promise<void> {
+    let config: WorkspaceConfiguration;
+    let target: ConfigurationTarget;
     if (uri) {
-        workspace.getConfiguration('checkstyle', uri).update(key, value);
+        config = workspace.getConfiguration('checkstyle', uri);
     } else {
         const settingTargets: PickWithData<ConfigurationTarget>[] = [
             new PickWithData<ConfigurationTarget>(ConfigurationTarget.Global, 'Application', 'User Settings')
@@ -92,8 +93,7 @@ async function updateSetting(key: string, value: any, ui: IUserInterface, uri?: 
             }
         }
 
-        const target: ConfigurationTarget = settingTargets.length === 1 ? settingTargets[0].data : (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
-        let config: WorkspaceConfiguration = workspace.getConfiguration('checkstyle');
+        target = settingTargets.length === 1 ? settingTargets[0].data : (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
         if (target === ConfigurationTarget.WorkspaceFolder) {
             if (workspace.workspaceFolders.length === 1) {
                 config = workspace.getConfiguration('checkstyle', workspace.workspaceFolders[0].uri);
@@ -102,9 +102,13 @@ async function updateSetting(key: string, value: any, ui: IUserInterface, uri?: 
                 const folderUri: Uri = (await ui.showQuickPick<Uri>(folderPicks, 'Pick Workspace Folder to which this setting should be applied')).data;
                 config = workspace.getConfiguration('checkstyle', folderUri);
             }
+        } else {
+            config = workspace.getConfiguration('checkstyle');
         }
-        config.update(key, value, target);
     }
+    settingPairs.forEach(async (value: any, key: string) => {
+        await config.update(key, value, target);
+    });
 }
 
 function validateVersionNumber(input: string): string | undefined {
