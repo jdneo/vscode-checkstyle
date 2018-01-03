@@ -1,7 +1,6 @@
 'use strict';
 
 import * as fse from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
 import {
     commands,
@@ -28,6 +27,7 @@ import {
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient';
+import { extensionGlobalPath, ICheckStyleSettings } from './checkStyleSetting';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
 import {
     setAutoCheckStatus,
@@ -36,7 +36,6 @@ import {
     setCheckstyleVersion
 } from './command/userSettings';
 import { DialogResponses } from './DialogResponses';
-import { ICheckStyleSettings } from './ICheckStyleSettings';
 import {
     CheckStatusNotification,
     DownloadStartNotification,
@@ -97,8 +96,8 @@ namespace Configuration {
     }
 }
 
-const resourcesPath: string = path.join(os.homedir(), '.vscode-checkstyle', 'resources');
 export async function activate(context: ExtensionContext): Promise<void> {
+    const resourcesPath: string = path.join(extensionGlobalPath, 'resources');
     await fse.ensureDir(resourcesPath);
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
     statusController = new StatusController();
@@ -116,7 +115,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
     initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
-    initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
+    initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', () => setCheckstyleConfig(context));
     initCommand(context, outputChannel, 'checkstyle.setPropertyFile', setCheckstyleProperties);
     initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
 
@@ -146,7 +145,7 @@ function initCommand(context: ExtensionContext, outputChannel: OutputChannel, co
             } else {
                 const errMsg: string = getErrorMessage(error);
                 outputChannel.appendLine(errMsg);
-                window.showErrorMessage(errMsg);
+                await window.showErrorMessage(errMsg);
             }
         }
     }));
@@ -181,7 +180,7 @@ function registerClientListener(): void {
         window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
             return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
                 p.report({ message: 'Fetching the download link...' });
-                client.onNotification(DownloadStatusNotification.notificationType, (param: IDownloadParams) => {
+                client.onNotification(DownloadStatusNotification.notificationType, async (param: IDownloadParams) => {
                     switch (param.downloadStatus) {
                         case DownloadStatus.downloading:
                             p.report({ message: `Downloading checkstyle... ${param.percent}%` });
@@ -190,7 +189,7 @@ function registerClientListener(): void {
                             resolve();
                             break;
                         case DownloadStatus.error:
-                            window.showWarningMessage(getErrorMessage(param.error));
+                            await window.showWarningMessage(getErrorMessage(param.error));
                             reject(param.error);
                             break;
                         default:
