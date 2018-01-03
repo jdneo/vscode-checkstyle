@@ -1,14 +1,20 @@
 'use strict';
 
 import * as fse from 'fs-extra';
+import * as os from 'os';
 import * as path from 'path';
 import {
     ConfigurationTarget,
+    ExtensionContext,
+    TextDocument,
     Uri,
+    window,
     workspace,
     WorkspaceConfiguration,
     WorkspaceFolder
 } from 'vscode';
+import * as xml2js from 'xml2js';
+import { extensionGlobalPath } from '../checkStyleSetting';
 import { IUserInterface, Pick, PickWithData } from '../IUserInterface';
 import { VSCodeUI } from '../VSCodeUI';
 
@@ -55,7 +61,7 @@ export async function setCheckstyleProperties(ui: IUserInterface = new VSCodeUI(
     await updateSettings(new Map([['propertiesPath', result]]), ui);
 }
 
-export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): Promise<void> {
+export async function setCheckstyleConfig(context: ExtensionContext, ui: IUserInterface = new VSCodeUI()): Promise<void> {
     const configPicks: Pick[] = [
         new Pick(ConfigurationType.GoogleChecks),
         new Pick(ConfigurationType.SunChecks),
@@ -65,7 +71,34 @@ export async function setCheckstyleConfig(ui: IUserInterface = new VSCodeUI()): 
     if (config === ConfigurationType.Customized) {
         config = await ui.showFolderDialog({ XML: ['xml'] });
     }
-    await updateSettings(new Map([['configurationFile', config]]), ui);
+    const settingDetail: ISettingDetail = await updateSettings(new Map([['configurationFile', config]]), ui);
+    if (config !== ConfigurationType.GoogleChecks && config !== ConfigurationType.SunChecks) {
+        const root: IModule = await resolveXml(config);
+        const properties: string[] = extractProperties(root);
+        if (properties.length > 0) {
+            const propertyString: string = `${properties.join(`=${os.EOL}`)}=`;
+            let propertyPath: string;
+            switch (settingDetail.target) {
+                case ConfigurationTarget.Global:
+                    propertyPath = path.join(extensionGlobalPath, '.checkstyle.properties');
+                    break;
+                case ConfigurationTarget.Workspace:
+                    propertyPath = path.join(context.storagePath, '.checkstyle.properties');
+                    break;
+                case ConfigurationTarget.WorkspaceFolder:
+                    propertyPath = path.join(settingDetail.uri.fsPath, '.checkstyle.properties');
+                    break;
+                default:
+                    break;
+            }
+            await fse.ensureFile(propertyPath);
+            await fse.writeFile(propertyPath, propertyString);
+            await workspace.getConfiguration('checkstyle', settingDetail.uri).update('propertiesPath', propertyPath, settingDetail.target);
+            const doc: TextDocument = await workspace.openTextDocument(Uri.file(propertyPath));
+            await window.showTextDocument(doc);
+            await window.showInformationMessage('Please provide property values for the Checkstlye configuration file.');
+        }
+    }
 }
 
 export async function setAutoCheckStatus(ui: IUserInterface = new VSCodeUI()): Promise<void> {
@@ -77,9 +110,10 @@ export async function setAutoCheckStatus(ui: IUserInterface = new VSCodeUI()): P
     await updateSettings(new Map([['autocheck', status]]), ui);
 }
 
-async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface, uri?: Uri): Promise<void> {
+async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface, uri?: Uri): Promise<ISettingDetail> {
     let config: WorkspaceConfiguration;
     let target: ConfigurationTarget;
+    const settingDetail: ISettingDetail = { target: undefined, uri: undefined };
     if (uri) {
         config = workspace.getConfiguration('checkstyle', uri);
     } else {
@@ -93,13 +127,15 @@ async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface
             }
         }
 
-        target = settingTargets.length === 1 ? settingTargets[0].data : (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
+        settingDetail.target = target = settingTargets.length === 1 ?
+                settingTargets[0].data :
+                (await ui.showQuickPick(settingTargets, 'Select the target to which this setting should be applied')).data;
         if (target === ConfigurationTarget.WorkspaceFolder) {
             if (workspace.workspaceFolders.length === 1) {
                 config = workspace.getConfiguration('checkstyle', workspace.workspaceFolders[0].uri);
             } else {
                 const folderPicks: PickWithData<Uri>[] = workspace.workspaceFolders.map((f: WorkspaceFolder) => new PickWithData(f.uri, f.uri.fsPath));
-                const folderUri: Uri = (await ui.showQuickPick<Uri>(folderPicks, 'Pick Workspace Folder to which this setting should be applied')).data;
+                const folderUri: Uri = settingDetail.uri = (await ui.showQuickPick<Uri>(folderPicks, 'Pick Workspace Folder to which this setting should be applied')).data;
                 config = workspace.getConfiguration('checkstyle', folderUri);
             }
         } else {
@@ -109,6 +145,7 @@ async function updateSettings(settingPairs: Map<string, any>, ui: IUserInterface
     settingPairs.forEach(async (value: any, key: string) => {
         await config.update(key, value, target);
     });
+    return settingDetail;
 }
 
 function validateVersionNumber(input: string): string | undefined {
@@ -119,4 +156,64 @@ function validateVersionNumber(input: string): string | undefined {
         return 'The version number is invalid';
     }
     return undefined;
+}
+
+async function resolveXml(xmlPath: string): Promise<IModule> {
+    return await new Promise(async (resolve: (ret: IModule) => void, reject: (e: Error) => void): Promise<void> => {
+        const configString: string = await fse.readFile(xmlPath, 'utf8');
+        xml2js.parseString(configString, (err: any, result: any): void => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result.module);
+            }
+        });
+    });
+}
+
+function extractProperties(configModule: IModule): string[] {
+    const propertyNames: string[] = [];
+    if (configModule) {
+        extractPropertyNames(configModule.property, propertyNames);
+        if (configModule.module) {
+            for (const child of configModule.module) {
+                propertyNames.push.apply(propertyNames, extractProperties(child));
+            }
+        }
+    }
+    return propertyNames;
+}
+
+function extractPropertyNames(property: IProperty[], propertyNames: string[]): void {
+    if (property) {
+        for (const child of property) {
+            if (child.$ && child.$.value) {
+                const result: string[] = child.$.value.match(/^.*\${(.*)}.*$/);
+                if (result) {
+                    propertyNames.push(result[1]);
+                }
+            }
+        }
+    }
+}
+
+interface IModule {
+    $: IAttribute;
+    // tslint:disable-next-line:no-reserved-keywords
+    module?: IModule[];
+    property?: IProperty[];
+}
+
+interface IProperty {
+    $?: IAttribute;
+}
+
+interface IAttribute {
+    name?: string;
+    value?: string;
+}
+
+interface ISettingDetail {
+    target: ConfigurationTarget;
+    uri?: Uri;
 }
