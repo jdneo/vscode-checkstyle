@@ -17,14 +17,14 @@ export namespace checker {
         if (settings.autocheck || force) {
             const checkstyleParams: string[] = [
                 '-jar',
-                jarPath,
+                `"${jarPath}"`,
                 '-c',
-                configPath
+                `"${configPath}"`
             ];
             if (settings.propertiesPath) {
-                checkstyleParams.push('-p', settings.propertiesPath);
+                checkstyleParams.push('-p', `"${settings.propertiesPath}"`);
             }
-            checkstyleParams.push(sourcePath);
+            checkstyleParams.push(`"${sourcePath}"`);
             return await exec(...checkstyleParams);
         }
         return undefined;
