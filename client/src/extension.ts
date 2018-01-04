@@ -29,12 +29,10 @@ import {
 } from 'vscode-languageclient';
 import { extensionGlobalPath, ICheckStyleSettings } from './checkStyleSetting';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
-import {
-    setAutoCheckStatus,
-    setCheckstyleConfig,
-    setCheckstyleProperties,
-    setCheckstyleVersion
-} from './command/userSettings';
+import { setAutoCheckStatus } from './command/setAutoCheckStatus';
+import { setCheckstyleConfig } from './command/setCheckstyleConfig';
+import { setCheckstyleProperties } from './command/setCheckstyleProperties';
+import { setCheckstyleVersion } from './command/setCheckstyleVersion';
 import { DialogResponses } from './DialogResponses';
 import {
     CheckStatusNotification,
