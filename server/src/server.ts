@@ -24,6 +24,7 @@ import { InvalidVersionError, VersionNotExistError } from './errors';
 import {
     CheckStatus,
     CheckStatusNotification,
+    ErrorNotification,
     ServerStatus,
     ServerStatusNotification,
     VersionInvalidNotification
@@ -99,10 +100,12 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
         } else {
             const errorMessage: string = getErrorMessage(error);
+            connection.sendNotification(ErrorNotification.notificationType, {errorMessage});
             connection.console.error(errorMessage);
         }
     } finally {
         if (result) {
+            connection.console.info(result);
             const diagnostics: Diagnostic[] = parser.parseOutput(result);
             if (diagnostics.length === 0) {
                 connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.ok });

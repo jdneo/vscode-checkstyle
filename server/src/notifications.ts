@@ -57,3 +57,11 @@ interface IDownloadParams {
     readonly percent?: number;
     readonly error?: Error;
 }
+
+export namespace ErrorNotification {
+    export const notificationType: NotificationType<IErrorParams, void> = new NotificationType<IErrorParams, void>('checkstyle/error');
+}
+
+interface IErrorParams {
+    readonly errorMessage: string;
+}
