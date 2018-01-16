@@ -40,8 +40,10 @@ import {
     DownloadStartNotification,
     DownloadStatus,
     DownloadStatusNotification,
+    ErrorNotification,
     ICheckStatusParams,
     IDownloadParams,
+    IErrorParams,
     IServerStatusParams,
     IVersionInvalidParams,
     ServerStatusNotification,
@@ -107,7 +109,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     client.onReady().then(() => {
         Configuration.initialize();
-        registerClientListener();
+        registerClientListener(outputChannel);
     });
 
     window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController);
@@ -175,7 +177,7 @@ function initializeClient(context: ExtensionContext): void {
     client.registerProposedFeatures();
 }
 
-function registerClientListener(): void {
+function registerClientListener(outputChannel: OutputChannel): void {
     client.onNotification(DownloadStartNotification.notificationType, () => {
         window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
             return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
@@ -214,6 +216,13 @@ function registerClientListener(): void {
 
     client.onNotification(ServerStatusNotification.notificationType, (params: IServerStatusParams) => {
         statusController.onServerStatusDidChange(params.status);
+    });
+
+    client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
+        if (outputChannel) {
+            outputChannel.appendLine(param.errorMessage);
+        }
+        TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, {properties: {errorMessage: param.errorMessage}});
     });
 }
 
