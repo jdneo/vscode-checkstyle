@@ -9,7 +9,7 @@ import { InvalidVersionError, VersionNotExistError } from './errors';
 
 export namespace checker {
 
-    export const resourcesPath: string = path.join(os.homedir(), '.vscode-checkstyle', 'resources');
+    export const resourcesPath: string = path.join(os.homedir(), '.vscode', 'vscode-checkstyle', 'resources');
 
     export async function checkstyle(settings: ICheckStyleSettings, sourcePath: string, force?: boolean): Promise<string | undefined> {
         const jarPath: string = await ensureJarFileParam(settings.version);
@@ -17,14 +17,14 @@ export namespace checker {
         if (settings.autocheck || force) {
             const checkstyleParams: string[] = [
                 '-jar',
-                jarPath,
+                `"${jarPath}"`,
                 '-c',
-                configPath
+                `"${configPath}"`
             ];
             if (settings.propertiesPath) {
-                checkstyleParams.push('-p', settings.propertiesPath);
+                checkstyleParams.push('-p', `"${settings.propertiesPath}"`);
             }
-            checkstyleParams.push(sourcePath);
+            checkstyleParams.push(`"${sourcePath}"`);
             return await exec(...checkstyleParams);
         }
         return undefined;

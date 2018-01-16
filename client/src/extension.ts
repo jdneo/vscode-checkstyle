@@ -1,7 +1,6 @@
 'use strict';
 
 import * as fse from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
 import {
     commands,
@@ -17,6 +16,7 @@ import {
     WorkspaceConfiguration
 } from 'vscode';
 import { UserCancelledError } from 'vscode-azureextensionui';
+import { TelemetryWrapper } from "vscode-extension-telemetry-wrapper";
 import {
     CancellationToken,
     DidChangeConfigurationNotification,
@@ -28,15 +28,13 @@ import {
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient';
+import { extensionGlobalPath, ICheckStyleSettings } from './checkStyleSetting';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
-import {
-    setAutoCheckStatus,
-    setCheckstyleConfig,
-    setCheckstyleProperties,
-    setCheckstyleVersion
-} from './command/userSettings';
+import { setAutoCheckStatus } from './command/setAutoCheckStatus';
+import { setCheckstyleConfig } from './command/setCheckstyleConfig';
+import { setCheckstyleProperties } from './command/setCheckstyleProperties';
+import { setCheckstyleVersion } from './command/setCheckstyleVersion';
 import { DialogResponses } from './DialogResponses';
-import { ICheckStyleSettings } from './ICheckStyleSettings';
 import {
     CheckStatusNotification,
     DownloadStartNotification,
@@ -97,13 +95,15 @@ namespace Configuration {
     }
 }
 
-const resourcesPath: string = path.join(os.homedir(), '.vscode-checkstyle', 'resources');
 export async function activate(context: ExtensionContext): Promise<void> {
+    const resourcesPath: string = path.join(extensionGlobalPath, 'resources');
     await fse.ensureDir(resourcesPath);
     const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
     statusController = new StatusController();
 
     initializeClient(context);
+
+    await TelemetryWrapper.initilizeFromJsonFile(context.asAbsolutePath('./package.json'));
 
     client.onReady().then(() => {
         Configuration.initialize();
@@ -114,14 +114,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
     workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController);
     workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController);
 
-    initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
-    initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
-    initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', setCheckstyleConfig);
-    initCommand(context, outputChannel, 'checkstyle.setPropertyFile', setCheckstyleProperties);
-    initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
-
     context.subscriptions.push(
-        client.start()
+        client.start(),
+        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(outputChannel, () => checkCodeWithCheckstyle(client))),
+        TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback(outputChannel, (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
+        TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(outputChannel, () => setCheckstyleConfig(context))),
+        TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(outputChannel, setCheckstyleProperties)),
+        TelemetryWrapper.registerCommand('checkstyle.setAutocheck', () => wrapCallback(outputChannel, setAutoCheckStatus))
     );
 }
 
@@ -136,8 +135,8 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: (...args: any[]) => any): void {
-    context.subscriptions.push(commands.registerCommand(commandId, async (...args: any[]) => {
+function wrapCallback(outputChannel: OutputChannel, callback: (...args: any[]) => any): (...args: any[]) => Promise<any> {
+    return async (...args: any[]): Promise<any> => {
         try {
             await callback(...args);
         } catch (error) {
@@ -146,10 +145,10 @@ function initCommand(context: ExtensionContext, outputChannel: OutputChannel, co
             } else {
                 const errMsg: string = getErrorMessage(error);
                 outputChannel.appendLine(errMsg);
-                window.showErrorMessage(errMsg);
+                await window.showErrorMessage(errMsg);
             }
         }
-    }));
+    };
 }
 
 function initializeClient(context: ExtensionContext): void {
@@ -181,7 +180,7 @@ function registerClientListener(): void {
         window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
             return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
                 p.report({ message: 'Fetching the download link...' });
-                client.onNotification(DownloadStatusNotification.notificationType, (param: IDownloadParams) => {
+                client.onNotification(DownloadStatusNotification.notificationType, async (param: IDownloadParams) => {
                     switch (param.downloadStatus) {
                         case DownloadStatus.downloading:
                             p.report({ message: `Downloading checkstyle... ${param.percent}%` });
@@ -190,7 +189,7 @@ function registerClientListener(): void {
                             resolve();
                             break;
                         case DownloadStatus.error:
-                            window.showWarningMessage(getErrorMessage(param.error));
+                            await window.showWarningMessage(getErrorMessage(param.error));
                             reject(param.error);
                             break;
                         default:

@@ -6,6 +6,7 @@
     "license": "MIT",
     "version": "0.2.0",
     "publisher": "shengchen",
+    "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
     "icon": "resources/icon_checkstyle.png",
     "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
     "repository": {
@@ -114,12 +115,15 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
+        "fs-extra": "^4.0.3",
         "vscode": "^1.1.5",
         "vscode-azureextensionui": "~0.3.0",
+        "vscode-extension-telemetry-wrapper": "^0.1.1",
         "vscode-languageclient": "^3.4.2",
-        "fs-extra": "^4.0.3"
+        "xml2js": "^0.4.19"
     },
     "devDependencies": {
-        "@types/fs-extra": "^4.0.5"
+        "@types/fs-extra": "^4.0.5",
+        "@types/xml2js": "^0.4.2"
     }
 }
