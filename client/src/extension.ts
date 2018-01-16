@@ -16,6 +16,7 @@ import {
     WorkspaceConfiguration
 } from 'vscode';
 import { UserCancelledError } from 'vscode-azureextensionui';
+import { TelemetryWrapper } from "vscode-extension-telemetry-wrapper";
 import {
     CancellationToken,
     DidChangeConfigurationNotification,
@@ -102,6 +103,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     initializeClient(context);
 
+    await TelemetryWrapper.initilizeFromJsonFile(context.asAbsolutePath('./package.json'));
+
     client.onReady().then(() => {
         Configuration.initialize();
         registerClientListener();
@@ -111,14 +114,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
     workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController);
     workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController);
 
-    initCommand(context, outputChannel, 'checkstyle.checkCodeWithCheckstyle', () => checkCodeWithCheckstyle(client));
-    initCommand(context, outputChannel, 'checkstyle.setVersion', (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri));
-    initCommand(context, outputChannel, 'checkstyle.setConfigurationFile', () => setCheckstyleConfig(context));
-    initCommand(context, outputChannel, 'checkstyle.setPropertyFile', setCheckstyleProperties);
-    initCommand(context, outputChannel, 'checkstyle.setAutocheck', setAutoCheckStatus);
-
     context.subscriptions.push(
-        client.start()
+        client.start(),
+        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(outputChannel, () => checkCodeWithCheckstyle(client))),
+        TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback(outputChannel, (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
+        TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(outputChannel, () => setCheckstyleConfig(context))),
+        TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(outputChannel, setCheckstyleProperties)),
+        TelemetryWrapper.registerCommand('checkstyle.setAutocheck', () => wrapCallback(outputChannel, setAutoCheckStatus))
     );
 }
 
@@ -133,8 +135,8 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-function initCommand(context: ExtensionContext, outputChannel: OutputChannel, commandId: string, callback: (...args: any[]) => any): void {
-    context.subscriptions.push(commands.registerCommand(commandId, async (...args: any[]) => {
+function wrapCallback(outputChannel: OutputChannel, callback: (...args: any[]) => any): (...args: any[]) => Promise<any> {
+    return async (...args: any[]): Promise<any> => {
         try {
             await callback(...args);
         } catch (error) {
@@ -146,7 +148,7 @@ function initCommand(context: ExtensionContext, outputChannel: OutputChannel, co
                 await window.showErrorMessage(errMsg);
             }
         }
-    }));
+    };
 }
 
 function initializeClient(context: ExtensionContext): void {
