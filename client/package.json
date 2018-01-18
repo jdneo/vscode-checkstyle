@@ -114,12 +114,12 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
-        "vscode": "^1.1.5",
         "vscode-azureextensionui": "~0.3.0",
         "vscode-languageclient": "^3.4.2",
         "fs-extra": "^4.0.3"
     },
     "devDependencies": {
+        "vscode": "^1.1.5",
         "@types/fs-extra": "^4.0.5"
     }
 }
