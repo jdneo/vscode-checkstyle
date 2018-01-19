@@ -1,5 +1,10 @@
 # Change Log
 
+
+## 0.3.0
+- Added support to automatically resolve properties in the Checkstyle configuration file.
+- Fixed [#61](https://github.com/jdneo/vscode-checkstyle/issues/61)
+
 ## 0.2.0
 - Added support to automatically resolve and download Checkstyle.
 - Added status icon in status bar.
