@@ -112,11 +112,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
         registerClientListener(outputChannel);
     });
 
-    window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController);
-    workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController);
-    workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController);
-
     context.subscriptions.push(
+        window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController),
+        workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
+        workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
         TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(outputChannel, () => checkCodeWithCheckstyle(client))),
         TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback(outputChannel, (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
