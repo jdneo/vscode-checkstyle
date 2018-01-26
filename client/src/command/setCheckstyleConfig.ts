@@ -77,6 +77,9 @@ function extractPropertyNames(property: IProperty[], propertyNames: string[]): v
     if (property) {
         for (const child of property) {
             if (child.$ && child.$.value) {
+                if (child.$.default) {
+                    continue;
+                }
                 const result: string[] = child.$.value.match(/^.*\${(.*)}.*$/);
                 if (result) {
                     propertyNames.push(result[1]);
@@ -147,4 +150,6 @@ interface IProperty {
 interface IAttribute {
     name?: string;
     value?: string;
+    // tslint:disable-next-line:no-reserved-keywords
+    default?: string;
 }
