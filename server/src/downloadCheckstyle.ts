@@ -46,7 +46,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
                     {
                         downloadStatus: DownloadStatus.error,
                         // tslint:disable-next-line:no-string-literal
-                        error: new DownloadCheckstyleError(`Download Checkstyle fail: ${err['code'] || err.toString()}`)
+                        error: new DownloadCheckstyleError(`Download Checkstyle fail: ${err['code'] || err.toString()}`),
+                        downloadLink
                     }
                 );
                 resolve(false);

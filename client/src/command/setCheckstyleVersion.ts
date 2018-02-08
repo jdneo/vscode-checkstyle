@@ -46,5 +46,5 @@ function validateVersionNumber(input: string): string | undefined {
 
 enum VersionType {
     CustomVersion = '$(tag) Enter a version number...',
-    CustomPath = '$(file-directory) Browse for jar...'
+    CustomPath = '$(file-directory) Select a local Checkstyle jar...'
 }
