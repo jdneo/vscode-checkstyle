@@ -193,8 +193,8 @@ function registerClientListener(outputChannel: OutputChannel): void {
                             break;
                         case DownloadStatus.error:
                             const choice: MessageItem = await window.showErrorMessage(getErrorMessage(param.error), DialogResponses.openDownloadPage);
-                            if (choice === DialogResponses.openDownloadPage && param.downloadLink) {
-                                opn(param.downloadLink);
+                            if (choice === DialogResponses.openDownloadPage) {
+                                opn(param.downloadLink || 'https://aka.ms/cs-download');
                             }
                             reject(param.error);
                             break;
