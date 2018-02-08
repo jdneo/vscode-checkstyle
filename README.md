@@ -1,6 +1,8 @@
 # Checkstyle extension for Visual Studio Code
 
-[![Travis CI](https://travis-ci.org/jdneo/vscode-checkstyle.svg?branch=master)](https://travis-ci.org/jdneo/vscode-checkstyle) [![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)
+[![Travis CI](https://travis-ci.org/jdneo/vscode-checkstyle.svg?branch=master)](https://travis-ci.org/jdneo/vscode-checkstyle)
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)
+[![Gitter](https://badges.gitter.im/vscode-checkstyle/Lobby.svg)](https://gitter.im/vscode-checkstyle/Lobby)
 
 ## Prerequisites
 
