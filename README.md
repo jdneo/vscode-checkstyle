@@ -24,7 +24,7 @@
 }
 ```
 
-_If you want to use customized checkstyle configuration file, please make sure the checkstyle rules are aligned with the checkstyle version._
+_If you want to use customized checkstyle configuration file, please make sure the checkstyle rules are compatible with the checkstyle version._
 
 
 ## Commands

@@ -4,7 +4,7 @@
     "description": "Checkstyle for Visual Studio Code",
     "author": "Sheng Chen",
     "license": "MIT",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "publisher": "shengchen",
     "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
     "icon": "resources/icon_checkstyle.png",
@@ -92,17 +92,6 @@
                     "type": "string",
                     "default": "",
                     "description": "The properties file path of the checkstyle."
-                },
-                "checkstyle.trace.server": {
-                    "scope": "window",
-                    "type": "string",
-                    "enum": [
-                        "off",
-                        "messages",
-                        "verbose"
-                    ],
-                    "default": "off",
-                    "description": "Traces the communication between VSCode and the language server."
                 }
             }
         }
