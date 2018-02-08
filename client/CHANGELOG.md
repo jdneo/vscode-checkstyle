@@ -1,5 +1,7 @@
 # Change Log
 
+## 0.3.1
+- Fixed [#74](https://github.com/jdneo/vscode-checkstyle/issues/74), [#75](https://github.com/jdneo/vscode-checkstyle/issues/75)
 
 ## 0.3.0
 - Added support to automatically resolve properties in the Checkstyle configuration file.
