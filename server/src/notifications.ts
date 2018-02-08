@@ -56,6 +56,7 @@ interface IDownloadParams {
     readonly downloadStatus: DownloadStatus;
     readonly percent?: number;
     readonly error?: Error;
+    readonly downloadLink?: string;
 }
 
 export namespace ErrorNotification {

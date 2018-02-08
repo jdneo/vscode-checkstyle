@@ -1,6 +1,8 @@
 'use strict';
 
 import * as fse from 'fs-extra';
+// tslint:disable-next-line:no-require-imports
+import opn = require('opn');
 import * as path from 'path';
 import {
     commands,
@@ -190,7 +192,10 @@ function registerClientListener(outputChannel: OutputChannel): void {
                             resolve();
                             break;
                         case DownloadStatus.error:
-                            await window.showWarningMessage(getErrorMessage(param.error));
+                            const choice: MessageItem = await window.showErrorMessage(getErrorMessage(param.error), DialogResponses.openDownloadPage);
+                            if (choice === DialogResponses.openDownloadPage && param.downloadLink) {
+                                opn(param.downloadLink);
+                            }
                             reject(param.error);
                             break;
                         default:
