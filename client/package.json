@@ -55,6 +55,11 @@
                 "command": "checkstyle.setAutocheck",
                 "title": "Turn on/off checking code with Checkstyle automatically",
                 "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.showOutputChannel",
+                "title": "Open Checkstyle output Channel",
+                "category": "Checkstyle"
             }
         ],
         "menus": {
