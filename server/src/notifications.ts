@@ -4,7 +4,8 @@ import { NotificationType } from 'vscode-languageserver';
 
 export enum CheckStatus {
     ok = 1,
-    warn = 2
+    bug = 2,
+    error = 3
 }
 
 interface ICheckStatusParams {
@@ -63,5 +64,6 @@ export namespace ErrorNotification {
 }
 
 interface IErrorParams {
+    readonly uri: string;
     readonly errorMessage: string;
 }

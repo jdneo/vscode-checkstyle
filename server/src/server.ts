@@ -100,7 +100,7 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
         } else {
             const errorMessage: string = getErrorMessage(error);
-            connection.sendNotification(ErrorNotification.notificationType, {errorMessage});
+            connection.sendNotification(ErrorNotification.notificationType, {uri: textDocumentUri, errorMessage});
         }
     } finally {
         if (result) {
@@ -109,7 +109,7 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             if (diagnostics.length === 0) {
                 connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.ok });
             } else {
-                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.warn });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.bug });
             }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }

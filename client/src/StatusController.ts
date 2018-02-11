@@ -45,9 +45,11 @@ export class StatusController {
                 case CheckStatus.ok:
                     this._statusbar.text = '$(check) Checkstyle';
                     break;
-                case CheckStatus.warn:
-                    this._statusbar.text = '$(alert) Checkstyle';
+                case CheckStatus.bug:
+                    this._statusbar.text = '$(bug) Checkstyle';
                     break;
+                case CheckStatus.error:
+                this._statusbar.text = '$(stop) Checkstyle';
                 default:
                     break;
             }
