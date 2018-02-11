@@ -38,6 +38,7 @@ import { setCheckstyleProperties } from './command/setCheckstyleProperties';
 import { setCheckstyleVersion } from './command/setCheckstyleVersion';
 import { DialogResponses } from './DialogResponses';
 import {
+    CheckStatus,
     CheckStatusNotification,
     DownloadStartNotification,
     DownloadStatus,
@@ -207,6 +208,7 @@ function registerClientListener(outputChannel: OutputChannel): void {
     });
 
     client.onNotification(VersionInvalidNotification.notificationType, async (param: IVersionInvalidParams) => {
+        statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
         const message: string = 'The Checkstyle version does not exist on download server. Would you like to update it?';
         const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.cancel);
         if (result === DialogResponses.yes) {
@@ -223,6 +225,7 @@ function registerClientListener(outputChannel: OutputChannel): void {
     });
 
     client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
+        statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
         if (outputChannel) {
             outputChannel.appendLine(param.errorMessage);
         }
