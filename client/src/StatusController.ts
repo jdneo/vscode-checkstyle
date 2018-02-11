@@ -42,14 +42,15 @@ export class StatusController {
 
         if (this._statusMap.has(editor.document.uri.toString())) {
             switch (this._statusMap.get(editor.document.uri.toString())) {
-                case CheckStatus.ok:
+                case CheckStatus.success:
                     this._statusbar.text = '$(check) Checkstyle';
                     break;
-                case CheckStatus.bug:
+                case CheckStatus.fail:
                     this._statusbar.text = '$(bug) Checkstyle';
                     break;
-                case CheckStatus.error:
-                this._statusbar.text = '$(stop) Checkstyle';
+                case CheckStatus.exception:
+                    this._statusbar.text = '$(stop) Checkstyle';
+                    break;
                 default:
                     break;
             }

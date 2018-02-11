@@ -107,9 +107,9 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             connection.console.info(result);
             const diagnostics: Diagnostic[] = parser.parseOutput(result);
             if (diagnostics.length === 0) {
-                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.ok });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.success });
             } else {
-                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.bug });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.fail });
             }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }

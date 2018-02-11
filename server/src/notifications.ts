@@ -3,9 +3,9 @@
 import { NotificationType } from 'vscode-languageserver';
 
 export enum CheckStatus {
-    ok = 1,
-    bug = 2,
-    error = 3
+    success = 1,
+    fail = 2,
+    exception = 3
 }
 
 interface ICheckStatusParams {
