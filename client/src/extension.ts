@@ -9,7 +9,6 @@ import {
     Disposable,
     ExtensionContext,
     MessageItem,
-    OutputChannel,
     Progress,
     ProgressLocation,
     Uri,
@@ -103,7 +102,6 @@ namespace Configuration {
 export async function activate(context: ExtensionContext): Promise<void> {
     const resourcesPath: string = path.join(extensionGlobalPath, 'resources');
     await fse.ensureDir(resourcesPath);
-    const outputChannel: OutputChannel = window.createOutputChannel('Checkstyle');
     statusController = new StatusController();
 
     initializeClient(context);
@@ -112,7 +110,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     client.onReady().then(() => {
         Configuration.initialize();
-        registerClientListener(outputChannel);
+        registerClientListener();
     });
 
     context.subscriptions.push(
@@ -120,11 +118,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
         workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
-        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(outputChannel, () => checkCodeWithCheckstyle(client))),
-        TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback(outputChannel, (uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
-        TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(outputChannel, () => setCheckstyleConfig(context))),
-        TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(outputChannel, setCheckstyleProperties)),
-        TelemetryWrapper.registerCommand('checkstyle.setAutocheck', () => wrapCallback(outputChannel, setAutoCheckStatus))
+        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(() => checkCodeWithCheckstyle(client))),
+        TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback((uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
+        TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(() => setCheckstyleConfig(context))),
+        TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(setCheckstyleProperties)),
+        TelemetryWrapper.registerCommand('checkstyle.setAutocheck', () => wrapCallback(setAutoCheckStatus)),
+        commands.registerCommand('checkstyle.showOutputChannel', () => { client.outputChannel.show(true); })
     );
 }
 
@@ -139,7 +138,7 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-function wrapCallback(outputChannel: OutputChannel, callback: (...args: any[]) => any): (...args: any[]) => Promise<any> {
+function wrapCallback(callback: (...args: any[]) => any): (...args: any[]) => Promise<any> {
     return async (...args: any[]): Promise<any> => {
         try {
             await callback(...args);
@@ -148,7 +147,7 @@ function wrapCallback(outputChannel: OutputChannel, callback: (...args: any[]) =
                 // do nothing here
             } else {
                 const errMsg: string = getErrorMessage(error);
-                outputChannel.appendLine(errMsg);
+                client.outputChannel.appendLine(errMsg);
                 await window.showErrorMessage(errMsg);
             }
         }
@@ -179,7 +178,7 @@ function initializeClient(context: ExtensionContext): void {
     client.registerProposedFeatures();
 }
 
-function registerClientListener(outputChannel: OutputChannel): void {
+function registerClientListener(): void {
     client.onNotification(DownloadStartNotification.notificationType, () => {
         window.withProgress({ location: ProgressLocation.Window }, async (p: Progress<{}>) => {
             return new Promise((resolve: () => void, reject: (e: Error) => void): void => {
@@ -226,9 +225,7 @@ function registerClientListener(outputChannel: OutputChannel): void {
 
     client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
         statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
-        if (outputChannel) {
-            outputChannel.appendLine(param.errorMessage);
-        }
+        client.outputChannel.appendLine(param.errorMessage);
         TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, {properties: {errorMessage: param.errorMessage}});
     });
 }

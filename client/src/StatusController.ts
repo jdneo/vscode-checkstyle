@@ -40,22 +40,28 @@ export class StatusController {
             return;
         }
 
-        if (this._statusMap.has(editor.document.uri.toString())) {
-            switch (this._statusMap.get(editor.document.uri.toString())) {
-                case CheckStatus.success:
-                    this._statusbar.text = '$(check) Checkstyle';
-                    break;
-                case CheckStatus.fail:
-                    this._statusbar.text = '$(bug) Checkstyle';
-                    break;
-                case CheckStatus.exception:
-                    this._statusbar.text = '$(stop) Checkstyle';
-                    break;
-                default:
-                    break;
-            }
+        const statusValue: CheckStatus = this._statusMap.get(editor.document.uri.toString());
+        switch (statusValue) {
+            case CheckStatus.success:
+                this._statusbar.text = '$(check) Checkstyle';
+                break;
+            case CheckStatus.fail:
+                this._statusbar.text = '$(bug) Checkstyle';
+                break;
+            case CheckStatus.exception:
+                this._statusbar.text = '$(stop) Checkstyle';
+                break;
+            default:
+                this._statusbar.text = '$(pencil) Checkstyle';
+                break;
+        }
+
+        if (!statusValue) {
+            this._statusbar.command = 'checkstyle.checkCodeWithCheckstyle';
+            this._statusbar.tooltip = 'Check code with Checkstyle';
         } else {
-            this._statusbar.text = '$(pencil) Checkstyle';
+            this._statusbar.command = 'checkstyle.showOutputChannel';
+            this._statusbar.tooltip = 'Open Checkstyle Ouput Channel';
         }
 
         this.showStatusBarItem(
