@@ -100,16 +100,16 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
         } else {
             const errorMessage: string = getErrorMessage(error);
-            connection.sendNotification(ErrorNotification.notificationType, {errorMessage});
+            connection.sendNotification(ErrorNotification.notificationType, {uri: textDocumentUri, errorMessage});
         }
     } finally {
         if (result) {
             connection.console.info(result);
             const diagnostics: Diagnostic[] = parser.parseOutput(result);
             if (diagnostics.length === 0) {
-                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.ok });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.success });
             } else {
-                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.warn });
+                connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.fail });
             }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }
