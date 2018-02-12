@@ -211,10 +211,10 @@ function registerClientListener(): void {
         client.outputChannel.appendLine('Checkstyle version setting is invalid, please update it to a valid version number.');
         if (workspace.getConfiguration('checkstyle').get<boolean>('showCheckstyleVersionInvalid')) {
             const message: string = 'The Checkstyle version setting is invalid. Would you like to update it?';
-            const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.dontShowAgain);
+            const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.never);
             if (result === DialogResponses.yes) {
                 commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
-            } else if (result === DialogResponses.dontShowAgain) {
+            } else if (result === DialogResponses.never) {
                 await workspace.getConfiguration('checkstyle').update('showCheckstyleVersionInvalid', false /* Value */, true /* User Setting */);
             }
         }
