@@ -208,10 +208,15 @@ function registerClientListener(): void {
 
     client.onNotification(VersionInvalidNotification.notificationType, async (param: IVersionInvalidParams) => {
         statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
-        const message: string = 'The Checkstyle version does not exist on download server. Would you like to update it?';
-        const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.cancel);
-        if (result === DialogResponses.yes) {
-            commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
+        client.outputChannel.appendLine('Checkstyle version setting is invalid, please update it to a valid version number.');
+        if (workspace.getConfiguration('checkstyle').get<boolean>('showCheckstyleVersionInvalid')) {
+            const message: string = 'The Checkstyle version setting is invalid. Would you like to update it?';
+            const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.dontShowAgain);
+            if (result === DialogResponses.yes) {
+                commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
+            } else if (result === DialogResponses.dontShowAgain) {
+                await workspace.getConfiguration('checkstyle').update('showCheckstyleVersionInvalid', false /* Value */, true /* User Setting */);
+            }
         }
     });
 

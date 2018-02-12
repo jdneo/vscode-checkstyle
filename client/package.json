@@ -97,6 +97,12 @@
                     "type": "string",
                     "default": "",
                     "description": "The properties file path of the checkstyle."
+                },
+                "checkstyle.showCheckstyleVersionInvalid": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show a warning if the version of Checkstyle is invalid."
                 }
             }
         }

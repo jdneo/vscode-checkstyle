@@ -8,4 +8,5 @@ export namespace DialogResponses {
     export const no: MessageItem = { title: 'No' };
     export const openDownloadPage: MessageItem = { title: 'Open download page' };
     export const cancel: MessageItem = { title: 'Cancel', isCloseAffordance: true };
+    export const dontShowAgain: MessageItem = { title: 'Don\'t show again' };
 }
