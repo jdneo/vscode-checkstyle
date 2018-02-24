@@ -1,8 +1,12 @@
 # Change Log
 
-## [Unreleased]
+## [0.4.0]
+### Added
+- Add 'don't warn again' option when invalid CheckStyle version warning pops up. ([#80](https://github.com/jdneo/vscode-checkstyle/pull/80))
+
 ### Changed
-- User can open the Checkstyle download page when downloading fails. ([#83](https://github.com/jdneo/vscode-checkstyle/pull/83))
+- Change status bar icon functionalities. ([#78](https://github.com/jdneo/vscode-checkstyle/pull/78))
+- User can open the Checkstyle download page when downloading fails. ([#79](https://github.com/jdneo/vscode-checkstyle/pull/79))
 
 ## [0.3.1]
 ### Changed
