@@ -34,12 +34,12 @@ _If you want to use customized checkstyle configuration file, please make sure t
 
 ## Commands
 This extension provides several commands in the Command Palette (F1 or Ctrl + Shift + P) for working with Java files:
-* **Checkstyle: Check code with Checkstyle**: Check current active Java file with Checkstyle.
-* **Checkstyle: Set the Checkstyle version**: Set the jar version for Checkstyle. Or you can specify \*.jar file local path of the checkstyle.
-* **Checkstyle: Set Checkstyle configuration file path**: Set the configuration file for Checkstyle.
-* **Checkstyle: Set Checkstyle properties file**: Set the properties file for Checkstyle.
-* **Checkstyle: Turn on/off checking code with Checkstyle automatically**: Set whether the extension will run Checkstyle automatically.
-* **Checkstyle: Open Checkstyle output channel**: Open the output channel for Checkstyle extension.
+* **Checkstyle: Check Code**: Check current active Java file with Checkstyle.
+* **Checkstyle: Set Version**: Set the jar version for Checkstyle. Or you can specify \*.jar file local path of the checkstyle.
+* **Checkstyle: Set Configuration**: Set the configuration file for Checkstyle.
+* **Checkstyle: Set Properties**: Set the properties file for Checkstyle.
+* **Checkstyle: Switch Automatic Checking**: Set whether the extension will run Checkstyle automatically.
+* **Checkstyle: Open Output Channel**: Open the output channel for Checkstyle extension.
 
 ## Release Notes
 Refer to [CHANGELOG](client/CHANGELOG.md)

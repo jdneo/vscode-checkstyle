@@ -7,6 +7,7 @@
 ### Changed
 - Change status bar icon functionalities. ([#78](https://github.com/jdneo/vscode-checkstyle/pull/78))
 - User can open the Checkstyle download page when downloading fails. ([#79](https://github.com/jdneo/vscode-checkstyle/pull/79))
+- Change command name. ([#93](https://github.com/jdneo/vscode-checkstyle/pull/93))
 
 ## [0.3.1]
 ### Changed
