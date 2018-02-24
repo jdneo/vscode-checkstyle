@@ -37,32 +37,32 @@
         "commands": [
             {
                 "command": "checkstyle.checkCodeWithCheckstyle",
-                "title": "Check code with Checkstyle",
+                "title": "Check Code",
                 "category": "Checkstyle"
             },
             {
                 "command": "checkstyle.setVersion",
-                "title": "Set the Checkstyle version",
+                "title": "Set Version",
                 "category": "Checkstyle"
             },
             {
                 "command": "checkstyle.setConfigurationFile",
-                "title": "Set Checkstyle configuration file",
+                "title": "Set Configuration",
                 "category": "Checkstyle"
             },
             {
                 "command": "checkstyle.setPropertyFile",
-                "title": "Set Checkstyle properties file",
+                "title": "Set Properties",
                 "category": "Checkstyle"
             },
             {
                 "command": "checkstyle.setAutocheck",
-                "title": "Turn on/off checking code with Checkstyle automatically",
+                "title": "Switch Automatic Checking",
                 "category": "Checkstyle"
             },
             {
                 "command": "checkstyle.showOutputChannel",
-                "title": "Open Checkstyle output channel",
+                "title": "Open Output Channel",
                 "category": "Checkstyle"
             }
         ],
