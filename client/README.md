@@ -4,7 +4,7 @@
 
 * Please make sure ```Java``` is in system ```PATH```
 
-## Options
+## Settings
 ```
 {
     // Specify whether the Checkstyle extension will check Java files automatically.
@@ -19,6 +19,9 @@
     
     // Specify the path to the checkstyle properties file, by default it's empty.
     "checkstyle.propertiesPath": ""
+
+    // Show a warning if the version of Checkstyle is invalid.
+    "checkstyle.showCheckstyleVersionInvalid": true
 }
 ```
 
@@ -32,6 +35,7 @@ This extension provides several commands in the Command Palette (F1 or Ctrl + Sh
 * **Checkstyle: Set Checkstyle configuration file path**: Set the configuration file for Checkstyle.
 * **Checkstyle: Set Checkstyle properties file**: Set the properties file for Checkstyle.
 * **Checkstyle: Turn on/off checking code with Checkstyle automatically**: Set whether the extension will run Checkstyle automatically.
+* **Checkstyle: Open Checkstyle output channel**: Open the output channel for Checkstyle extension.
 
 ## Release Notes
 Refer to [CHANGELOG](CHANGELOG.md)

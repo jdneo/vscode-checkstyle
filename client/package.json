@@ -62,7 +62,7 @@
             },
             {
                 "command": "checkstyle.showOutputChannel",
-                "title": "Open Checkstyle output Channel",
+                "title": "Open Checkstyle output channel",
                 "category": "Checkstyle"
             }
         ],
