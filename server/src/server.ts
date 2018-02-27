@@ -27,14 +27,15 @@ import {
     ErrorNotification,
     ServerStatus,
     ServerStatusNotification,
-    VersionInvalidNotification
+    VersionCheckNotification,
+    VersionCheckResult
 } from './notifications';
 import { parser } from './parser';
 
 const connection: any = createConnection(ProposedFeatures.all);
 const documents: TextDocuments = new TextDocuments();
 const documentSettings: Map<string, Thenable<ICheckStyleSettings>> = new Map();
-let status: ServerStatus = ServerStatus.Stopped;
+let status: ServerStatus = ServerStatus.stopped;
 let hasConfigurationCapability: boolean = false;
 let globalSettings: ICheckStyleSettings = DEFAULT_SETTINGS;
 
@@ -50,7 +51,7 @@ connection.onInitialize((params: InitializeParams) => {
     };
 });
 
-connection.onInitialized(() => updateServerStatus(ServerStatus.Running));
+connection.onInitialized(() => updateServerStatus(ServerStatus.running));
 
 connection.onRequest(CheckStyleRequest.requestType, (params: ICheckstyleParams) => checkstyle(params.textDocument.uri, true));
 
@@ -83,21 +84,22 @@ function getDocumentSettings(resource: string): Thenable<ICheckStyleSettings> {
 }
 
 async function checkstyle(textDocumentUri: string, force?: boolean): Promise<void> {
-    if (status !== ServerStatus.Running) {
+    if (status !== ServerStatus.running) {
         return;
     }
+    connection.sendNotification(CheckStatusNotification.notificationType, { uri: textDocumentUri, state: CheckStatus.wait });
     const settings: ICheckStyleSettings = await getDocumentSettings(textDocumentUri);
     let result: string;
     try {
         result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
     } catch (error) {
         if (error instanceof VersionNotExistError) {
-            updateServerStatus(ServerStatus.Downloading);
+            updateServerStatus(ServerStatus.downloading);
             if (await downloadCheckstyle(connection, checker.resourcesPath, error.version, textDocumentUri)) {
                 result = await checker.checkstyle(settings, URI.parse(textDocumentUri).fsPath, force);
             }
         } else if (error instanceof InvalidVersionError) {
-            connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
+            connection.sendNotification(VersionCheckNotification.notificationType, { uri: textDocumentUri, result: VersionCheckResult.invalid });
         } else {
             const errorMessage: string = getErrorMessage(error);
             connection.sendNotification(ErrorNotification.notificationType, {uri: textDocumentUri, errorMessage});
@@ -113,7 +115,7 @@ async function checkstyle(textDocumentUri: string, force?: boolean): Promise<voi
             }
             connection.sendDiagnostics({ uri: textDocumentUri, diagnostics });
         }
-        updateServerStatus(ServerStatus.Running);
+        updateServerStatus(ServerStatus.running);
     }
 }
 

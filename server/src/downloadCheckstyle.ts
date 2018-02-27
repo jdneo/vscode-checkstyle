@@ -5,30 +5,22 @@ import * as path from 'path';
 import * as request from 'request';
 // tslint:disable-next-line:no-require-imports no-var-requires typedef
 const progress = require('request-progress');
-import { MessageType, ShowMessageNotification } from 'vscode-languageserver';
 import { DownloadCheckstyleError } from './errors';
 import {
     DownloadStartNotification,
     DownloadStatus,
     DownloadStatusNotification,
-    VersionInvalidNotification
+    VersionCheckNotification,
+    VersionCheckResult
 } from './notifications';
 
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
-    const response: ResponseType = await requestForVersion(downloadLink);
-    switch (response) {
-        case ResponseType.Found:
-            break;
-        case ResponseType.Error:
-            connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: 'Failed to download CheckStyle, please try again later.' });
-            return false;
-        case ResponseType.Others:
-            connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
-            return false;
-        default:
-            return false;
+    const result: VersionCheckResult = await requestForVersion(downloadLink);
+    connection.sendNotification(VersionCheckNotification.notificationType, { uri: textDocumentUri, result });
+    if (result !== VersionCheckResult.found) {
+        return false;
     }
 
     const tempFileName: string = `${checkstyleJar}.download`;
@@ -75,8 +67,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
     });
 }
 
-async function requestForVersion(url: string): Promise<ResponseType> {
-    return await new Promise((resolve: (ret: ResponseType) => void): void => {
+async function requestForVersion(url: string): Promise<VersionCheckResult> {
+    return await new Promise((resolve: (ret: VersionCheckResult) => void): void => {
         request(
             {
                 method: 'GET',
@@ -86,20 +78,14 @@ async function requestForVersion(url: string): Promise<ResponseType> {
             },
             (_error: any, response: request.RequestResponse, _body: any): void => {
                 if (!response || _error) {
-                    resolve(ResponseType.Error);
+                    resolve(VersionCheckResult.exception);
                 } else {
                     if (response.statusCode === 302) {
-                        resolve(ResponseType.Found);
+                        resolve(VersionCheckResult.found);
                     } else {
-                        resolve(ResponseType.Others);
+                        resolve(VersionCheckResult.invalid);
                     }
                 }
             });
     });
-}
-
-enum ResponseType {
-    Found,
-    Others,
-    Error
 }
