@@ -17,8 +17,18 @@ import {
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
-    if (!(await isValidVersionNumber(downloadLink, connection, textDocumentUri))) {
-        return false;
+    const response: ResponseType = await requestForVersion(downloadLink);
+    switch (response) {
+        case ResponseType.Found:
+            break;
+        case ResponseType.Error:
+            connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: 'Failed to download CheckStyle, please try again later.' });
+            return false;
+        case ResponseType.Others:
+            connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
+            return false;
+        default:
+            return false;
     }
 
     const tempFileName: string = `${checkstyleJar}.download`;
@@ -65,8 +75,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
     });
 }
 
-async function isValidVersionNumber(url: string, connection: any, textDocumentUri: string): Promise<boolean> {
-    return await new Promise((resolve: (ret: boolean) => void): void => {
+async function requestForVersion(url: string): Promise<ResponseType> {
+    return await new Promise((resolve: (ret: ResponseType) => void): void => {
         request(
             {
                 method: 'GET',
@@ -76,16 +86,20 @@ async function isValidVersionNumber(url: string, connection: any, textDocumentUr
             },
             (_error: any, response: request.RequestResponse, _body: any): void => {
                 if (!response || _error) {
-                    connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: 'Failed to download CheckStyle, please try again later.' });
-                    resolve(false);
+                    resolve(ResponseType.Error);
                 } else {
                     if (response.statusCode === 302) {
-                        resolve(true);
+                        resolve(ResponseType.Found);
                     } else {
-                        connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
-                        resolve(false);
+                        resolve(ResponseType.Others);
                     }
                 }
             });
     });
+}
+
+enum ResponseType {
+    Found,
+    Others,
+    Error
 }
