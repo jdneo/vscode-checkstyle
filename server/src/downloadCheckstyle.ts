@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as request from 'request';
 // tslint:disable-next-line:no-require-imports no-var-requires typedef
 const progress = require('request-progress');
+import { MessageType, ShowMessageNotification } from 'vscode-languageserver';
 import { DownloadCheckstyleError } from './errors';
 import {
     DownloadStartNotification,
@@ -16,9 +17,18 @@ import {
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
-    if (!(await isValidVersionNumber(downloadLink))) {
-        connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
-        return false;
+    const response: ResponseType = await requestForVersion(downloadLink);
+    switch (response) {
+        case ResponseType.Found:
+            break;
+        case ResponseType.Error:
+            connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: 'Failed to download CheckStyle, please try again later.' });
+            return false;
+        case ResponseType.Others:
+            connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
+            return false;
+        default:
+            return false;
     }
 
     const tempFileName: string = `${checkstyleJar}.download`;
@@ -65,8 +75,8 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
     });
 }
 
-async function isValidVersionNumber(url: string): Promise<boolean> {
-    return await new Promise((resolve: (ret: boolean) => void): void => {
+async function requestForVersion(url: string): Promise<ResponseType> {
+    return await new Promise((resolve: (ret: ResponseType) => void): void => {
         request(
             {
                 method: 'GET',
@@ -75,11 +85,21 @@ async function isValidVersionNumber(url: string): Promise<boolean> {
                 timeout: 10 * 1000 /*wait for 10 seconds*/
             },
             (_error: any, response: request.RequestResponse, _body: any): void => {
-                if (response.statusCode === 302) {
-                    resolve(true);
+                if (!response || _error) {
+                    resolve(ResponseType.Error);
                 } else {
-                    resolve(false);
+                    if (response.statusCode === 302) {
+                        resolve(ResponseType.Found);
+                    } else {
+                        resolve(ResponseType.Others);
+                    }
                 }
             });
     });
+}
+
+enum ResponseType {
+    Found,
+    Others,
+    Error
 }
