@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as request from 'request';
 // tslint:disable-next-line:no-require-imports no-var-requires typedef
 const progress = require('request-progress');
+import { MessageType, ShowMessageNotification } from 'vscode-languageserver';
 import { DownloadCheckstyleError } from './errors';
 import {
     DownloadStartNotification,
@@ -16,8 +17,7 @@ import {
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
     const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
-    if (!(await isValidVersionNumber(downloadLink))) {
-        connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
+    if (!(await isValidVersionNumber(downloadLink, connection, textDocumentUri))) {
         return false;
     }
 
@@ -65,7 +65,7 @@ export async function downloadCheckstyle(connection: any, downloadPath: string, 
     });
 }
 
-async function isValidVersionNumber(url: string): Promise<boolean> {
+async function isValidVersionNumber(url: string, connection: any, textDocumentUri: string): Promise<boolean> {
     return await new Promise((resolve: (ret: boolean) => void): void => {
         request(
             {
@@ -75,10 +75,16 @@ async function isValidVersionNumber(url: string): Promise<boolean> {
                 timeout: 10 * 1000 /*wait for 10 seconds*/
             },
             (_error: any, response: request.RequestResponse, _body: any): void => {
-                if (response.statusCode === 302) {
-                    resolve(true);
-                } else {
+                if (!response || _error) {
+                    connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: 'Failed to download CheckStyle, please try again later.' });
                     resolve(false);
+                } else {
+                    if (response.statusCode === 302) {
+                        resolve(true);
+                    } else {
+                        connection.sendNotification(VersionInvalidNotification.notificationType, { uri: textDocumentUri });
+                        resolve(false);
+                    }
                 }
             });
     });
