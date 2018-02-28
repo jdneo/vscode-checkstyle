@@ -47,9 +47,10 @@ import {
     IDownloadParams,
     IErrorParams,
     IServerStatusParams,
-    IVersionInvalidParams,
+    IVersionCheckParams,
     ServerStatusNotification,
-    VersionInvalidNotification
+    VersionCheckNotification,
+    VersionCheckResult
 } from './notifications';
 import { StatusController } from './StatusController';
 
@@ -206,17 +207,30 @@ function registerClientListener(): void {
         });
     });
 
-    client.onNotification(VersionInvalidNotification.notificationType, async (param: IVersionInvalidParams) => {
-        statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
-        client.outputChannel.appendLine('Checkstyle version setting is invalid, please update it to a valid version number.');
-        if (workspace.getConfiguration('checkstyle').get<boolean>('showCheckstyleVersionInvalid')) {
-            const message: string = 'The Checkstyle version setting is invalid. Would you like to update it?';
-            const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.never);
-            if (result === DialogResponses.yes) {
-                commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
-            } else if (result === DialogResponses.never) {
-                await workspace.getConfiguration('checkstyle').update('showCheckstyleVersionInvalid', false /* Value */, true /* User Setting */);
-            }
+    client.onNotification(VersionCheckNotification.notificationType, async (param: IVersionCheckParams) => {
+        switch (param.result) {
+            case VersionCheckResult.found:
+                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.wait });
+                break;
+            case VersionCheckResult.invalid:
+                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
+                client.outputChannel.appendLine('Checkstyle version setting is invalid, please update it to a valid version number.');
+                if (workspace.getConfiguration('checkstyle').get<boolean>('showCheckstyleVersionInvalid')) {
+                    const message: string = 'The Checkstyle version setting is invalid. Would you like to update it?';
+                    const result: MessageItem | undefined = await window.showWarningMessage(message, DialogResponses.yes, DialogResponses.never);
+                    if (result === DialogResponses.yes) {
+                        commands.executeCommand('checkstyle.setVersion', client.protocol2CodeConverter.asUri(param.uri));
+                    } else if (result === DialogResponses.never) {
+                        await workspace.getConfiguration('checkstyle').update('showCheckstyleVersionInvalid', false /* Value */, true /* User Setting */);
+                    }
+                }
+                break;
+            case VersionCheckResult.exception:
+                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
+                window.showErrorMessage('Failed to download the CheckStyle, please try again later.');
+                break;
+            default:
+                break;
         }
     });
 
@@ -229,9 +243,9 @@ function registerClientListener(): void {
     });
 
     client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
-        statusController.updateStatusBar(window.activeTextEditor, {uri: param.uri, state: CheckStatus.exception });
+        statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
         client.outputChannel.appendLine(param.errorMessage);
-        TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, {properties: {errorMessage: param.errorMessage}});
+        TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, { properties: { errorMessage: param.errorMessage } });
     });
 }
 

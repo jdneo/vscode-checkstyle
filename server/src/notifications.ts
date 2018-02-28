@@ -3,9 +3,10 @@
 import { NotificationType } from 'vscode-languageserver';
 
 export enum CheckStatus {
-    success = 1,
-    fail = 2,
-    exception = 3
+    success,
+    fail,
+    exception,
+    wait
 }
 
 interface ICheckStatusParams {
@@ -18,9 +19,9 @@ export namespace CheckStatusNotification {
 }
 
 export enum ServerStatus {
-    Downloading = 1,
-    Running = 2,
-    Stopped = 3
+    downloading,
+    running,
+    stopped
 }
 
 export namespace ServerStatusNotification {
@@ -31,12 +32,19 @@ interface IServerStatusParams {
     readonly status: ServerStatus;
 }
 
-export interface IVersionInvalidParams {
+export interface IVersionCheckParams {
     readonly uri: string;
+    readonly result: VersionCheckResult;
 }
 
-export namespace VersionInvalidNotification {
-    export const notificationType: NotificationType<IVersionInvalidParams, void> = new NotificationType<IVersionInvalidParams, void>('checkstyle/versioninvalid');
+export enum VersionCheckResult {
+    found,
+    invalid,
+    exception
+}
+
+export namespace VersionCheckNotification {
+    export const notificationType: NotificationType<IVersionCheckParams, void> = new NotificationType<IVersionCheckParams, void>('checkstyle/versioncheck');
 }
 
 export namespace DownloadStartNotification {
@@ -44,9 +52,9 @@ export namespace DownloadStartNotification {
 }
 
 export enum DownloadStatus {
-    downloading = 1,
-    finished = 2,
-    error = 3
+    downloading,
+    finished,
+    error
 }
 
 export namespace DownloadStatusNotification {

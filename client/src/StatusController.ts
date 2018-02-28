@@ -51,12 +51,13 @@ export class StatusController {
             case CheckStatus.exception:
                 this._statusbar.text = '$(stop) Checkstyle';
                 break;
+            case CheckStatus.wait:
             default:
                 this._statusbar.text = '$(pencil) Checkstyle';
                 break;
         }
 
-        if (!statusValue) {
+        if (!statusValue || statusValue === CheckStatus.wait) {
             this._statusbar.command = 'checkstyle.checkCodeWithCheckstyle';
             this._statusbar.tooltip = 'Check code with Checkstyle';
         } else {
@@ -71,7 +72,7 @@ export class StatusController {
     }
 
     public onServerStatusDidChange(status: ServerStatus): void {
-        if (status === ServerStatus.Running) {
+        if (status === ServerStatus.running) {
             this._serverRunning = true;
         } else {
             this._serverRunning = false;
