@@ -57,7 +57,7 @@ export class StatusController {
                 break;
         }
 
-        if (!statusValue || statusValue === CheckStatus.wait) {
+        if (statusValue === undefined || statusValue === CheckStatus.wait) {
             this._statusbar.command = 'checkstyle.checkCodeWithCheckstyle';
             this._statusbar.tooltip = 'Check code with Checkstyle';
         } else {
