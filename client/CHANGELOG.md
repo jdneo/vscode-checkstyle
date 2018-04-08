@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.1]
+### Fixed
+- Fix a potential security vulnerability. ([#100](https://github.com/jdneo/vscode-checkstyle/issues/100))
+
 ## [0.4.0]
 ### Added
 - Add 'don't warn again' option when invalid CheckStyle version warning pops up. ([#80](https://github.com/jdneo/vscode-checkstyle/pull/80))
