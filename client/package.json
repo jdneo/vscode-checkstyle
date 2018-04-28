@@ -72,6 +72,20 @@
                     "command": "checkstyle.checkCodeWithCheckstyle",
                     "when": "resourceExtname == .java"
                 }
+            ],
+            "explorer/context": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
+                    "group": "checkstyle@1"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "resourceExtname == .java",
+                    "group": "checkstyle@1"
+                }
             ]
         },
         "configuration": {

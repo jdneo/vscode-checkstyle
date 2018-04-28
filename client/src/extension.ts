@@ -119,7 +119,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
-        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback(() => checkCodeWithCheckstyle(client))),
+        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback((uri?: Uri) => checkCodeWithCheckstyle(client, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback((uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(() => setCheckstyleConfig(context))),
         TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(setCheckstyleProperties)),
