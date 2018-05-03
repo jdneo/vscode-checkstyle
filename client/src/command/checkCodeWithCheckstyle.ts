@@ -1,14 +1,19 @@
 'use strict';
 
-import { TextEditor, window } from 'vscode';
+import { TextEditor, Uri, window } from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CheckStyleRequest } from '../CheckStyleRequest';
 
-export function checkCodeWithCheckstyle(client: LanguageClient): void {
-    const textEditor: TextEditor = window.activeTextEditor;
-    if (!textEditor) {
-        return;
+export function checkCodeWithCheckstyle(client: LanguageClient, fileUri?: Uri): void {
+    let uri: string;
+    if (!fileUri) {
+        const textEditor: TextEditor = window.activeTextEditor;
+        if (!textEditor) {
+            return;
+        }
+        uri = textEditor.document.uri.toString();
+    } else {
+        uri = fileUri.fsPath;
     }
-    const uri: string = textEditor.document.uri.toString();
     client.sendRequest(CheckStyleRequest.requestType, { textDocument: { uri } });
 }
