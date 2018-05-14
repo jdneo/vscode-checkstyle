@@ -30,34 +30,32 @@ export class StatusController {
         this._statusMap = new Map();
     }
 
-    public updateStatusBar(editor: TextEditor | undefined, status?: ICheckStatusParams): void {
+    public updateStatusBar(status?: ICheckStatusParams): void {
         if (status) {
             this._statusMap.set(status.uri, status.state);
         }
 
-        if (!editor) {
-            this.showStatusBarItem(false);
-            return;
+        const activeEditor: TextEditor | undefined = window.activeTextEditor;
+
+        if (activeEditor.document.uri.toString() === status.uri) {
+            switch (status.state) {
+                case CheckStatus.success:
+                    this._statusbar.text = '$(check) Checkstyle';
+                    break;
+                case CheckStatus.fail:
+                    this._statusbar.text = '$(bug) Checkstyle';
+                    break;
+                case CheckStatus.exception:
+                    this._statusbar.text = '$(stop) Checkstyle';
+                    break;
+                case CheckStatus.wait:
+                default:
+                    this._statusbar.text = '$(pencil) Checkstyle';
+                    break;
+            }
         }
 
-        const statusValue: CheckStatus = this._statusMap.get(editor.document.uri.toString());
-        switch (statusValue) {
-            case CheckStatus.success:
-                this._statusbar.text = '$(check) Checkstyle';
-                break;
-            case CheckStatus.fail:
-                this._statusbar.text = '$(bug) Checkstyle';
-                break;
-            case CheckStatus.exception:
-                this._statusbar.text = '$(stop) Checkstyle';
-                break;
-            case CheckStatus.wait:
-            default:
-                this._statusbar.text = '$(pencil) Checkstyle';
-                break;
-        }
-
-        if (statusValue === undefined || statusValue === CheckStatus.wait) {
+        if (status.state === undefined || status.state === CheckStatus.wait) {
             this._statusbar.command = 'checkstyle.checkCodeWithCheckstyle';
             this._statusbar.tooltip = 'Check code with Checkstyle';
         } else {
@@ -66,7 +64,7 @@ export class StatusController {
         }
 
         this.showStatusBarItem(
-            editor.document.languageId === 'java' &&
+            window.activeTextEditor.document.languageId === 'java' &&
             this._serverRunning
         );
     }
@@ -77,7 +75,7 @@ export class StatusController {
         } else {
             this._serverRunning = false;
         }
-        this.updateStatusBar(window.activeTextEditor);
+        this.updateStatusBar();
     }
 
     public onDidChangeTextDocument(event: TextDocumentChangeEvent): void {
@@ -85,7 +83,7 @@ export class StatusController {
         const autocheck: boolean = workspace.getConfiguration('checkstyle', uri).get<boolean>('autocheck');
         if (!autocheck) {
             this._statusMap.delete(uri.toString());
-            this.updateStatusBar(window.activeTextEditor);
+            this.updateStatusBar();
         }
     }
 

@@ -116,12 +116,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     });
 
     context.subscriptions.push(
-        window.onDidChangeActiveTextEditor(statusController.updateStatusBar, statusController),
         workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
         TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback((uri?: Uri) => checkCodeWithCheckstyle(client, uri))),
-        TelemetryWrapper.registerCommand('checkstyle.cleanCheckstyleViolation', () => wrapCallback((uri?: Uri) => clearCheckstyleViolation(client, uri))),
+        TelemetryWrapper.registerCommand('checkstyle.cleanCheckstyleViolation', () => wrapCallback((uri?: Uri) => clearCheckstyleViolation(client, statusController, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback((uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(() => setCheckstyleConfig(context))),
         TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(setCheckstyleProperties)),
@@ -212,10 +211,10 @@ function registerClientListener(): void {
     client.onNotification(VersionCheckNotification.notificationType, async (param: IVersionCheckParams) => {
         switch (param.result) {
             case VersionCheckResult.found:
-                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.wait });
+                statusController.updateStatusBar({ uri: param.uri, state: CheckStatus.wait });
                 break;
             case VersionCheckResult.invalid:
-                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
+                statusController.updateStatusBar({ uri: param.uri, state: CheckStatus.exception });
                 client.outputChannel.appendLine('Checkstyle version setting is invalid, please update it to a valid version number.');
                 if (workspace.getConfiguration('checkstyle').get<boolean>('showCheckstyleVersionInvalid')) {
                     const message: string = 'The Checkstyle version setting is invalid. Would you like to update it?';
@@ -228,7 +227,7 @@ function registerClientListener(): void {
                 }
                 break;
             case VersionCheckResult.exception:
-                statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
+                statusController.updateStatusBar({ uri: param.uri, state: CheckStatus.exception });
                 window.showErrorMessage('Failed to download the CheckStyle, please try again later.');
                 break;
             default:
@@ -237,7 +236,7 @@ function registerClientListener(): void {
     });
 
     client.onNotification(CheckStatusNotification.notificationType, (params: ICheckStatusParams) => {
-        statusController.updateStatusBar(window.activeTextEditor, params);
+        statusController.updateStatusBar(params);
     });
 
     client.onNotification(ServerStatusNotification.notificationType, (params: IServerStatusParams) => {
@@ -245,7 +244,7 @@ function registerClientListener(): void {
     });
 
     client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
-        statusController.updateStatusBar(window.activeTextEditor, { uri: param.uri, state: CheckStatus.exception });
+        statusController.updateStatusBar({ uri: param.uri, state: CheckStatus.exception });
         client.outputChannel.appendLine(param.errorMessage);
         TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, { properties: { errorMessage: param.errorMessage } });
     });
