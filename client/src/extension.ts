@@ -116,6 +116,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     });
 
     context.subscriptions.push(
+        window.onDidChangeActiveTextEditor(() => statusController.updateStatusBar()),
         workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
