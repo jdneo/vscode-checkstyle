@@ -31,6 +31,7 @@ import {
 } from 'vscode-languageclient';
 import { extensionGlobalPath, ICheckStyleSettings } from './checkStyleSetting';
 import { checkCodeWithCheckstyle } from './command/checkCodeWithCheckstyle';
+import { clearCheckstyleViolation } from './command/clearCheckstyleViolation';
 import { setAutoCheckStatus } from './command/setAutoCheckStatus';
 import { setCheckstyleConfig } from './command/setCheckstyleConfig';
 import { setCheckstyleProperties } from './command/setCheckstyleProperties';
@@ -120,6 +121,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
         TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback((uri?: Uri) => checkCodeWithCheckstyle(client, uri))),
+        TelemetryWrapper.registerCommand('checkstyle.cleanCheckstyleViolation', () => wrapCallback((uri?: Uri) => clearCheckstyleViolation(client, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback((uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
         TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(() => setCheckstyleConfig(context))),
         TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(setCheckstyleProperties)),
