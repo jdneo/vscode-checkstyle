@@ -17,7 +17,7 @@
         "vscode": "^1.18.0"
     },
     "categories": [
-        "Languages",
+        "Programming Languages",
         "Linters"
     ],
     "keywords": [
@@ -27,6 +27,7 @@
     "activationEvents": [
         "onLanguage:java",
         "onCommand:checkstyle.checkCodeWithCheckstyle",
+        "onCommand:checkstyle.cleanCheckstyleViolation",
         "onCommand:checkstyle.setVersion",
         "onCommand:checkstyle.setConfigurationFile",
         "onCommand:checkstyle.setPropertyFile",
@@ -38,6 +39,11 @@
             {
                 "command": "checkstyle.checkCodeWithCheckstyle",
                 "title": "Check Code",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.cleanCheckstyleViolation",
+                "title": "Clean Checkstyle Violation",
                 "category": "Checkstyle"
             },
             {
@@ -78,6 +84,11 @@
                     "command": "checkstyle.checkCodeWithCheckstyle",
                     "when": "explorerResourceIsFolder == false && resourceExtname == .java",
                     "group": "checkstyle@1"
+                },
+                {
+                    "command": "checkstyle.cleanCheckstyleViolation",
+                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
+                    "group": "checkstyle@2"
                 }
             ],
             "editor/context": [
@@ -85,6 +96,11 @@
                     "command": "checkstyle.checkCodeWithCheckstyle",
                     "when": "resourceExtname == .java",
                     "group": "checkstyle@1"
+                },
+                {
+                    "command": "checkstyle.cleanCheckstyleViolation",
+                    "when": "resourceExtname == .java",
+                    "group": "checkstyle@2"
                 }
             ]
         },

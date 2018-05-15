@@ -30,17 +30,22 @@ export class StatusController {
         this._statusMap = new Map();
     }
 
-    public updateStatusBar(editor: TextEditor | undefined, status?: ICheckStatusParams): void {
+    public updateStatusBar(status?: ICheckStatusParams): void {
+        const activeEditor: TextEditor | undefined = window.activeTextEditor;
+        if (activeEditor === undefined) {
+            return;
+        }
+
+        this.showStatusBarItem(
+            window.activeTextEditor.document.languageId === 'java' &&
+            this._serverRunning
+        );
+
         if (status) {
             this._statusMap.set(status.uri, status.state);
         }
 
-        if (!editor) {
-            this.showStatusBarItem(false);
-            return;
-        }
-
-        const statusValue: CheckStatus = this._statusMap.get(editor.document.uri.toString());
+        const statusValue: CheckStatus = this._statusMap.get(activeEditor.document.uri.toString());
         switch (statusValue) {
             case CheckStatus.success:
                 this._statusbar.text = '$(check) Checkstyle';
@@ -64,11 +69,6 @@ export class StatusController {
             this._statusbar.command = 'checkstyle.showOutputChannel';
             this._statusbar.tooltip = 'Open Checkstyle Ouput Channel';
         }
-
-        this.showStatusBarItem(
-            editor.document.languageId === 'java' &&
-            this._serverRunning
-        );
     }
 
     public onServerStatusDidChange(status: ServerStatus): void {
@@ -77,7 +77,7 @@ export class StatusController {
         } else {
             this._serverRunning = false;
         }
-        this.updateStatusBar(window.activeTextEditor);
+        this.updateStatusBar();
     }
 
     public onDidChangeTextDocument(event: TextDocumentChangeEvent): void {
@@ -85,7 +85,7 @@ export class StatusController {
         const autocheck: boolean = workspace.getConfiguration('checkstyle', uri).get<boolean>('autocheck');
         if (!autocheck) {
             this._statusMap.delete(uri.toString());
-            this.updateStatusBar(window.activeTextEditor);
+            this.updateStatusBar();
         }
     }
 

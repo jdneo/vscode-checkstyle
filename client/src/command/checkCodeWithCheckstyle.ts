@@ -13,7 +13,7 @@ export function checkCodeWithCheckstyle(client: LanguageClient, fileUri?: Uri): 
         }
         uri = textEditor.document.uri.toString();
     } else {
-        uri = fileUri.fsPath;
+        uri = fileUri.toString();
     }
     client.sendRequest(CheckStyleRequest.requestType, { textDocument: { uri } });
 }
