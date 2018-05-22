@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.5.0]
+### Added
+- Support clean Checkstyle Violation through Command Palette/File Explorer/Editor. ([#104](https://github.com/jdneo/vscode-checkstyle/issues/104))
+- Support check code through File Explorer/Editor. ([#108](https://github.com/jdneo/vscode-checkstyle/issues/108))
+
 ## [0.4.1]
 ### Fixed
 - Fix a potential security vulnerability. ([#100](https://github.com/jdneo/vscode-checkstyle/issues/100))
