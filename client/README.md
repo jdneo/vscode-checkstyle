@@ -30,7 +30,8 @@ _If you want to use customized checkstyle configuration file, please make sure t
 
 ## Commands
 This extension provides several commands in the Command Palette (F1 or Ctrl + Shift + P) for working with Java files:
-* **Checkstyle: Check Code**: Check current active Java file with Checkstyle.
+* **Checkstyle: Check Code**: Check selected Java file with Checkstyle.
+* **Checkstyle: Clean Checkstyle Violation**: Clean the Checkstyle violations in selected Java file.
 * **Checkstyle: Set Version**: Set the jar version for Checkstyle. Or you can specify \*.jar file local path of the checkstyle.
 * **Checkstyle: Set Configuration**: Set the configuration file for Checkstyle.
 * **Checkstyle: Set Properties**: Set the properties file for Checkstyle.
