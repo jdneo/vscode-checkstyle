@@ -94,12 +94,12 @@
             "editor/context": [
                 {
                     "command": "checkstyle.checkCodeWithCheckstyle",
-                    "when": "resourceExtname == .java",
+                    "when": "editorLangId == java",
                     "group": "checkstyle@1"
                 },
                 {
                     "command": "checkstyle.cleanCheckstyleViolation",
-                    "when": "resourceExtname == .java",
+                    "when": "editorLangId == java",
                     "group": "checkstyle@2"
                 }
             ]
@@ -160,6 +160,6 @@
         "@types/fs-extra": "^4.0.5",
         "@types/opn": "^5.1.0",
         "@types/xml2js": "^0.4.2",
-        "vscode": "^1.1.5"
+        "vscode": "^1.1.18"
     }
 }
