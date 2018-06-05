@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.5.1]
+## Fixed
+- Disable Checkstyle commands appear in the context menu of output panel. ([#118](https://github.com/jdneo/vscode-checkstyle/issues/118))
+- Download Checkstyle jars from Github. ([#120](https://github.com/jdneo/vscode-checkstyle/issues/120))
+
 ## [0.5.0]
 ### Added
 - Support clean Checkstyle Violation through Command Palette/File Explorer/Editor. ([#104](https://github.com/jdneo/vscode-checkstyle/issues/104))
