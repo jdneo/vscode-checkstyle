@@ -16,7 +16,7 @@ import {
 
 export async function downloadCheckstyle(connection: any, downloadPath: string, version: string, textDocumentUri: string): Promise<boolean> {
     const checkstyleJar: string = `checkstyle-${version}-all.jar`;
-    const downloadLink: string = `https://sourceforge.net/projects/checkstyle/files/checkstyle/${version}/${checkstyleJar}/download`;
+    const downloadLink: string = `https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${version}/${checkstyleJar}`;
     const result: VersionCheckResult = await requestForVersion(downloadLink);
     connection.sendNotification(VersionCheckNotification.notificationType, { uri: textDocumentUri, result });
     if (result !== VersionCheckResult.found) {
