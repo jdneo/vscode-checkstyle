@@ -39,7 +39,7 @@ This extension provides several commands in the Command Palette (F1 or Ctrl + Sh
 * **Checkstyle: Open Output Channel**: Open the output channel for Checkstyle extension.
 
 ## Release Notes
-Refer to [CHANGELOG](CHANGELOG.md)
+Refer to [CHANGELOG](https://github.com/jdneo/vscode-checkstyle/blob/master/client/CHANGELOG.md)
 
 ## License
 MIT
