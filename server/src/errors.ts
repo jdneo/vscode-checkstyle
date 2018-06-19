@@ -24,3 +24,13 @@ export class DownloadCheckstyleError extends Error {
         this.message = message;
     }
 }
+
+export function getErrorMessage(err: Error): string {
+    let errorMessage: string = 'unknown error';
+    if (typeof err.message === 'string') {
+        errorMessage = <string>err.message;
+    } else {
+        errorMessage = err.toString();
+    }
+    return `Checkstyle Error: - '${errorMessage}'`;
+}
