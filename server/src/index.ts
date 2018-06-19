@@ -2,7 +2,7 @@
 
 import { Connector } from './Connector';
 import { DocumentConfigProvider } from './DocumentConfigProvider';
-import { Server } from './Server';
+import { LanguageServer } from './LanguageServer';
 
 const connector: Connector = new Connector();
 connector.bindListeners();
@@ -10,7 +10,7 @@ connector.bindListeners();
 const documents: DocumentConfigProvider = new DocumentConfigProvider(connector);
 documents.bindListeners();
 
-const server: Server = new Server(connector, documents);
+const server: LanguageServer = new LanguageServer(connector, documents);
 server.bindListeners();
 
 connector.startListening();

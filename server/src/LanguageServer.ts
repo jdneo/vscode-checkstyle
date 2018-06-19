@@ -13,9 +13,9 @@ import { Connector } from './connector';
 import { cpUtils } from './cpUtils';
 import { DocumentConfigProvider } from './DocumentConfigProvider';
 import { DownloadCheckstyleError, getErrorMessage, InvalidVersionError, VersionNotExistError } from './errors';
-import { CheckStatus, CheckStatusNotification, DownloadStartNotification, DownloadStatus, DownloadStatusNotification, ErrorNotification, ServerStatus, VersionCheckNotification, VersionCheckResult } from './notifications';
+import { CheckStatus, CheckStatusNotification, DownloadStartNotification, DownloadStatus, DownloadStatusNotification, ErrorNotification, ServerStatus, ServerStatusNotification, VersionCheckNotification, VersionCheckResult } from './notifications';
 
-export class Server {
+export class LanguageServer {
     private _serverStatus: ServerStatus;
     private _connector: Connector;
     private _documents: DocumentConfigProvider;
@@ -34,7 +34,7 @@ export class Server {
 
     public bindListeners(): void {
         this._connector.on('initialized', () => {
-            this._serverStatus = ServerStatus.running;
+            this.updateServerStatus(ServerStatus.running);
         });
 
         this._connector.on('requestCheck', async (uri: string) => {
@@ -60,7 +60,7 @@ export class Server {
             result = await this.checkstyle(settings, URI.parse(uri).fsPath);
         } catch (error) {
             if (error instanceof VersionNotExistError) {
-                this._serverStatus = ServerStatus.downloading;
+                this.updateServerStatus(ServerStatus.downloading);
                 if (await this.downloadCheckstyle(error.version, uri)) {
                     result = await this.checkstyle(settings, URI.parse(uri).fsPath);
                 }
@@ -81,7 +81,7 @@ export class Server {
                 }
                 this._connector.connection.sendDiagnostics({ uri, diagnostics });
             }
-            this._serverStatus = ServerStatus.running;
+            this.updateServerStatus(ServerStatus.running);
         }
     }
 
@@ -231,5 +231,12 @@ export class Server {
             }
         }
         return diagnostics;
+    }
+
+    private updateServerStatus(newStatus: ServerStatus): void {
+        if (this._serverStatus !== newStatus) {
+            this._serverStatus = newStatus;
+            this._connector.connection.sendNotification(ServerStatusNotification.notificationType, { status: this._serverStatus });
+        }
     }
 }
