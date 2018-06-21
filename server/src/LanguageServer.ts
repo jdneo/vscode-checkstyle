@@ -9,7 +9,7 @@ import URI from 'vscode-uri';
 const progress = require('request-progress');
 import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
 import { ConfigurationType, ICheckStyleSettings } from './checkstyleSetting';
-import { Connector } from './connector';
+import { Connector } from './Connector';
 import { cpUtils } from './cpUtils';
 import { DocumentConfigProvider } from './DocumentConfigProvider';
 import { DownloadCheckstyleError, getErrorMessage, InvalidVersionError, VersionNotExistError } from './errors';

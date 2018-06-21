@@ -3,7 +3,7 @@
 import { EventEmitter } from 'events';
 import { ClientCapabilities, DidChangeConfigurationParams, TextDocument, TextDocumentChangeEvent, TextDocuments } from 'vscode-languageserver';
 import { DEFAULT_SETTINGS, ICheckStyleSettings } from './checkstyleSetting';
-import { Connector } from './connector';
+import { Connector } from './Connector';
 
 export class DocumentConfigProvider extends EventEmitter {
     private _hasConfigurationCapability: boolean;
