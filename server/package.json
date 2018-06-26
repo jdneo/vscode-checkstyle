@@ -20,7 +20,7 @@
         "fs-extra": "^4.0.3",
         "request": "^2.87.0",
         "request-progress": "^3.0.0",
-        "vscode-languageserver": "^3.4.2",
+        "vscode-languageserver": "^4.1.3",
         "vscode-uri": "^1.0.1"
     },
     "devDependencies": {

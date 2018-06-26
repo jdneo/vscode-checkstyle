@@ -20,12 +20,11 @@ import { UserCancelledError } from 'vscode-azureextensionui';
 import { TelemetryWrapper } from "vscode-extension-telemetry-wrapper";
 import {
     CancellationToken,
+    ConfigurationParams,
     DidChangeConfigurationNotification,
     LanguageClient,
     LanguageClientOptions,
     Middleware,
-    Proposed,
-    ProposedFeatures,
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient';
@@ -62,7 +61,7 @@ namespace Configuration {
 
     let configurationListener: Disposable;
 
-    export function computeConfiguration(params: Proposed.ConfigurationParams, _token: CancellationToken, _next: Function): {}[] {
+    export function computeConfiguration(params: ConfigurationParams, _token: CancellationToken, _next: Function): {}[] {
         if (!params.items) {
             return null;
         }
@@ -158,7 +157,7 @@ function wrapCallback(callback: (...args: any[]) => any): (...args: any[]) => Pr
 }
 
 function initializeClient(context: ExtensionContext): void {
-    const serverModule: string = context.asAbsolutePath(path.join('server', 'server.js'));
+    const serverModule: string = context.asAbsolutePath(path.join('server', 'index.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
     const serverOptions: ServerOptions = {
@@ -166,7 +165,7 @@ function initializeClient(context: ExtensionContext): void {
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
     };
 
-    const middleware: ProposedFeatures.ConfigurationMiddleware | Middleware = {
+    const middleware: Middleware = {
         workspace: {
             configuration: Configuration.computeConfiguration
         }
