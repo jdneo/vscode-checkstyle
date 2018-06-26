@@ -5,7 +5,7 @@ import { Connection, createConnection, DidChangeConfigurationParams, InitializeP
 import { CheckStyleRequest, ICheckstyleParams } from './CheckStyleRequest';
 
 export class Connector extends EventEmitter {
-    private _connection: any;
+    private _connection: Connection;
 
     constructor() {
         super();
