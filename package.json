@@ -142,12 +142,12 @@
     },
     "scripts": {
         "vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-		"compile:client": "tsc -p ./client/tsconfig.json",
-		"compile:server": "tsc -p ./server/tsconfig.json",
-		"watch:client": "tsc -w -p ./client/tsconfig.json",
-		"watch:server": "tsc -w -p ./server/tsconfig.json",
-		"compile": "npm run compile:client && npm run compile:server",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+        "compile:client": "tsc -p ./client/tsconfig.json",
+        "compile:server": "tsc -p ./server/tsconfig.json",
+        "watch:client": "tsc -w -p ./client/tsconfig.json",
+        "watch:server": "tsc -w -p ./server/tsconfig.json",
+        "compile": "npm run compile:client && npm run compile:server",
+        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
         "lint": "tslint -c tslint.json 'server/src/**/*.ts' 'client/src/**/*.ts'"
     },
     "devDependencies": {
