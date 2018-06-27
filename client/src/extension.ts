@@ -157,7 +157,7 @@ function wrapCallback(callback: (...args: any[]) => any): (...args: any[]) => Pr
 }
 
 function initializeClient(context: ExtensionContext): void {
-    const serverModule: string = context.asAbsolutePath(path.join('server', 'index.js'));
+    const serverModule: string = context.asAbsolutePath(path.join('server', 'out', 'index.js'));
     const debugOptions: {} = { execArgv: ['--nolazy', '--inspect=6009'] };
 
     const serverOptions: ServerOptions = {

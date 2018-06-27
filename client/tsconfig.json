@@ -7,13 +7,15 @@
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
-        "rootDir": ".",
+        "rootDir": "src",
         "outDir": "out",
         "lib": [ "es2016" ],
         "sourceMap": true
     },
+    "include": [
+		"src"
+	],
     "exclude": [
         "node_modules",
-        "server"
     ]
 }
