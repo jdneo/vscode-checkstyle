@@ -1,19 +1,153 @@
 {
     "name": "vscode-checkstyle",
+    "displayName": "Checkstyle for Java",
     "version": "0.5.1",
     "description": "The umbrella project for the checkstyle client and server",
     "author": "Sheng Chen",
+    "publisher": "shengchen",
+    "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
+    "icon": "resources/icon_checkstyle.png",
+    "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
     "repository": {
         "type": "git",
         "url": "https://github.com/jdneo/vscode-checkstyle"
     },
+    "engines": {
+        "vscode": "^1.23.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "keywords": [
+        "java",
+        "checkstyle"
+    ],
+    "activationEvents": [
+        "onLanguage:java",
+        "onCommand:checkstyle.checkCodeWithCheckstyle",
+        "onCommand:checkstyle.cleanCheckstyleViolation",
+        "onCommand:checkstyle.setVersion",
+        "onCommand:checkstyle.setConfigurationFile",
+        "onCommand:checkstyle.setPropertyFile",
+        "onCommand:checkstyle.setAutocheck"
+    ],
+    "main": "./client/out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "checkstyle.checkCodeWithCheckstyle",
+                "title": "Check Code",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.cleanCheckstyleViolation",
+                "title": "Clean Checkstyle Violation",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setVersion",
+                "title": "Set Version",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setConfigurationFile",
+                "title": "Set Configuration",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setPropertyFile",
+                "title": "Set Properties",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.setAutocheck",
+                "title": "Switch Automatic Checking",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "checkstyle.showOutputChannel",
+                "title": "Open Output Channel",
+                "category": "Checkstyle"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "resourceExtname == .java"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
+                    "group": "checkstyle@1"
+                },
+                {
+                    "command": "checkstyle.cleanCheckstyleViolation",
+                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
+                    "group": "checkstyle@2"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "checkstyle.checkCodeWithCheckstyle",
+                    "when": "editorLangId == java",
+                    "group": "checkstyle@1"
+                },
+                {
+                    "command": "checkstyle.cleanCheckstyleViolation",
+                    "when": "editorLangId == java",
+                    "group": "checkstyle@2"
+                }
+            ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "Checkstyle configuration",
+            "properties": {
+                "checkstyle.autocheck": {
+                    "scope": "resource",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specify whether the checkstyle extension will check Java files automatically."
+                },
+                "checkstyle.version": {
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "8.0",
+                    "description": "The Checkstyle version or you can specify *.jar file path of the checkstyle."
+                },
+                "checkstyle.configurationFile": {
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "google_checks",
+                    "description": "The checkstyle configuration file. You can use bundled 'google_checks' or 'sun_checks', or specify the local path to the configuration file."
+                },
+                "checkstyle.propertiesPath": {
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "",
+                    "description": "The properties file path of the checkstyle."
+                },
+                "checkstyle.showCheckstyleVersionInvalid": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show a warning if the version of Checkstyle is invalid."
+                }
+            }
+        }
+    },
     "scripts": {
-        "postinstall": "cd server && npm install && cd ../client && npm install && cd ..",
-        "compile": "tsc -p client/tsconfig.json && cd server && npm run installServer && cd .. && tsc -p server/tsconfig.json",
-        "compile:client": "tsc -p client/tsconfig.json",
-        "watch:client": "tsc -w -p client/tsconfig.json",
-        "compile:server": "cd server && npm run installServer && cd .. && tsc -p server/tsconfig.json",
-        "watch:server": "cd server && npm run installServer && cd .. && tsc -w -p server/tsconfig.json",
+        "vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
+        "compile:client": "tsc -p ./client/tsconfig.json",
+        "compile:server": "tsc -p ./server/tsconfig.json",
+        "watch:client": "tsc -w -p ./client/tsconfig.json",
+        "watch:server": "tsc -w -p ./server/tsconfig.json",
+        "compile": "npm run compile:client && npm run compile:server",
+        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
         "lint": "tslint -c tslint.json 'server/src/**/*.ts' 'client/src/**/*.ts'"
     },
     "devDependencies": {
