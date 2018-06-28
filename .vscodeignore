@@ -1,11 +1,9 @@
 .vscode/**
 .vscode-test/**
-typings/**
-out/test/**
-test/**
-src/**
+**/*.ts
 **/*.map
 .gitignore
 .travis.yml
-tsconfig.json
+**/tsconfig.json
 package-lock.json
+CONTRIBUTING.md
