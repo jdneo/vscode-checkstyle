@@ -32,7 +32,7 @@
         "onCommand:checkstyle.setPropertyFile",
         "onCommand:checkstyle.setAutocheck"
     ],
-    "main": "./client/out/src/extension",
+    "main": "./client/out/extension",
     "contributes": {
         "commands": [
             {
