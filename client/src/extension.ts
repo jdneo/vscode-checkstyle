@@ -119,14 +119,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
         workspace.onDidCloseTextDocument(statusController.onDidCloseTextDocument, statusController),
         workspace.onDidChangeTextDocument(statusController.onDidChangeTextDocument, statusController),
         client.start(),
-        TelemetryWrapper.registerCommand('checkstyle.checkCodeWithCheckstyle', () => wrapCallback((uri?: Uri) => checkCodeWithCheckstyle(client, uri))),
-        TelemetryWrapper.registerCommand('checkstyle.cleanCheckstyleViolation', () => wrapCallback((uri?: Uri) => clearCheckstyleViolation(client, statusController, uri))),
-        TelemetryWrapper.registerCommand('checkstyle.setVersion', () => wrapCallback((uri?: Uri) => setCheckstyleVersion(resourcesPath, uri))),
-        TelemetryWrapper.registerCommand('checkstyle.setConfigurationFile', () => wrapCallback(() => setCheckstyleConfig(context))),
-        TelemetryWrapper.registerCommand('checkstyle.setPropertyFile', () => wrapCallback(setCheckstyleProperties)),
-        TelemetryWrapper.registerCommand('checkstyle.setAutocheck', () => wrapCallback(setAutoCheckStatus)),
         commands.registerCommand('checkstyle.showOutputChannel', () => { client.outputChannel.show(true); })
     );
+
+    registerCommand(context, 'checkstyle.checkCodeWithCheckstyle', async (uri?: Uri) => await checkCodeWithCheckstyle(client, uri));
+    registerCommand(context, 'checkstyle.cleanCheckstyleViolation', async (uri?: Uri) => await clearCheckstyleViolation(client, statusController, uri));
+    registerCommand(context, 'checkstyle.setVersion', async (uri?: Uri) => await setCheckstyleVersion(resourcesPath, uri));
+    registerCommand(context, 'checkstyle.setConfigurationFile', async () => await setCheckstyleConfig(context));
+    registerCommand(context, 'checkstyle.setPropertyFile', async () => await setCheckstyleProperties());
+    registerCommand(context, 'checkstyle.setAutocheck', async () => await setAutoCheckStatus());
 }
 
 export function deactivate(): Thenable<void> {
@@ -140,10 +141,10 @@ export function deactivate(): Thenable<void> {
     return client.stop();
 }
 
-function wrapCallback(callback: (...args: any[]) => any): (...args: any[]) => Promise<any> {
-    return async (...args: any[]): Promise<any> => {
+function registerCommand(context: ExtensionContext, commandName: string, callback: (...args: any[]) => any): void {
+    context.subscriptions.push(TelemetryWrapper.registerCommand(commandName, async (args: any) => {
         try {
-            await callback(...args);
+            await callback(args);
         } catch (error) {
             if (error instanceof UserCancelledError) {
                 // do nothing here
@@ -153,7 +154,7 @@ function wrapCallback(callback: (...args: any[]) => any): (...args: any[]) => Pr
                 await window.showErrorMessage(errMsg);
             }
         }
-    };
+    }));
 }
 
 function initializeClient(context: ExtensionContext): void {
@@ -246,7 +247,7 @@ function registerClientListener(): void {
     client.onNotification(ErrorNotification.notificationType, (param: IErrorParams) => {
         statusController.updateStatusBar({ uri: param.uri, state: CheckStatus.exception });
         client.outputChannel.appendLine(param.errorMessage);
-        TelemetryWrapper.report(TelemetryWrapper.EventType.ERROR, { properties: { errorMessage: param.errorMessage } });
+        TelemetryWrapper.error(param.errorMessage);
     });
 }
 
