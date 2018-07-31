@@ -1,7 +1,7 @@
 {
     "name": "vscode-checkstyle",
     "displayName": "Checkstyle for Java",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "description": "The umbrella project for the checkstyle client and server",
     "author": "Sheng Chen",
     "publisher": "shengchen",
