@@ -96,7 +96,9 @@ async function resolvePropertyContents(propertiesFoundInConfig: string[], proper
         const existingProperties: Map<string, string> = new Map<string, string>();
         lines.forEach((line: string) => {
             const keyVal: string[] = line.trim().split('=');
-            existingProperties.set(keyVal[0].trim(), keyVal[1].trim());
+            if (keyVal && keyVal.length >= 2) {
+                existingProperties.set(keyVal[0].trim(), keyVal[1].trim());
+            }
         });
         const propertyWrittenToFile: string[] = [];
         propertiesFoundInConfig.forEach((property: string) => {
