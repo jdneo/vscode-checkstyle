@@ -1,9 +1,0 @@
-.vscode/**
-.vscode-test/**
-**/*.ts
-**/*.map
-.gitignore
-.travis.yml
-**/tsconfig.json
-package-lock.json
-CONTRIBUTING.md
