@@ -20,8 +20,9 @@ export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     }
 
     if (uri) {
-        if (path.extname(uri.fsPath).toLowerCase() === 'xml') {
+        if (path.extname(uri.fsPath).toLowerCase() === '.xml') {
             setCheckstyleConfigurationPath(uri.fsPath, uri);
+            window.showInformationMessage('Successfully set the Checkstyle configuration.');
         }
     }
 }

@@ -1,0 +1,4 @@
+{
+    "description": "",
+    "contributes.commands.java.checkstyle.set.configuration.title": "设置 Checkstyle 配置文件"
+}

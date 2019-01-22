@@ -1,0 +1,4 @@
+{
+    "description": "",
+    "contributes.commands.java.checkstyle.set.configuration.title": "Set the Checkstyle Configuration file"
+}

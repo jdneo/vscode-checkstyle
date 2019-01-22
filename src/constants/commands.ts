@@ -4,4 +4,5 @@ export namespace JavaLanguageServerCommands {
 
 export namespace CheckstyleExtensionCommands {
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.check';
+    export const SET_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.set.configuration';
 }

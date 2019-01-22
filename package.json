@@ -1,22 +1,53 @@
 {
     "name": "vscode-checkstyle",
     "displayName": "vscode-checkstyle",
-    "description": "",
+    "description": "%description%",
     "version": "0.0.1",
+    "author": "Sheng Chen",
+    "publisher": "shengchen",
+    "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
+    "icon": "resources/icon_checkstyle.png",
+    "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jdneo/vscode-checkstyle"
+    },
     "engines": {
         "vscode": "^1.30.0"
     },
     "categories": [
-        "Other"
+        "Programming Languages",
+        "Linters"
     ],
     "activationEvents": [
+        "onCommand:java.checkstyle.check",
+        "onCommand:java.checkstyle.set.configuration"
     ],
-    "main": "./out/extension.js",
+    "main": "./out/src/extension.js",
     "contributes": {
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "java.checkstyle.check",
+                    "when": "resourceLangId == java",
+                    "group": "Checkstyle@1"
+                },
+                {
+                    "command": "java.checkstyle.set.configuration",
+                    "when": "!explorerResourceIsFolder && resourceLangId == xml",
+                    "group": "Checkstyle@2"
+                }
+            ]
+        },
         "commands": [
             {
                 "command": "java.checkstyle.check",
                 "title": "%contributes.commands.java.checkstyle.check.title%",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "java.checkstyle.set.configuration",
+                "title": "%contributes.commands.java.checkstyle.set.configuration.title%",
                 "category": "Checkstyle"
             }
         ],
@@ -44,5 +75,8 @@
         "tslint": "^5.8.0",
         "@types/node": "^8.10.25",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "vscode-extension-telemetry-wrapper": "^0.3.8"
     }
 }
