@@ -16,7 +16,7 @@ export async function deactivate(): Promise<void> {
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
         instrumentAndRegisterCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
-        instrumentAndRegisterCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uris: Uri | Uri[]) => await checkstyle(uris)),
+        instrumentAndRegisterCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri: Uri) => await checkstyle(uri)),
     );
 }
 

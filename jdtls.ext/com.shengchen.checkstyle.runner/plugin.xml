@@ -3,7 +3,7 @@
 <plugin>
   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
     <delegateCommandHandler class="com.shengchen.checkstyle.runner.handler.DelegateCommandHandler">
-    	<command id="vscode.checkstyle.check"/>
+    	<command id="java.checkstyle.check"/>
     </delegateCommandHandler>
   </extension>
 </plugin>
