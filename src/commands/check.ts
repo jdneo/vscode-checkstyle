@@ -7,7 +7,7 @@ import { JAVA_CHECKSTYLE_CONFIGURATION } from '../constants/configs';
 import { ICheckstyleResult } from '../models';
 import { executeJavaLanguageServerCommand } from '../utils/lsCommandUtils';
 
-export async function checkstyle(uri: Uri): Promise<void> {
+export async function checkstyle(uri?: Uri): Promise<void> {
     if (!uri) {
         if (!window.activeTextEditor) {
             return;

@@ -15,10 +15,11 @@ class CheckstyleDiagnosticCollector implements Disposable {
         const diagnostics: Diagnostic[] = [];
         for (const violation of violations) {
             diagnostics.push({
-                range: new Range(violation.line - 1, violation.column - 1, violation.line - 1, Number.MAX_SAFE_INTEGER),
+                range: new Range(violation.line - 1, violation.column - 1, violation.line, 0),
                 message: violation.message,
                 severity: this.parseDiagnosticSeverity(violation.severity),
                 source: 'Checkstyle',
+                code: violation.sourceName,
             });
         }
         this.diagnosticCollection.set(uri, diagnostics);

@@ -11,12 +11,15 @@ import java.util.List;
 public class DelegateCommandHandler implements IDelegateCommandHandler {
 
     private static final String CHECK_CODE_WITH_CHECKSTYLE = "java.checkstyle.check";
+    private static final String FIX_CHECKSTYLE_VIOLATION = "java.checkstyle.quickfix";
 
     @Override
     public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
         switch (commandId) {
             case CHECK_CODE_WITH_CHECKSTYLE:
                 return CheckstyleRunner.check(arguments);
+            case FIX_CHECKSTYLE_VIOLATION:
+                return CheckstyleRunner.quickFix(arguments);
         }
         return null;
     }

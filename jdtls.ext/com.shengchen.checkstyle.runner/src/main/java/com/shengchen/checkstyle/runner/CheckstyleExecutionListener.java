@@ -17,7 +17,9 @@ public class CheckstyleExecutionListener implements AuditListener {
         if (severity.equals(SeverityLevel.IGNORE)) {
             return;
         }
-        result.add(new CheckResult(error.getLine(), error.getColumn(), error.getMessage(), severity.toString()));
+        final String sourceName = error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1);
+        result.add(new CheckResult(error.getLine(), error.getColumn(), error.getMessage(), severity.toString(),
+                sourceName));
     }
 
     @Override

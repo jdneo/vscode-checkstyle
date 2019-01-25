@@ -1,4 +1,6 @@
 {
-    "description": "",
-    "contributes.commands.java.checkstyle.set.configuration.title": "Set the Checkstyle Configuration file"
+    "description": "Checkstyle",
+    "contributes.commands.java.checkstyle.set.configuration.title": "Set the Checkstyle Configuration File",
+    "contributes.commands.java.checkstyle.check.title": "Check Code with Checkstyle",
+    "configuration.java.checkstyle.configuration.description": "Sprcify the path of the Checkstyle configuration file"
 }

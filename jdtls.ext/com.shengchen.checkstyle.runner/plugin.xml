@@ -4,6 +4,7 @@
   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
     <delegateCommandHandler class="com.shengchen.checkstyle.runner.handler.DelegateCommandHandler">
     	<command id="java.checkstyle.check"/>
+    	<command id="java.checkstyle.quickfix"/>
     </delegateCommandHandler>
   </extension>
 </plugin>

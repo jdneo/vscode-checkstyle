@@ -5,12 +5,14 @@ public class CheckResult {
     private int column;
     private String message;
     private String severity;
+    private String sourceName;
 
-    public CheckResult(int line, int column, String msg, String severity) {
+    public CheckResult(int line, int column, String msg, String severity, String sourceName) {
         this.line = line;
         this.column = column;
         this.message = msg;
-        this.setSeverity(severity);
+        this.severity = severity;
+        this.sourceName = sourceName;
     }
 
     public int getLine() {
@@ -43,6 +45,14 @@ public class CheckResult {
 
     public void setSeverity(String severity) {
         this.severity = severity;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 
 }

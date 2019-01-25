@@ -6,10 +6,20 @@ import com.puppycrawl.tools.checkstyle.ConfigurationLoader.IgnoredModulesOptions
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+import com.shengchen.checkstyle.runner.quickfix.BaseQuickFix;
+import com.shengchen.checkstyle.runner.utils.EditUtils;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 import org.eclipse.jdt.ls.core.internal.JDTUtils;
+import org.eclipse.jface.text.Document;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -46,59 +56,33 @@ public class CheckstyleRunner {
         final List<File> filesToCheck = new ArrayList<>();
         filesToCheck.add(new File(URI.create(fileToCheckUri)));
         checker.process(filesToCheck);
+
         return listener.getResult();
-//
-//      final CompilationUnit astRoot = CoreASTProvider.getInstance().getAST(unit,
-//        CoreASTProvider.WAIT_YES, null);
-//        ASTParser astParser = ASTParser.newParser(AST.JLS8);
-//        astParser.setKind(ASTParser.K_COMPILATION_UNIT);
-//        astParser.setSource(unit);
-//        CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
-//        astRoot.recordModifications();
-//        astRoot.accept(new ASTVisitor() {
-//
-//            @SuppressWarnings("unchecked")
-//            @Override
-//            public boolean visit(SingleVariableDeclaration node) {
-//                if (!Modifier.isFinal(node.getModifiers())) {
-//                    Modifier finalModifier = node.getAST().newModifier(
-//        ModifierKeyword.FINAL_KEYWORD);
-//                    node.modifiers().add(finalModifier);
-//                }
-//                return true;
-//            }
-//
-//            @SuppressWarnings("unchecked")
-//            @Override
-//            public boolean visit(VariableDeclarationStatement node) {
-//                if (!Modifier.isFinal(node.getModifiers())) {
-//                    Modifier finalModifier = node.getAST()
-//        .newModifier(ModifierKeyword.FINAL_KEYWORD);
-//                    node.modifiers().add(finalModifier);
-//                }
-//                return true;
-//            }
-//        });
-//        IPath path = unit.getPath();
-//        ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
-//        TextEdit edit = rewrite.rewriteAST();
-//        ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
-//        bufferManager.connect(path, LocationKind.IFILE, null);
-//        ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, LocationKind.IFILE);
-//        IDocument document = textFileBuffer.getDocument();
-//        TextEdit edit = astRoot.rewrite(document, unit.getJavaProject().getOptions(true));
-//        IJavaElement element = JDTUtils.findElementAtSelection
-//        (unit, Integer.valueOf(listener.getResult()[1]).intValue() - 1,
-//                Integer.valueOf(listener.getResult()[2]).intValue() - 1, null, null);
-//        final ASTNode name = NodeFinder.perform(astRoot, ((ISourceReference) element).getNameRange());
-//        ASTRewrite rewrite = ASTRewrite.create(name.getAST());
-//        Modifier finalModifier = name.getAST().newModifier(ModifierKeyword.FINAL_KEYWORD);
-////        rewrite.set(name, VariableDeclarationStatement.MODIFIERS2_PROPERTY, finalModifier, null);
-//        if (name instanceof VariableDeclarationStatement ) {
-//            ((VariableDeclarationStatement)name).modifiers().add(finalModifier);
-//        }
-//        rewrite.rewriteAST();
-//        List<String> result = Arrays.asList(listener.getResult());
-//        return result.toArray(new String[result.size()]);
+    }
+
+    public static WorkspaceEdit quickFix(List<Object> arguments) throws JavaModelException, IllegalArgumentException {
+        if (arguments == null || arguments.size() < 3) {
+            throw new RuntimeException("Illegal arguments for checking.");
+        }
+        final String fileToCheckUri = (String) arguments.get(0);
+        final int offset = ((Double) arguments.get(1)).intValue();
+        final String sourceName = (String) arguments.get(2);
+
+        final BaseQuickFix quickFix = QuickFixProvider.getQuickFix(sourceName);
+        if (quickFix == null) {
+            throw new RuntimeException("Unsupported quick fix.");
+        }
+
+        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
+        final ASTParser astParser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
+        astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+        astParser.setSource(unit);
+        final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
+        final Document document = new Document(unit.getSource());
+        final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
+        astRoot.recordModifications();
+        astRoot.accept(quickFix.getCorrectingASTVisitor(offset));
+        final TextEdit edit = rewrite.rewriteAST(document, null);
+        return EditUtils.convertToWorkspaceEdit(unit, edit);
     }
 }

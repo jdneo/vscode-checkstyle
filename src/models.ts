@@ -3,4 +3,5 @@ export interface ICheckstyleResult {
     column: number;
     message: string;
     severity: string;
+    sourceName: string;
 }

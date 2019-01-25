@@ -20,10 +20,11 @@
         "Linters"
     ],
     "activationEvents": [
+        "onCommand:java.checkstyle.quickfix",
         "onCommand:java.checkstyle.check",
         "onCommand:java.checkstyle.set.configuration"
     ],
-    "main": "./out/src/extension.js",
+    "main": "./dist/extension",
     "contributes": {
         "javaExtensions": [
             "./server/com.shengchen.checkstyle.runner-0.1.0.jar"
@@ -66,9 +67,9 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
+        "vscode:prepublish": "webpack --mode production",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "watch": "webpack --mode development --watch --info-verbosity verbose",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "lint": "gulp lint",
@@ -85,9 +86,12 @@
         "gulp-decompress": "^2.0.2",
         "gulp-download": "0.0.1",
         "gulp-tslint": "^8.1.3",
+        "ts-loader": "^5.3.3",
         "tslint": "^5.8.0",
         "typescript": "^3.1.4",
-        "vscode": "^1.1.25"
+        "vscode": "^1.1.25",
+        "webpack": "^4.29.0",
+        "webpack-cli": "^3.2.1"
     },
     "dependencies": {
         "fs-extra": "^7.0.1",
