@@ -14,7 +14,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 import org.eclipse.jdt.ls.core.internal.JDTUtils;
 import org.eclipse.jface.text.Document;
@@ -74,15 +73,15 @@ public class CheckstyleRunner {
         }
 
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
+        final Document document = new Document(unit.getSource());
         final ASTParser astParser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
         astParser.setKind(ASTParser.K_COMPILATION_UNIT);
         astParser.setSource(unit);
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
-        final Document document = new Document(unit.getSource());
-        final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
+//        final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
         astRoot.recordModifications();
         astRoot.accept(quickFix.getCorrectingASTVisitor(offset));
-        final TextEdit edit = rewrite.rewriteAST(document, null);
+        final TextEdit edit = astRoot.rewrite(document, null);
         return EditUtils.convertToWorkspaceEdit(unit, edit);
     }
 }

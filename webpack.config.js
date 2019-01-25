@@ -7,6 +7,7 @@ const path = require('path');
 /**@type {import('webpack').Configuration}*/
 const config = {
     // 📖 -> https://webpack.js.org/configuration/node/
+    target: 'node',
     node: {
         __dirname: false,
         __filename: false,

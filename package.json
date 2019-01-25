@@ -21,7 +21,7 @@
     ],
     "activationEvents": [
         "onCommand:java.checkstyle.quickfix",
-        "onCommand:java.checkstyle.check",
+        "onCommand:java.checkstyle.checkcode",
         "onCommand:java.checkstyle.set.configuration"
     ],
     "main": "./dist/extension",
@@ -32,7 +32,7 @@
         "menus": {
             "explorer/context": [
                 {
-                    "command": "java.checkstyle.check",
+                    "command": "java.checkstyle.checkcode",
                     "when": "resourceLangId == java",
                     "group": "Checkstyle@1"
                 },
@@ -45,8 +45,8 @@
         },
         "commands": [
             {
-                "command": "java.checkstyle.check",
-                "title": "%contributes.commands.java.checkstyle.check.title%",
+                "command": "java.checkstyle.checkcode",
+                "title": "%contributes.commands.java.checkstyle.checkcode.title%",
                 "category": "Checkstyle"
             },
             {
@@ -95,6 +95,8 @@
     },
     "dependencies": {
         "fs-extra": "^7.0.1",
-        "vscode-extension-telemetry-wrapper": "^0.3.8"
+        "vscode-extension-telemetry-wrapper": "^0.3.8",
+        "vscode-languageclient": "^5.2.1",
+        "vscode-languageserver-protocol": "^3.14.1"
     }
 }

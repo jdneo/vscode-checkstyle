@@ -10,7 +10,7 @@ import java.util.List;
 @SuppressWarnings("restriction")
 public class DelegateCommandHandler implements IDelegateCommandHandler {
 
-    private static final String CHECK_CODE_WITH_CHECKSTYLE = "java.checkstyle.check";
+    private static final String CHECK_CODE_WITH_CHECKSTYLE = "java.checkstyle.checkcode";
     private static final String FIX_CHECKSTYLE_VIOLATION = "java.checkstyle.quickfix";
 
     @Override
