@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jface.text.IRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class ModifierOrderQuickFix extends BaseQuickFix {
         ModifierKeyword.VOLATILE_KEYWORD, ModifierKeyword.SYNCHRONIZED_KEYWORD, ModifierKeyword.NATIVE_KEYWORD,
         ModifierKeyword.STRICTFP_KEYWORD, ModifierKeyword.DEFAULT_KEYWORD });
 
-    public static List<ASTNode> reOrderModifiers(List<ASTNode> modifiers) {
+    public static List<ASTNode> reorderModifiers(List<ASTNode> modifiers) {
 
         final List<ASTNode> copies = new ArrayList<>();
         final Iterator<ASTNode> it = modifiers.iterator();
@@ -63,7 +64,7 @@ public class ModifierOrderQuickFix extends BaseQuickFix {
     }
 
     @Override
-    public ASTVisitor getCorrectingASTVisitor(int markerStartOffset) {
+    public ASTVisitor getCorrectingASTVisitor(IRegion lineInfo, int markerStartOffset) {
         return new ASTVisitor() {
 
             @Override
@@ -98,7 +99,7 @@ public class ModifierOrderQuickFix extends BaseQuickFix {
                 final int maxPos = modifiers.stream().mapToInt(Modifier::getStartPosition).max().getAsInt();
 
                 if (minPos <= markerStartOffset && markerStartOffset <= maxPos) {
-                    final List<?> reorderedModifiers = reOrderModifiers(node.modifiers());
+                    final List<?> reorderedModifiers = reorderModifiers(node.modifiers());
                     node.modifiers().clear();
                     node.modifiers().addAll(reorderedModifiers);
                 }

@@ -14,8 +14,10 @@ class CheckstyleDiagnosticCollector implements Disposable {
         }
         const diagnostics: Diagnostic[] = [];
         for (const violation of violations) {
+            const startLine: number = Math.max(violation.line - 1, 0);
+            const startCharacter: number = Math.max(violation.column - 1, 0);
             diagnostics.push({
-                range: new Range(violation.line - 1, violation.column - 1, violation.line, 0),
+                range: new Range(startLine, startCharacter, startLine + 1, 0),
                 message: violation.message,
                 severity: this.parseDiagnosticSeverity(violation.severity),
                 source: 'Checkstyle',

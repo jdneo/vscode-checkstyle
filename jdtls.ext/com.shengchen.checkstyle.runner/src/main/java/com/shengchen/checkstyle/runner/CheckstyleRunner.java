@@ -16,7 +16,9 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 import org.eclipse.jdt.ls.core.internal.JDTUtils;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -59,7 +61,8 @@ public class CheckstyleRunner {
         return listener.getResult();
     }
 
-    public static WorkspaceEdit quickFix(List<Object> arguments) throws JavaModelException, IllegalArgumentException {
+    public static WorkspaceEdit quickFix(List<Object> arguments)
+            throws JavaModelException, IllegalArgumentException, BadLocationException {
         if (arguments == null || arguments.size() < 3) {
             throw new RuntimeException("Illegal arguments for checking.");
         }
@@ -74,13 +77,13 @@ public class CheckstyleRunner {
 
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
         final Document document = new Document(unit.getSource());
+        final IRegion lineInfo = document.getLineInformationOfOffset(offset);
         final ASTParser astParser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
         astParser.setKind(ASTParser.K_COMPILATION_UNIT);
         astParser.setSource(unit);
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
-//        final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
         astRoot.recordModifications();
-        astRoot.accept(quickFix.getCorrectingASTVisitor(offset));
+        astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset));
         final TextEdit edit = astRoot.rewrite(document, null);
         return EditUtils.convertToWorkspaceEdit(unit, edit);
     }

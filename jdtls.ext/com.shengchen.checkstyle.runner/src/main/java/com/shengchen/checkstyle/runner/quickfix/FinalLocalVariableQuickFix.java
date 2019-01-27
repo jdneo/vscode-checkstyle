@@ -5,11 +5,12 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jface.text.IRegion;
 
 public class FinalLocalVariableQuickFix extends BaseQuickFix {
     @Override
     @SuppressWarnings("unchecked")
-    public ASTVisitor getCorrectingASTVisitor(final int markerStartOffset) {
+    public ASTVisitor getCorrectingASTVisitor(IRegion lineInfo, int markerStartOffset) {
         return new ASTVisitor() {
 
             @Override
