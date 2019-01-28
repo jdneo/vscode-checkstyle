@@ -1,5 +1,5 @@
-import { commands, ExtensionContext, languages, TextDocument, Uri, workspace } from 'vscode';
-import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation } from 'vscode-extension-telemetry-wrapper';
+import { ExtensionContext, languages, TextDocument, Uri, workspace } from 'vscode';
+import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyle } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
@@ -10,7 +10,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'), true);
     await instrumentOperation('activation', doActivate)(context);
     workspace.onDidSaveTextDocument((doc: TextDocument) => {
-        checkstyle(doc.uri);
+        if (doc.languageId === 'java') {
+            checkstyle(doc.uri);
+        }
     }, null, context.subscriptions);
 }
 
@@ -21,13 +23,8 @@ export async function deactivate(): Promise<void> {
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
-        commands.registerCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
-        commands.registerCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkstyle(uri)),
-        commands.registerCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkstyle(uri)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),
     );
 }
-
-// function instrumentAndRegisterCommand(name: string, cb: (...args: any[]) => any): Disposable {
-//     const instrumented: (...args: any[]) => any = instrumentOperation(name, async (_operationId: string, ...args: any[]) => await cb(...args));
-//     return commands.registerCommand(name, instrumented);
-// }

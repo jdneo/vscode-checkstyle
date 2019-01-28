@@ -27,17 +27,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @SuppressWarnings("restriction")
 public class CheckstyleRunner {
     public static List<CheckResult> check(List<Object> arguments)
             throws UnsupportedEncodingException, CoreException, CheckstyleException {
-        if (arguments == null || arguments.size() < 2) {
+        if (arguments == null || arguments.size() < 3) {
             throw new RuntimeException("Illegal arguments for checking.");
         }
         final String fileToCheckUri = (String) arguments.get(0);
         final String configurationFsPath = (String) arguments.get(1);
+        final Map<String, String> properties = (Map) arguments.get(2);
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
 
         final Checker checker = new Checker();
@@ -49,8 +51,10 @@ public class CheckstyleRunner {
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
         checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
+        final Properties checkstyleProperties = new Properties();
+        checkstyleProperties.putAll(properties);
         final Configuration configuration = ConfigurationLoader.loadConfiguration(configurationFsPath,
-                new PropertiesExpander(new Properties()), IgnoredModulesOptions.OMIT);
+                new PropertiesExpander(checkstyleProperties), IgnoredModulesOptions.OMIT);
         checker.configure(configuration);
         final CheckstyleExecutionListener listener = new CheckstyleExecutionListener();
         checker.addListener(listener);

@@ -3,7 +3,6 @@ import * as ls from 'vscode-languageserver-protocol';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { applyWorkspaceEdit } from '../utils/editUtils';
 import { executeJavaLanguageServerCommand } from '../utils/lsCommandUtils';
-import { checkstyle } from './check';
 
 export async function fixCheckstyleViolation(uri: Uri, offset: number, sourceName: string): Promise<void> {
     const workspaceEdit: ls.WorkspaceEdit | undefined = await executeJavaLanguageServerCommand<ls.WorkspaceEdit>(
@@ -13,5 +12,4 @@ export async function fixCheckstyleViolation(uri: Uri, offset: number, sourceNam
         return;
     }
     await applyWorkspaceEdit(workspaceEdit);
-    await checkstyle(uri);
 }
