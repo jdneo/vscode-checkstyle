@@ -1,8 +1,8 @@
-import { Uri, workspace } from 'vscode';
+import { Uri } from 'vscode';
 import * as ls from 'vscode-languageserver-protocol';
 import { CheckstyleExtensionCommands } from '../constants/commands';
+import { applyWorkspaceEdit } from '../utils/editUtils';
 import { executeJavaLanguageServerCommand } from '../utils/lsCommandUtils';
-import { asWorkspaceEdit } from '../utils/quickFixUtils';
 import { checkstyle } from './check';
 
 export async function fixCheckstyleViolation(uri: Uri, offset: number, sourceName: string): Promise<void> {
@@ -12,6 +12,6 @@ export async function fixCheckstyleViolation(uri: Uri, offset: number, sourceNam
         // TODO: log
         return;
     }
-    await workspace.applyEdit(asWorkspaceEdit(workspaceEdit));
+    await applyWorkspaceEdit(workspaceEdit);
     await checkstyle(uri);
 }
