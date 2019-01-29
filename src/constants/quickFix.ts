@@ -1,4 +1,4 @@
-export enum AvailableQuickFix {
+export enum FixableCheck {
     FinalLocalVariableCheck = 'FinalLocalVariableCheck',
     ModifierOrderCheck = 'ModifierOrderCheck',
     RedundantModifierCheck = 'RedundantModifierCheck',

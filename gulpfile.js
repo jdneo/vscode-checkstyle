@@ -14,12 +14,21 @@ const serverDir = path.join(__dirname, 'jdtls.ext');
 const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
 
 // Build required jar files.
-gulp.task('build-plugin', (done) => {
+const checkstyleVersion = '8.17';
+gulp.task('download-checkstyle', (done) => {
+    download(`https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${checkstyleVersion}/checkstyle-${checkstyleVersion}-all.jar`)
+        .pipe(gulp.dest(path.join(serverDir, 'com.shengchen.checkstyle.runner', 'lib')))
+        .on('end', done);
+});
+
+gulp.task('build-jar', (done) => {
     cp.execSync(`${mvnw()} clean package`, { cwd: serverDir, stdio: [0, 1, 2] });
     gulp.src(path.join(serverDir, 'com.shengchen.checkstyle.runner/target/*.jar'))
         .pipe(gulp.dest('./server'));
     done();
 });
+
+gulp.task('build-plugin', gulp.series('download-checkstyle', 'build-jar'));
 
 // Lint
 gulp.task('checkstyle', (done) => {

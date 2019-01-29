@@ -1,7 +1,7 @@
-import { AvailableQuickFix } from '../constants/quickFix';
+import { FixableCheck } from '../constants/quickFix';
 
 export function isQuickFixAvailable(violationSourceName: string | number | undefined): boolean {
-    if (violationSourceName && violationSourceName in AvailableQuickFix) {
+    if (violationSourceName && violationSourceName in FixableCheck) {
         return true;
     }
     return false;

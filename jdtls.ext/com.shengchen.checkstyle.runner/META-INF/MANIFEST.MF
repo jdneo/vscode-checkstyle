@@ -18,5 +18,5 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.jdt.core.manipulation,
  org.eclipse.text
 Bundle-ClassPath: .,
- lib/checkstyle-8.15-all.jar
+ lib/checkstyle-8.17-all.jar
 Automatic-Module-Name: com.shengchen.checkstyle.runner

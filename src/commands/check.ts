@@ -4,8 +4,8 @@ import { Uri, window } from 'vscode';
 import { checkstyleDiagnosticCollector } from '../CheckstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
-import { executeJavaLanguageServerCommand } from '../utils/lsCommandUtils';
 import { getCheckstyleConfigurationPath, getCheckstyleProperties } from '../utils/settingUtils';
+import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
 export async function checkstyle(uri?: Uri): Promise<void> {
     if (!uri) {
