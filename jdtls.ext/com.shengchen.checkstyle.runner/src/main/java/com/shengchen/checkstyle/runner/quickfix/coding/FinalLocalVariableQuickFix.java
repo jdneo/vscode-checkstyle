@@ -1,4 +1,6 @@
-package com.shengchen.checkstyle.runner.quickfix;
+package com.shengchen.checkstyle.runner.quickfix.coding;
+
+import com.shengchen.checkstyle.runner.quickfix.BaseQuickFix;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Modifier;

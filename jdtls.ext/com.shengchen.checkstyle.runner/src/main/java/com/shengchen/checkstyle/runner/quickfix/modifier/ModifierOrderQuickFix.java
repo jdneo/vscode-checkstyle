@@ -107,5 +107,4 @@ public class ModifierOrderQuickFix extends BaseQuickFix {
             }
         };
     }
-
 }
