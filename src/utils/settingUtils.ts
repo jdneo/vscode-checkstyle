@@ -1,4 +1,4 @@
-import { ConfigurationTarget, Uri, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
+import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
 import { JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/configs';
 
 export function getCheckstyleConfigurationPath(uri: Uri): string {
@@ -15,7 +15,7 @@ export function getCheckstyleProperties(uri: Uri): object {
 }
 
 export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void {
-    getConfiguration(uri).update(JAVA_CHECKSTYLE_CONFIGURATION, fsPath, ConfigurationTarget.WorkspaceFolder);
+    setConfiguration(JAVA_CHECKSTYLE_CONFIGURATION, fsPath, uri);
 }
 
 const workspaceRegexp: RegExp = /\$\{workspacefolder\}/i;
@@ -32,4 +32,17 @@ function resolveVariables(resourceUri: Uri, value: string): string {
 
 function getConfiguration(uri?: Uri): WorkspaceConfiguration {
     return workspace.getConfiguration(undefined, uri);
+}
+
+function setConfiguration(section: string, value: any, uri?: Uri): void {
+    if (!uri && window.activeTextEditor) {
+        uri = window.activeTextEditor.document.uri;
+    }
+    let target: ConfigurationTarget;
+    if (uri && workspace.getWorkspaceFolder(uri)) {
+        target = ConfigurationTarget.WorkspaceFolder;
+    } else {
+        target = ConfigurationTarget.Global;
+    }
+    getConfiguration(uri).update(section, value, target);
 }
