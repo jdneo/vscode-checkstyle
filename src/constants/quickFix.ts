@@ -9,6 +9,9 @@ export enum FixableCheck {
     EmptyStatementCheck = 'EmptyStatementCheck',
     MissingSwitchDefaultCheck = 'MissingSwitchDefaultCheck',
     ExplicitInitializationCheck = 'ExplicitInitializationCheck',
+    RequireThisCheck = 'RequireThisCheck',
+    SimplifyBooleanReturnCheck = 'SimplifyBooleanReturnCheck',
+    StringLiteralEqualityCheck = 'StringLiteralEqualityCheck',
 
     // Design
     DesignForExtensionCheck = 'DesignForExtensionCheck',
@@ -17,4 +20,10 @@ export enum FixableCheck {
     // Modifier
     ModifierOrderCheck = 'ModifierOrderCheck',
     RedundantModifierCheck = 'RedundantModifierCheck',
+
+    // Misc
+    FinalParametersCheck = 'FinalParametersCheck',
+    UncommentedMainCheck = 'UncommentedMainCheck',
+    UpperEllCheck = 'UpperEllCheck',
+    ArrayTypeStyleCheck = 'ArrayTypeStyleCheck',
 }
