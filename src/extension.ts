@@ -1,19 +1,21 @@
 import { ExtensionContext, languages, TextDocument, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
-import { checkstyle } from './commands/check';
+import { checkOpenedEditors, checkstyle } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
+import { isAutoCheckEnabled } from './utils/settingUtils';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'), true);
     await instrumentOperation('activation', doActivate)(context);
     workspace.onDidSaveTextDocument((doc: TextDocument) => {
-        if (doc.languageId === 'java') {
+        if (doc.languageId === 'java' && isAutoCheckEnabled()) {
             checkstyle(doc.uri);
         }
     }, null, context.subscriptions);
+    checkOpenedEditors();
 }
 
 export async function deactivate(): Promise<void> {

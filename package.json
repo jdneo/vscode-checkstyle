@@ -20,6 +20,7 @@
         "Linters"
     ],
     "activationEvents": [
+        "onLanguage:java",
         "onCommand:java.checkstyle.quickfix",
         "onCommand:java.checkstyle.checkcode",
         "onCommand:java.checkstyle.set.configuration"
@@ -67,6 +68,12 @@
                     "type": "object",
                     "description": "%configuration.java.checkstyle.properties.description%",
                     "scope": "resource"
+                },
+                "java.checkstyle.autocheck": {
+                    "type": "boolean",
+                    "description": "%configuration.java.checkstyle.autocheck.description%",
+                    "scope": "application",
+                    "default": true
                 }
             }
         }

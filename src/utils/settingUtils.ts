@@ -1,5 +1,5 @@
 import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
-import { JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/configs';
+import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/configs';
 
 export function getCheckstyleConfigurationPath(uri: Uri): string {
     const configurationPath: string = getConfiguration(uri).get<string>(JAVA_CHECKSTYLE_CONFIGURATION, '');
@@ -12,6 +12,10 @@ export function getCheckstyleProperties(uri: Uri): object {
         properties[key] = resolveVariables(uri, resolveVariables(uri, properties[key]));
     }
     return properties;
+}
+
+export function isAutoCheckEnabled(): boolean {
+    return getConfiguration().get<boolean>(JAVA_CHECKSTYLE_AUTOCHECK, true);
 }
 
 export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void {

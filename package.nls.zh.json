@@ -1,4 +1,7 @@
 {
     "description": "",
-    "contributes.commands.java.checkstyle.set.configuration.title": "设置 Checkstyle 配置文件"
+    "contributes.commands.java.checkstyle.set.configuration.title": "设置 Checkstyle 配置文件",
+    "contributes.commands.java.checkstyle.checkcode.title": "检查代码",
+    "configuration.java.checkstyle.configuration.description": "Checkstyle 配置文件所在路径",
+    "configuration.java.checkstyle.autocheck.description": "是否启用自动检查"
 }

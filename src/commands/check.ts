@@ -22,7 +22,7 @@ export async function checkstyle(uri?: Uri): Promise<void> {
 
     const configurationPath: string = getCheckstyleConfigurationPath(uri);
     if (configurationPath === '') {
-        window.showErrorMessage('The path of the Checkstyle configuration file has not been set, please set it first.');
+        // TODO: log
         return;
     }
     if (!isBuiltinConfiguration(configurationPath) && !await fse.pathExists(configurationPath)) {
@@ -37,6 +37,14 @@ export async function checkstyle(uri?: Uri): Promise<void> {
         return;
     }
     checkstyleDiagnosticCollector.addDiagnostics(uri, results);
+}
+
+export async function checkOpenedEditors(): Promise<void> {
+    for (const editor of window.visibleTextEditors) {
+        if (path.extname(editor.document.uri.fsPath).toLocaleLowerCase() === '.java') {
+            checkstyle(editor.document.uri);
+        }
+    }
 }
 
 function isBuiltinConfiguration(config: string): boolean {
