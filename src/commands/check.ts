@@ -39,14 +39,6 @@ export async function checkstyle(uri?: Uri): Promise<void> {
     checkstyleDiagnosticCollector.addDiagnostics(uri, results);
 }
 
-export async function checkOpenedEditors(): Promise<void> {
-    for (const editor of window.visibleTextEditors) {
-        if (path.extname(editor.document.uri.fsPath).toLocaleLowerCase() === '.java') {
-            checkstyle(editor.document.uri);
-        }
-    }
-}
-
 function isBuiltinConfiguration(config: string): boolean {
     return config === BuiltinConfiguration.GoogleCheck || config === BuiltinConfiguration.SunCheck;
 }
