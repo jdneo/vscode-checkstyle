@@ -7,3 +7,7 @@ export namespace CheckstyleExtensionCommands {
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkcode';
     export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickfix';
 }
+
+export namespace VsCodeCommands {
+    export const OPEN: string = 'vscode.open';
+}

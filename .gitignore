@@ -7,3 +7,4 @@ node_modules
 .project
 *.ini
 dist
+.DS_Store

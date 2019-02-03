@@ -1,5 +1,6 @@
 import { commands, Position, Range, Selection, TextEdit, TextEditor, Uri, window, workspace, WorkspaceEdit } from 'vscode';
 import * as ls from 'vscode-languageserver-protocol';
+import { handleErrors } from './errorUtils';
 
 export async function applyWorkspaceEdit(edit: ls.WorkspaceEdit): Promise<void> {
     const workspaceEdit: WorkspaceEdit = asWorkspaceEdit(edit);
@@ -32,7 +33,7 @@ export async function applyWorkspaceEdit(edit: ls.WorkspaceEdit): Promise<void> 
             // Recover the cursor's original position
             currentEditor.selection = new Selection(cursorPostion, cursorPostion);
         } catch (error) {
-            // TODO: log
+            handleErrors(error);
         }
     }
 }
@@ -101,8 +102,7 @@ function asWorkspaceEdit(item: ls.WorkspaceEdit | undefined | null): WorkspaceEd
             } else if (ls.TextDocumentEdit.is(change)) {
                 result.set(Uri.parse(change.textDocument.uri), asTextEdits(change.edits));
             } else {
-                // console.error(`Unknown workspace edit change received:\n${JSON.stringify(change, undefined, 4)}`);
-                // TODO: log
+                handleErrors(new Error(`Unknown workspace edit change received:\n${JSON.stringify(change, undefined, 4)}`));
             }
         });
     } else if (item.changes) {
