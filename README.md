@@ -55,9 +55,10 @@
 | `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `false` |
 
 > Note: You can use the `${workspaceFolder}` to represent the root folder path of the file to be checked. For example: 
-```jsonc
+
+```javascript
 "java.checkstyle.properties": {
-	"basedir": "${workspaceFolder}"
+    "basedir": "${workspaceFolder}"
 }
 ```
 
