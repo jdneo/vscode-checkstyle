@@ -1,5 +1,5 @@
 {
-    "description": "",
+    "description": "提供实时的 Checkstyle 代码检测结果，并帮助用户修改代码",
     "contributes.commands.java.checkstyle.set.configuration.title": "设置 Checkstyle 配置文件",
     "contributes.commands.java.checkstyle.checkcode.title": "检查代码",
     "configuration.java.checkstyle.configuration.description": "Checkstyle 配置文件所在路径",

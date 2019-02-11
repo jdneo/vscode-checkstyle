@@ -1,5 +1,5 @@
 {
-    "description": "Checkstyle",
+    "description": "Provide real-time feedback about Checkstyle violations and quick fix actions",
     "contributes.commands.java.checkstyle.set.configuration.title": "Set the Checkstyle Configuration File",
     "contributes.commands.java.checkstyle.checkcode.title": "Check Code with Checkstyle",
     "configuration.java.checkstyle.configuration.description": "Specify the path of the Checkstyle configuration file",
