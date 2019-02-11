@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import { ExtensionContext, languages, TextDocument, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';

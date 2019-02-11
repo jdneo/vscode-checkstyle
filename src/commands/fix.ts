@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import { Uri } from 'vscode';
 import * as ls from 'vscode-languageserver-protocol';
 import { checkstyleChannel } from '../checkstyleChannel';
