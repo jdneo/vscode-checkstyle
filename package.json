@@ -2,7 +2,7 @@
     "name": "vscode-checkstyle",
     "displayName": "vscode-checkstyle",
     "description": "%description%",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "author": "Sheng Chen",
     "publisher": "shengchen",
     "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
@@ -28,7 +28,7 @@
     "main": "./dist/extension",
     "contributes": {
         "javaExtensions": [
-            "./server/com.shengchen.checkstyle.runner-0.1.0.jar"
+            "./server/com.shengchen.checkstyle.runner-1.0.0.jar"
         ],
         "menus": {
             "explorer/context": [

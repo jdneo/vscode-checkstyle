@@ -20,6 +20,8 @@
   </a>
 </p>
 
+> Note: Start from `1.0.0`, the extension is not back compatible with the previous version (before 0.5.2). Click [here](https://github.com/jdneo/vscode-checkstyle/tree/v0.5.2) if you want to check the previous documents.
+
 ## Requirements
 - JDK (version 1.8.0 or later)
 - VS Code (version 1.30.0 or later)
