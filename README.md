@@ -47,7 +47,7 @@
   <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/quick_fix.png" alt="Set Checkstyle Configuration File" />
 </p>
 
-- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) to show the available quick fixes.
+- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) button in the editor to show the available quick fixes.
 
 ## Settings
 | Setting Name | Description | Default Value |
