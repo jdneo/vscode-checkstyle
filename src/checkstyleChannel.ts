@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import { Disposable, OutputChannel, window } from 'vscode';
 
 class CheckstyleChannel implements Disposable {

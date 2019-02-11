@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 export namespace JavaLanguageServerCommands {
     export const EXECUTE_WORKSPACE_COMMAND: string = 'java.execute.workspaceCommand';
 }

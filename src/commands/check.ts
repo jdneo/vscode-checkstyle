@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { Uri, window } from 'vscode';

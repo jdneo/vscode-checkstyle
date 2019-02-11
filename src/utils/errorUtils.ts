@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import { commands, Uri, window } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
 import { VsCodeCommands } from '../constants/commands';

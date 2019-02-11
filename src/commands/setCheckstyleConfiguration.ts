@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import * as path from 'path';
 import { OpenDialogOptions, QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';

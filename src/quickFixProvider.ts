@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Range, Selection, TextDocument } from 'vscode';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { isQuickFixAvailable } from './utils/quickFixUtils';

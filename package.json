@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "author": "Sheng Chen",
     "publisher": "shengchen",
+    "license": "GNU LGPL V3.0",
     "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
     "icon": "resources/icon_checkstyle.png",
     "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
