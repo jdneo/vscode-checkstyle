@@ -3,7 +3,7 @@
 > Check your Java code format and fix it!
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/reborn/resources/icon_checkstyle.png" alt="">
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/resources/icon_checkstyle.png" alt="">
 </p>
 <p align="center">
   <a href="https://travis-ci.org/jdneo/vscode-checkstyle">
@@ -28,12 +28,12 @@
 - [Language Support for Java by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java)
 
 ## Quick Start
-![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/reborn/docs/gifs/demo.gif)
+![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/demo.gif)
 
 ## Features
 ### Set Checkstyle Configuration File
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/reborn/docs/imgs/set_config.png" alt="Set Checkstyle Configuration File" />
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_config.png" alt="Set Checkstyle Configuration File" />
 </p>
 
 - To set the configuration file, Just Right click the `.xml` file and select `Set the Checkstyle Configuration File`.
@@ -44,10 +44,10 @@
 
 ### Check the Style and Fix the Violations
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/reborn/docs/imgs/quick_fix.png" alt="Set Checkstyle Configuration File" />
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/quick_fix.png" alt="Set Checkstyle Configuration File" />
 </p>
 
-- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/reborn/docs/imgs/btn_bulb.png) to show the available quick fixes.
+- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) to show the available quick fixes.
 
 ## Settings
 | Setting Name | Description | Default Value |
@@ -56,7 +56,7 @@
 | `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
 | `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `false` |
 
-> Note: You can use the `${workspaceFolder}` to represent the root folder path of the file to be checked. For example: 
+> Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example: 
 
 ```javascript
 "java.checkstyle.properties": {
