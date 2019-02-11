@@ -1,6 +1,6 @@
 {
     "name": "vscode-checkstyle",
-    "displayName": "vscode-checkstyle",
+    "displayName": "Checkstyle for Java",
     "description": "%description%",
     "version": "1.0.0",
     "author": "Sheng Chen",
@@ -18,6 +18,10 @@
     "categories": [
         "Programming Languages",
         "Linters"
+    ],
+    "keywords": [
+        "java",
+        "checkstyle"
     ],
     "activationEvents": [
         "onLanguage:java",
