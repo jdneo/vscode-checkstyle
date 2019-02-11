@@ -1,49 +1,69 @@
-# Checkstyle extension for Visual Studio Code
+# Checkstyle for VS Code
 
-[![Travis CI](https://travis-ci.org/jdneo/vscode-checkstyle.svg?branch=master)](https://travis-ci.org/jdneo/vscode-checkstyle)
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)](https://vsmarketplacebadge.apphb.com/version-short/shengchen.vscode-checkstyle.svg)
-[![Gitter](https://badges.gitter.im/vscode-checkstyle/Lobby.svg)](https://gitter.im/vscode-checkstyle/Lobby)
+> Check your Java code format and fix it!
 
-## Prerequisites
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/resources/icon_checkstyle.png" alt="">
+</p>
+<p align="center">
+  <a href="https://travis-ci.org/jdneo/vscode-checkstyle">
+    <img src="https://img.shields.io/travis/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  </a>
+  <a href="https://lgtm.com/projects/g/jdneo/vscode-checkstyle/alerts">
+    <img src="https://img.shields.io/lgtm/alerts/g/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle">
+    <img src="https://img.shields.io/visual-studio-marketplace/d/shengchen.vscode-checkstyle.svg?style=flat-square" alt="">
+  </a>
+  <a href="https://gitter.im/vscode-checkstyle/Lobby">
+    <img src="https://img.shields.io/gitter/room/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  </a>
+</p>
 
-* Please make sure ```Java``` is in system ```PATH```
+> Note: Start from `1.0.0`, the extension is not back compatible with the previous version (before 0.5.2). Click [here](https://github.com/jdneo/vscode-checkstyle/tree/v0.5.2) if you want to check the previous documents.
+
+## Requirements
+- JDK (version 1.8.0 or later)
+- VS Code (version 1.30.0 or later)
+- [Language Support for Java by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java)
+
+## Quick Start
+![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/demo.gif)
+
+## Features
+### Set Checkstyle Configuration File
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_config.png" alt="Set Checkstyle Configuration File" />
+</p>
+
+- To set the configuration file, Just Right click the `.xml` file and select `Set the Checkstyle Configuration File`.
+
+- You can also trigger the command **Checkstyle: Set Checkstyle Configuration File** to choose the configuration file in the File Explorer. You will also see the two built-in configurations:
+  - **Google's Check**
+  - **Sun's Check**
+
+### Check the Style and Fix the Violations
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/quick_fix.png" alt="Set Checkstyle Configuration File" />
+</p>
+
+- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) to show the available quick fixes.
 
 ## Settings
-```
-{
-    // Specify whether the Checkstyle extension will check Java files automatically.
-    "checkstyle.autocheck": false
+| Setting Name | Description | Default Value |
+|---|---|---|
+| `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. | `""` |
+| `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
+| `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `false` |
 
-    // Specify the Checkstyle version, or the local path to the checkstyle jar file.
-    "checkstyle.version": "8.0",
+> Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example: 
 
-    // Specify the checkstyle configuration file. You can use bundled ```google_checks``` or ```sun_checks```.
-    // Or you can specify the local path to the configuration file.
-    "checkstyle.configurationFile": "google_checks"
-    
-    // Specify the path to the checkstyle properties file, by default it's empty.
-    "checkstyle.propertiesPath": ""
-
-    // Show a warning if the version of Checkstyle is invalid.
-    "checkstyle.showCheckstyleVersionInvalid": true
+```javascript
+"java.checkstyle.properties": {
+    "basedir": "${workspaceFolder}"
 }
 ```
 
-_If you want to use customized checkstyle configuration file, please make sure the checkstyle rules are compatible with the checkstyle version._
-
-
-## Commands
-This extension provides several commands in the Command Palette (F1 or Ctrl + Shift + P) for working with Java files:
-* **Checkstyle: Check Code**: Check selected Java file with Checkstyle.
-* **Checkstyle: Clean Checkstyle Violation**: Clean the Checkstyle violations in selected Java file.
-* **Checkstyle: Set Version**: Set the jar version for Checkstyle. Or you can specify \*.jar file local path of the checkstyle.
-* **Checkstyle: Set Configuration**: Set the configuration file for Checkstyle.
-* **Checkstyle: Set Properties**: Set the properties file for Checkstyle.
-* **Checkstyle: Switch Automatic Checking**: Set whether the extension will run Checkstyle automatically.
-* **Checkstyle: Open Output Channel**: Open the output channel for Checkstyle extension.
-
 ## Release Notes
-Refer to [CHANGELOG](CHANGELOG.md)
 
-## License
-MIT
+Refer to [CHANGELOG.md](https://github.com/jdneo/vscode-checkstyle/blob/develop/CHANGELOG.md)

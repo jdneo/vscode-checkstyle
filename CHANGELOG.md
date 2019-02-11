@@ -1,4 +1,12 @@
 # Change Log
+All notable changes to the "vscode-checkstyle" extension will be documented in this file.
+
+Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+
+## [1.0.0]
+Initial release for the new Checkstyle extension, the new extension contains following features:
+- Check code with Checkstyle.
+- Provide quick fix if it's available.
 
 ## [0.5.2]
 ## Fixed

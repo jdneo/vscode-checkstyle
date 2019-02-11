@@ -1,0 +1,8 @@
+{
+    "description": "Checkstyle",
+    "contributes.commands.java.checkstyle.set.configuration.title": "Set the Checkstyle Configuration File",
+    "contributes.commands.java.checkstyle.checkcode.title": "Check Code with Checkstyle",
+    "configuration.java.checkstyle.configuration.description": "Specify the path of the Checkstyle configuration file",
+    "configuration.java.checkstyle.properties.description": "Specify the customized properties used in the Checkstyle configuration",
+    "configuration.java.checkstyle.autocheck.description": "Specify if the extension will check the format automatically or not"
+}

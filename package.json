@@ -1,8 +1,8 @@
 {
     "name": "vscode-checkstyle",
-    "displayName": "Checkstyle for Java",
-    "version": "0.5.2",
-    "description": "The umbrella project for the checkstyle client and server",
+    "displayName": "vscode-checkstyle",
+    "description": "%description%",
+    "version": "1.0.0",
     "author": "Sheng Chen",
     "publisher": "shengchen",
     "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
@@ -13,149 +13,102 @@
         "url": "https://github.com/jdneo/vscode-checkstyle"
     },
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.30.0"
     },
     "categories": [
         "Programming Languages",
         "Linters"
     ],
-    "keywords": [
-        "java",
-        "checkstyle"
-    ],
     "activationEvents": [
         "onLanguage:java",
-        "onCommand:checkstyle.checkCodeWithCheckstyle",
-        "onCommand:checkstyle.cleanCheckstyleViolation",
-        "onCommand:checkstyle.setVersion",
-        "onCommand:checkstyle.setConfigurationFile",
-        "onCommand:checkstyle.setPropertyFile",
-        "onCommand:checkstyle.setAutocheck"
+        "onCommand:java.checkstyle.quickfix",
+        "onCommand:java.checkstyle.checkcode",
+        "onCommand:java.checkstyle.set.configuration"
     ],
-    "main": "./client/out/extension",
+    "main": "./dist/extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "checkstyle.checkCodeWithCheckstyle",
-                "title": "Check Code",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.cleanCheckstyleViolation",
-                "title": "Clean Checkstyle Violation",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.setVersion",
-                "title": "Set Version",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.setConfigurationFile",
-                "title": "Set Configuration",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.setPropertyFile",
-                "title": "Set Properties",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.setAutocheck",
-                "title": "Switch Automatic Checking",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "checkstyle.showOutputChannel",
-                "title": "Open Output Channel",
-                "category": "Checkstyle"
-            }
+        "javaExtensions": [
+            "./server/com.shengchen.checkstyle.runner-1.0.0.jar"
         ],
         "menus": {
-            "commandPalette": [
-                {
-                    "command": "checkstyle.checkCodeWithCheckstyle",
-                    "when": "resourceExtname == .java"
-                }
-            ],
             "explorer/context": [
                 {
-                    "command": "checkstyle.checkCodeWithCheckstyle",
-                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
-                    "group": "checkstyle@1"
+                    "command": "java.checkstyle.checkcode",
+                    "when": "resourceLangId == java",
+                    "group": "Checkstyle@1"
                 },
                 {
-                    "command": "checkstyle.cleanCheckstyleViolation",
-                    "when": "explorerResourceIsFolder == false && resourceExtname == .java",
-                    "group": "checkstyle@2"
-                }
-            ],
-            "editor/context": [
-                {
-                    "command": "checkstyle.checkCodeWithCheckstyle",
-                    "when": "editorLangId == java",
-                    "group": "checkstyle@1"
-                },
-                {
-                    "command": "checkstyle.cleanCheckstyleViolation",
-                    "when": "editorLangId == java",
-                    "group": "checkstyle@2"
+                    "command": "java.checkstyle.set.configuration",
+                    "when": "!explorerResourceIsFolder && resourceLangId == xml",
+                    "group": "Checkstyle@2"
                 }
             ]
         },
+        "commands": [
+            {
+                "command": "java.checkstyle.checkcode",
+                "title": "%contributes.commands.java.checkstyle.checkcode.title%",
+                "category": "Checkstyle"
+            },
+            {
+                "command": "java.checkstyle.set.configuration",
+                "title": "%contributes.commands.java.checkstyle.set.configuration.title%",
+                "category": "Checkstyle"
+            }
+        ],
         "configuration": {
-            "type": "object",
-            "title": "Checkstyle configuration",
+            "title": "Checkstyle",
             "properties": {
-                "checkstyle.autocheck": {
-                    "scope": "resource",
+                "java.checkstyle.configuration": {
+                    "type": "string",
+                    "description": "%configuration.java.checkstyle.configuration.description%",
+                    "scope": "resource"
+                },
+                "java.checkstyle.properties": {
+                    "type": "object",
+                    "description": "%configuration.java.checkstyle.properties.description%",
+                    "scope": "resource"
+                },
+                "java.checkstyle.autocheck": {
                     "type": "boolean",
-                    "default": false,
-                    "description": "Specify whether the checkstyle extension will check Java files automatically."
-                },
-                "checkstyle.version": {
-                    "scope": "resource",
-                    "type": "string",
-                    "default": "8.0",
-                    "description": "The Checkstyle version or you can specify *.jar file path of the checkstyle."
-                },
-                "checkstyle.configurationFile": {
-                    "scope": "resource",
-                    "type": "string",
-                    "default": "google_checks",
-                    "description": "The checkstyle configuration file. You can use bundled 'google_checks' or 'sun_checks', or specify the local path to the configuration file."
-                },
-                "checkstyle.propertiesPath": {
-                    "scope": "resource",
-                    "type": "string",
-                    "default": "",
-                    "description": "The properties file path of the checkstyle."
-                },
-                "checkstyle.showCheckstyleVersionInvalid": {
-                    "scope": "window",
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Show a warning if the version of Checkstyle is invalid."
+                    "description": "%configuration.java.checkstyle.autocheck.description%",
+                    "scope": "application",
+                    "default": true
                 }
             }
         }
     },
     "scripts": {
-        "vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-        "compile:client": "tsc -p ./client/tsconfig.json",
-        "compile:server": "tsc -p ./server/tsconfig.json",
-        "watch:client": "tsc -w -p ./client/tsconfig.json",
-        "watch:server": "tsc -w -p ./server/tsconfig.json",
-        "compile": "npm run compile:client && npm run compile:server",
-        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-        "lint": "tslint -c tslint.json 'server/src/**/*.ts' 'client/src/**/*.ts'"
+        "vscode:prepublish": "webpack --mode production",
+        "compile": "tsc -p ./",
+        "watch": "webpack --mode development --watch --info-verbosity verbose",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "lint": "gulp lint",
+        "build-plugin": "gulp build-plugin"
     },
+    "extensionDependencies": [
+        "redhat.java"
+    ],
     "devDependencies": {
+        "@types/fs-extra": "^5.0.4",
         "@types/mocha": "^2.2.42",
-        "@types/node": "^6.0.88",
+        "@types/node": "^8.10.25",
+        "gulp": "^4.0.0",
+        "gulp-decompress": "^2.0.2",
+        "gulp-download": "0.0.1",
+        "gulp-tslint": "^8.1.3",
+        "ts-loader": "^5.3.3",
         "tslint": "^5.8.0",
-        "tslint-microsoft-contrib": "^5.0.1",
-        "typescript": "^2.6.2"
+        "typescript": "^3.1.4",
+        "vscode": "^1.1.25",
+        "webpack": "^4.29.0",
+        "webpack-cli": "^3.2.1"
     },
-    "dependencies": {}
+    "dependencies": {
+        "fs-extra": "^7.0.1",
+        "vscode-extension-telemetry-wrapper": "^0.3.8",
+        "vscode-languageclient": "^5.2.1",
+        "vscode-languageserver-protocol": "^3.14.1"
+    }
 }
