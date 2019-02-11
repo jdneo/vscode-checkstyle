@@ -85,7 +85,7 @@ public class CheckstyleRunner {
     public static WorkspaceEdit quickFix(List<Object> arguments)
             throws JavaModelException, IllegalArgumentException, BadLocationException {
         if (arguments == null || arguments.size() < 3) {
-            throw new RuntimeException("Illegal arguments for checking.");
+            throw new RuntimeException("Illegal arguments for quick fix.");
         }
         final String fileToCheckUri = (String) arguments.get(0);
         final int offset = ((Double) arguments.get(1)).intValue();
@@ -107,5 +107,17 @@ public class CheckstyleRunner {
         astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset));
         final TextEdit edit = astRoot.rewrite(document, null);
         return EditUtils.convertToWorkspaceEdit(unit, edit);
+    }
+
+    public static boolean validateConfigurationFile(List<Object> arguments) throws CheckstyleException {
+        if (arguments == null || arguments.size() < 1) {
+            throw new RuntimeException("Illegal arguments for validating configuration file.");
+        }
+
+        final String configurationFsPath = (String) arguments.get(0);
+
+        ConfigurationLoader.loadConfiguration(configurationFsPath, new PropertiesExpander(new Properties()),
+                IgnoredModulesOptions.OMIT);
+        return true;
     }
 }

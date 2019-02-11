@@ -29,6 +29,7 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
 
     private static final String CHECK_CODE_WITH_CHECKSTYLE = "java.checkstyle.checkcode";
     private static final String FIX_CHECKSTYLE_VIOLATION = "java.checkstyle.quickfix";
+    private static final String VALIDATE_CHECKSTYLE_CONFIGURATION = "java.checkstyle.validate.configuration";
 
     @Override
     public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
@@ -37,8 +38,11 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
                 return CheckstyleRunner.check(arguments);
             case FIX_CHECKSTYLE_VIOLATION:
                 return CheckstyleRunner.quickFix(arguments);
+            case VALIDATE_CHECKSTYLE_CONFIGURATION:
+                return CheckstyleRunner.validateConfigurationFile(arguments);
+            default:
+                return null;
         }
-        return null;
     }
 
 }

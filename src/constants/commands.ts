@@ -7,6 +7,7 @@ export namespace JavaLanguageServerCommands {
 
 export namespace CheckstyleExtensionCommands {
     export const SET_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.set.configuration';
+    export const VALIDATE_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.validate.configuration';
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkcode';
     export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickfix';
 }

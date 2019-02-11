@@ -4,7 +4,10 @@
 import * as path from 'path';
 import { OpenDialogOptions, QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
+import { CheckstyleExtensionCommands } from '../constants/commands';
+import { handleErrors } from '../utils/errorUtils';
 import { setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
 export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -25,7 +28,9 @@ export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
                 if (!selectedConfig) {
                     return;
                 }
-                setCheckstyleConfigurationPath(selectedConfig.fsPath, selectedConfig);
+                if (await isCheckstyleConfigurationValid(selectedConfig.fsPath)) {
+                    setCheckstyleConfigurationPath(selectedConfig.fsPath, selectedConfig);
+                }
                 break;
             case ConfigurationSelction.GoogleStyle:
                 setCheckstyleConfigurationPath(BuiltinConfiguration.GoogleCheck);
@@ -90,6 +95,16 @@ async function browseForConfiguration(): Promise<Uri | undefined> {
         return result[0];
     }
     return undefined;
+}
+
+async function isCheckstyleConfigurationValid(fsPath: string): Promise<boolean> {
+    try {
+        return await executeJavaLanguageServerCommand<boolean>(
+            CheckstyleExtensionCommands.VALIDATE_CHECKSTYLE_CONFIGURATION, fsPath) || false;
+    } catch (error) {
+        handleErrors(error);
+        return false;
+    }
 }
 
 enum ConfigurationSelction {

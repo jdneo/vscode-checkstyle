@@ -5,6 +5,7 @@
     <delegateCommandHandler class="com.shengchen.checkstyle.runner.handler.DelegateCommandHandler">
     	<command id="java.checkstyle.checkcode"/>
     	<command id="java.checkstyle.quickfix"/>
+    	<command id="java.checkstyle.validate.configuration"/>
     </delegateCommandHandler>
   </extension>
 </plugin>
