@@ -18,6 +18,6 @@ install:
 - npm install
 
 script:
-- npm run lint
 - npm run build-plugin
+- npm run lint
 - npx vsce@latest package
