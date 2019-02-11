@@ -1,10 +1,49 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+**/test-launch.config
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.iml
+**/*.vsix
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# build
+target/
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# Checkstyle
+**/.checkstyle
+
+# VS Code
 out
-node_modules
+**/node_modules/
 .vscode-test/
 *.vsix
-*.jar
-.checkstyle
-.project
-*.ini
 dist
+jdtls/
+
+# Mac
 .DS_Store
+
+!jdtls.ext/.mvn/wrapper/maven-wrapper.jar

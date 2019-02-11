@@ -3,6 +3,7 @@
 out/test/**
 src/**
 .gitignore
+.travis.yml
 **/tsconfig.json
 **/tslint.json
 **/*.map
@@ -10,3 +11,7 @@ src/**
 dist/**/*.map
 webpack.config.js
 node_modules
+package-lock.json
+docs
+gulpfile.js
+jdtls.ext
