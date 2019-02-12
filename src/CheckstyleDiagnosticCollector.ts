@@ -42,12 +42,12 @@ class CheckstyleDiagnosticCollector implements Disposable {
     }
 
     private parseDiagnosticSeverity(severity: string): DiagnosticSeverity {
-        switch (severity) {
-            case 'INFO':
+        switch (severity.toLocaleLowerCase()) {
+            case 'info':
                 return DiagnosticSeverity.Information;
-            case 'WARNING':
+            case 'warning':
                 return DiagnosticSeverity.Warning;
-            case 'ERROR':
+            case 'error':
             default:
                 return DiagnosticSeverity.Error;
         }
