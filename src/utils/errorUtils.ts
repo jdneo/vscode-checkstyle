@@ -9,7 +9,11 @@ const OPEN: string = 'Open';
 const REPORT_ISSUE: string = 'Report Issue';
 
 export async function handleErrors(error: Error): Promise<void> {
-    checkstyleChannel.appendLine(error.toString());
+    if (error['data']) {
+        checkstyleChannel.appendLine(JSON.stringify(error['data']));
+    } else {
+        checkstyleChannel.appendLine(error.toString());
+    }
     const choice: string | undefined = await window.showErrorMessage('Unexpected exception occurred, please open the Checkstyle output channel for details.', OPEN, REPORT_ISSUE);
     if (!choice) {
         return;
