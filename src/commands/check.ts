@@ -10,14 +10,10 @@ import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
 import { handleErrors } from '../utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, isAutoCheckEnabled } from '../utils/settingUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleProperties } from '../utils/settingUtils';
 import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
 export async function checkstyle(uri?: Uri): Promise<void> {
-    if (!isAutoCheckEnabled()) {
-        return;
-    }
-
     if (!uri) {
         if (!window.activeTextEditor) {
             return;

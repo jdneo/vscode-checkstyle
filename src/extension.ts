@@ -9,20 +9,27 @@ import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
+import { isAutoCheckEnabled } from './utils/settingUtils';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'), true);
     await instrumentOperation('activation', doActivate)(context);
 
     workspace.onDidSaveTextDocument((doc: TextDocument) => {
-        checkstyle(doc.uri);
+        if (isAutoCheckEnabled()) {
+            checkstyle(doc.uri);
+        }
     }, null, context.subscriptions);
 
     workspace.onDidOpenTextDocument((doc: TextDocument) => {
-        checkstyle(doc.uri);
+        if (isAutoCheckEnabled()) {
+            checkstyle(doc.uri);
+        }
     }, null, context.subscriptions);
 
-    checkstyle();
+    if (isAutoCheckEnabled()) {
+        checkstyle();
+    }
 }
 
 export async function deactivate(): Promise<void> {
