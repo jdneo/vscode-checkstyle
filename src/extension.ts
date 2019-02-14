@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ExtensionContext, languages, TextDocument, Uri, workspace } from 'vscode';
+import { ExtensionContext, languages, TextDocument, TextEditor, Uri, window, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyle } from './commands/check';
@@ -21,9 +21,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
         }
     }, null, context.subscriptions);
 
-    workspace.onDidOpenTextDocument((doc: TextDocument) => {
-        if (isAutoCheckEnabled()) {
-            checkstyle(doc.uri);
+    window.onDidChangeActiveTextEditor((editor: TextEditor | undefined) => {
+        if (editor && isAutoCheckEnabled()) {
+            checkstyle(editor.document.uri);
         }
     }, null, context.subscriptions);
 
