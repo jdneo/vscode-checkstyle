@@ -54,7 +54,7 @@
 |---|---|---|
 | `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. | `""` |
 | `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
-| `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `false` |
+| `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `true` |
 
 > Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example: 
 
