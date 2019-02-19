@@ -5,7 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { Uri, window } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
-import { checkstyleDiagnosticCollector } from '../CheckstyleDiagnosticCollector';
+import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
