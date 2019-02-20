@@ -12,9 +12,6 @@ class CheckstyleDiagnosticCollector implements Disposable {
     }
 
     public addDiagnostics(uri: Uri, violations: ICheckstyleResult[]): void {
-        if (violations.length === 0) {
-            return;
-        }
         const diagnostics: Diagnostic[] = [];
         for (const violation of violations) {
             const startLine: number = Math.max(violation.line - 1, 0);
@@ -28,6 +25,10 @@ class CheckstyleDiagnosticCollector implements Disposable {
             });
         }
         this.diagnosticCollection.set(uri, diagnostics);
+    }
+
+    public getDiagnostics(uri: Uri): Diagnostic[] | undefined {
+        return this.diagnosticCollection.get(uri);
     }
 
     public delete(uri: Uri): void {
