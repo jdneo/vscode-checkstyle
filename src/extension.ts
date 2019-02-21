@@ -5,13 +5,13 @@ import { ExtensionContext, FileSystemWatcher, languages, TextEditor, Uri, window
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
+import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkstyle } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
 import { isAutoCheckEnabled } from './utils/settingUtils';
-import { checkstyleStatusBar } from './checkstyleStatusBar';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'));
