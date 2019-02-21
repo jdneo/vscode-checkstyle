@@ -11,6 +11,7 @@ import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguratio
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
 import { isAutoCheckEnabled } from './utils/settingUtils';
+import { checkstyleStatusBar } from './checkstyleStatusBar';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'));
@@ -45,6 +46,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
 
     context.subscriptions.push(
         checkstyleChannel,
+        checkstyleStatusBar,
         watcher,
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
