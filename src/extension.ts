@@ -5,6 +5,7 @@ import { ExtensionContext, FileSystemWatcher, languages, TextEditor, Uri, window
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
+import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkstyle } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
@@ -45,8 +46,10 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
 
     context.subscriptions.push(
         checkstyleChannel,
+        checkstyleStatusBar,
         watcher,
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkstyle(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),

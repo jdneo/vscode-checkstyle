@@ -6,6 +6,7 @@ import * as path from 'path';
 import { Uri, window } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
 import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
+import { checkstyleStatusBar } from '../checkstyleStatusBar';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
@@ -45,6 +46,7 @@ export async function checkstyle(uri?: Uri): Promise<void> {
             return;
         }
         checkstyleDiagnosticCollector.addDiagnostics(uri, results);
+        checkstyleStatusBar.showStatus();
     } catch (error) {
         handleErrors(error);
     }
