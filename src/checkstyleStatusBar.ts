@@ -26,7 +26,7 @@ class CheckstyleStatusBar implements Disposable {
         }
 
         this.statusBar.text = diagnostics.length !== 0 ? '$(bug)' : '$(check)';
-        this.statusBar.tooltip = `[Checkstyle] ${diagnostics.length} violation${diagnostics.length > 1 ? 's' : ''} found`;
+        this.statusBar.tooltip = `[Checkstyle] ${diagnostics.length} violation${diagnostics.length === 1 ? '' : 's'} found`;
         this.statusBar.show();
     }
 
