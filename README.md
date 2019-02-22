@@ -66,4 +66,4 @@
 
 ## Release Notes
 
-Refer to [CHANGELOG.md](https://github.com/jdneo/vscode-checkstyle/blob/develop/CHANGELOG.md)
+Refer to [CHANGELOG.md](https://github.com/jdneo/vscode-checkstyle/blob/master/CHANGELOG.md)
