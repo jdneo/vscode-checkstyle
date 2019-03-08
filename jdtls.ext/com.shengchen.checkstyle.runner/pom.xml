@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.shengchen.checkstyle</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>com.shengchen.checkstyle.runner</artifactId>
 	<packaging>eclipse-plugin</packaging>

@@ -3,6 +3,13 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.1]
+## Changed
+- Upgrade the embedded Checkstyle version to 8.18.
+
+## Fixed
+- [Bug fixed](https://github.com/jdneo/vscode-checkstyle/issues?q=is%3Aissue+is%3Aclosed+milestone%3A1.0.1+label%3Abug)
+
 ## [1.0.0]
 Initial release for the new Checkstyle extension, the new extension contains following features:
 - Check code with Checkstyle.
