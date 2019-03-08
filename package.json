@@ -2,7 +2,7 @@
     "name": "vscode-checkstyle",
     "displayName": "Checkstyle for Java",
     "description": "%description%",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Sheng Chen",
     "publisher": "shengchen",
     "license": "GNU LGPL V3.0",
