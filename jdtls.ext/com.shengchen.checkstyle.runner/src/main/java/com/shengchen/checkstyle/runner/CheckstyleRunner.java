@@ -67,7 +67,7 @@ public class CheckstyleRunner {
         // names, see
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
-        checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
+        checker.setModuleClassLoader(Checker.class.getClassLoader());
         final Properties checkstyleProperties = new Properties();
         checkstyleProperties.putAll(properties);
         final Configuration configuration = ConfigurationLoader.loadConfiguration(configurationFsPath,
