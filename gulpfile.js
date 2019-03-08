@@ -14,7 +14,7 @@ const serverDir = path.join(__dirname, 'jdtls.ext');
 const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
 
 // Build required jar files.
-const checkstyleVersion = '8.17';
+const checkstyleVersion = '8.18';
 gulp.task('download-checkstyle', (done) => {
     download(`https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${checkstyleVersion}/checkstyle-${checkstyleVersion}-all.jar`)
         .pipe(gulp.dest(path.join(serverDir, 'com.shengchen.checkstyle.runner', 'lib')))
