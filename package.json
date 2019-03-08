@@ -33,7 +33,7 @@
     "main": "./dist/extension",
     "contributes": {
         "javaExtensions": [
-            "./server/com.shengchen.checkstyle.runner-1.0.0.jar"
+            "./server/com.shengchen.checkstyle.runner-1.0.1.jar"
         ],
         "menus": {
             "explorer/context": [
