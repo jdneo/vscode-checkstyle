@@ -112,7 +112,7 @@
     },
     "dependencies": {
         "fs-extra": "^7.0.1",
-        "vscode-extension-telemetry-wrapper": "^0.3.8",
+        "vscode-extension-telemetry-wrapper": "^0.3.9",
         "vscode-languageclient": "^5.2.1",
         "vscode-languageserver-protocol": "^3.14.1"
     }
