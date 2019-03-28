@@ -3,6 +3,10 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.3]
+## Fixed
+- Fix vulnerability issues. ([PR#170](https://github.com/jdneo/vscode-checkstyle/pull/170))
+
 ## [1.0.2]
 ## Fixed
 - Fixed the java extension version.
