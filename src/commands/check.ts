@@ -34,7 +34,7 @@ export async function checkstyle(uri?: Uri): Promise<void> {
         return;
     }
     if (!isBuiltinConfiguration(configurationPath) && !await fse.pathExists(configurationPath)) {
-        window.showErrorMessage('The Checkstyle configuration file does not exist. Please make sure it is set correctly.');
+        window.showErrorMessage('The following Checkstyle configuration file does not exist. Please make sure it is set correctly.', configurationPath);
         return;
     }
 
