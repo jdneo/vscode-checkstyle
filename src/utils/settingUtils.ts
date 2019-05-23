@@ -25,7 +25,7 @@ export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void 
     setConfiguration(JAVA_CHECKSTYLE_CONFIGURATION, fsPath, uri);
 }
 
-const workspaceRegexp: RegExp = /\$\{workspacefolder\}/i;
+const workspaceRegexp: RegExp = /\$\{workspaceFolder\}/i;
 function resolveVariables(resourceUri: Uri, value: string): string {
     const workspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(resourceUri);
     if (!workspaceFolder) {
