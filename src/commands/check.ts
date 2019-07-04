@@ -1,13 +1,11 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import * as fse from 'fs-extra';
 import * as path from 'path';
 import { Uri, window } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
 import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
 import { checkstyleStatusBar } from '../checkstyleStatusBar';
-import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
 import { handleErrors } from '../utils/errorUtils';
@@ -33,10 +31,6 @@ export async function checkstyle(uri?: Uri): Promise<void> {
         checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
         return;
     }
-    if (!isBuiltinConfiguration(configurationPath) && !await fse.pathExists(configurationPath)) {
-        window.showErrorMessage('The Checkstyle configuration file does not exist. Please make sure it is set correctly.');
-        return;
-    }
 
     try {
         const results: ICheckstyleResult[] | undefined = await executeJavaLanguageServerCommand<ICheckstyleResult[]>(
@@ -50,8 +44,4 @@ export async function checkstyle(uri?: Uri): Promise<void> {
     } catch (error) {
         handleErrors(error);
     }
-}
-
-function isBuiltinConfiguration(config: string): boolean {
-    return config === BuiltinConfiguration.GoogleCheck || config === BuiltinConfiguration.SunCheck;
 }
