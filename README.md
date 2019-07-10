@@ -52,7 +52,7 @@
 ## Settings
 | Setting Name | Description | Default Value |
 |---|---|---|
-| `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. | `""` |
+| `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. The path can either be a local file path or a URL. | `""` |
 | `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
 | `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `true` |
 

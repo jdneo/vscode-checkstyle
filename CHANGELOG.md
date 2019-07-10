@@ -4,31 +4,34 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [1.0.3]
-## Fixed
+### Added
+- Support loading CheckStyle Configuration via URL. ([#181](https://github.com/jdneo/vscode-checkstyle/issues/181))
+
+### Fixed
 - Fix vulnerability issues. ([PR#170](https://github.com/jdneo/vscode-checkstyle/pull/170))
 
 ## [1.0.2]
-## Fixed
+### Fixed
 - Fixed the java extension version.
 
 ## [1.0.1]
-## Changed
+### Changed
 - Upgrade the embedded Checkstyle version to 8.18.
 
-## Fixed
+### Fixed
 - [Bug fixed](https://github.com/jdneo/vscode-checkstyle/issues?q=is%3Aissue+is%3Aclosed+milestone%3A1.0.1+label%3Abug)
 
-## [1.0.0]
+### [1.0.0]
 Initial release for the new Checkstyle extension, the new extension contains following features:
 - Check code with Checkstyle.
 - Provide quick fix if it's available.
 
 ## [0.5.2]
-## Fixed
+### Fixed
 - Fixed some bugs.
 
 ## [0.5.1]
-## Fixed
+### Fixed
 - Disable Checkstyle commands appear in the context menu of output panel. ([#118](https://github.com/jdneo/vscode-checkstyle/issues/118))
 - Download Checkstyle jars from Github. ([#120](https://github.com/jdneo/vscode-checkstyle/issues/120))
 
