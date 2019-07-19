@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import * as crypto from 'crypto';
 import * as fse from 'fs-extra';
 import * as path from 'path';
@@ -119,8 +122,9 @@ export class FileSynchronizer {
     }
 
     private getTempPath(document: vscode.TextDocument): string {
-        if (this.tempFilePool.has(document.uri.fsPath)) {
-            return this.tempFilePool.get(document.uri.fsPath)!;
+        const tempPath: string | undefined = this.tempFilePool.get(document.uri.fsPath);
+        if (tempPath) {
+            return tempPath;
         }
         const tempStorage: string | undefined = this.context.storagePath;
         if (!tempStorage) {

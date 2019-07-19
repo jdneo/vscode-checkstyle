@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import { checkstyleChannel } from './checkstyleChannel';
@@ -99,7 +102,6 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         }
         this.syncedFiles.delete(filePath);
         syncedFile.close();
-        checkstyleDiagnosticCollector.delete(syncedFile.realUri);
     }
 }
 
