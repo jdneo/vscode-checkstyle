@@ -3,6 +3,7 @@
 
 import * as crypto from 'crypto';
 import * as fse from 'fs-extra';
+import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
@@ -55,13 +56,18 @@ interface ISyncRequests {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class FileSynchronizer {
+export class FileSynchronizer implements vscode.Disposable {
 
+    private tempStorage: string = this.getTempStorage();
     private tempFilePool: Map<string, string> = new Map(); // managed filePath -> tempPath
     private pending: ISyncRequests = { open: new Map(), change: new Map(), close: new Map() };
     private lastFlush: Promise<void[]>;
 
     constructor(private context: vscode.ExtensionContext) {}
+
+    public dispose(): void {
+        fse.remove(this.tempStorage);
+    }
 
     // Ensure a file created in temp folder and managed by synchronizer
     public open(document: vscode.TextDocument): vscode.Uri {
@@ -126,11 +132,15 @@ export class FileSynchronizer {
         if (tempPath) {
             return tempPath;
         }
-        const tempStorage: string | undefined = this.context.storagePath;
-        if (!tempStorage) {
-            throw Error('Open a folder first'); // Todo: create in tmp folder?
-        }
         const tempFile: string = `${crypto.createHash('md5').update(document.uri.fsPath).digest('hex')}.${document.languageId}`;
-        return path.join(tempStorage, tempFile);
+        return path.join(this.tempStorage, tempFile);
+    }
+
+    private getTempStorage(): string {
+        const storagePath: string | undefined = this.context.storagePath;
+        if (!storagePath) {
+            return path.join(os.tmpdir(), `vscode_checkstyle_sync_${Math.random().toString(36).slice(2, 10)}`);
+        }
+        return path.join(storagePath, 'sync');
     }
 }

@@ -34,6 +34,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
     }
 
     public dispose(): void {
+        this.synchronizer.dispose();
         for (const listener of this.listeners) {
             listener.dispose();
         }
