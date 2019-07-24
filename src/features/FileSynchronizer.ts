@@ -61,7 +61,7 @@ export class FileSynchronizer implements vscode.Disposable {
     private tempStorage: string = this.getTempStorage();
     private tempFilePool: Map<string, string> = new Map(); // managed filePath -> tempPath
     private pending: ISyncRequests = { open: new Map(), change: new Map(), close: new Map() };
-    private lastFlush: Promise<void[]>;
+    private pendingPromises: Map<string, Promise<void>> = new Map();
 
     constructor(private context: vscode.ExtensionContext) {}
 
@@ -97,34 +97,22 @@ export class FileSynchronizer implements vscode.Disposable {
 
     // Do the actual IO operartion, sending out all pending requests
     public async flush(): Promise<void> {
-        // Wait for last flush to complete
-        await this.lastFlush;
-        const pendingPromises: Map<string, Promise<void>> = new Map();
-
         for (const [filePath, tempPath] of this.pending.open.entries()) {
-            pendingPromises.set(tempPath, (async (): Promise<void> => {
-                if (!await fse.pathExists(tempPath)) {
-                    await fse.createFile(tempPath);
-                }
-            })());
+            this.appendPromise(tempPath, fse.createFile(tempPath));
             this.tempFilePool.set(filePath, tempPath);
         }
 
         for (const [tempPath, content] of this.pending.change.entries()) {
-            pendingPromises.set(tempPath, (async (): Promise<void> => {
-                await pendingPromises.get(tempPath); // Wait for potential open request first
-                await fse.writeFile(tempPath, content);
-            })());
+            this.appendPromise(tempPath, fse.writeFile(tempPath, content));
         }
 
         for (const [filePath, tempPath] of this.pending.close.entries()) {
-            pendingPromises.set(tempPath, fse.remove(tempPath));
+            this.appendPromise(tempPath, fse.remove(tempPath));
             this.tempFilePool.delete(filePath);
         }
 
         this.pending = { open: new Map(), change: new Map(), close: new Map() };
-        this.lastFlush = Promise.all(pendingPromises.values());
-        await this.lastFlush;
+        await Promise.all(this.pendingPromises.values());
     }
 
     private getTempPath(document: vscode.TextDocument): string {
@@ -142,5 +130,12 @@ export class FileSynchronizer implements vscode.Disposable {
             return path.join(os.tmpdir(), `vscode_checkstyle_sync_${Math.random().toString(36).slice(2, 10)}`);
         }
         return path.join(storagePath, 'sync');
+    }
+
+    private appendPromise(file: string, nextPromise: Promise<void>): void {
+        this.pendingPromises.set(file, (async (): Promise<void> => {
+            await this.pendingPromises.get(file);
+            await nextPromise;
+        })());
     }
 }
