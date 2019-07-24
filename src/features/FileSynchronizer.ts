@@ -81,24 +81,41 @@ export class FileSynchronizer implements vscode.Disposable {
 
     // Ensure a file created in temp folder and managed by synchronizer
     public open(document: vscode.TextDocument): void {
-        if (!this.managedFiles.has(document.uri.fsPath)) {
-            this.pending.open.add(document.uri.fsPath);
-        } // Skip if already open
+        // Cancel pending remove request
+        if (this.pending.close.has(document.fileName)) {
+            this.pending.close.delete(document.fileName);
+        }
+        // Skip if already open
+        if (!this.managedFiles.has(document.fileName)) {
+            this.pending.open.add(document.fileName);
+        }
     }
 
     // Change content of temp file that already exists
     public change(document: vscode.TextDocument, _event?: vscode.TextDocumentContentChangeEvent[]): void {
+        // Skip if there's pending remove request
+        if (this.pending.close.has(document.fileName)) {
+            return;
+        }
         // Skip if not already open and will not be open in the pending requests
-        if (this.managedFiles.has(document.uri.fsPath) || this.pending.open.has(document.uri.fsPath)) {
-            this.pending.change.set(document.uri.fsPath, document.getText());
+        if (this.managedFiles.has(document.fileName) || this.pending.open.has(document.fileName)) {
+            this.pending.change.set(document.fileName, document.getText());
         }
     }
 
     // Delete the temp file, release the management of synchronizer
     public close(document: vscode.TextDocument): void {
-        if (this.managedFiles.has(document.uri.fsPath)) {
-            this.pending.close.add(document.uri.fsPath);
-        } // Skip if already closed
+        // Cancel the pending open or change request
+        if (this.pending.open.has(document.fileName)) {
+            this.pending.open.delete(document.fileName);
+        }
+        if (this.pending.change.has(document.fileName)) {
+            this.pending.change.delete(document.fileName);
+        }
+        // Skip if already closed
+        if (this.managedFiles.has(document.fileName)) {
+            this.pending.close.add(document.fileName);
+        }
     }
 
     // Do the actual IO operartion, sending out all pending requests
@@ -130,7 +147,7 @@ export class FileSynchronizer implements vscode.Disposable {
             } catch (error) { // Error in IO task, e.g. file occupied
                 tempPath = this.getTempPath(tempPath); // Compute a new temp path
                 this.tempPathMap.set(filePath, tempPath);
-                await syncTask(tempPath); // If fails again, turn to next flush for new temp path
+                await syncTask(tempPath); // If fails again, postpone to next flush for new temp path
             }
         })());
     }
