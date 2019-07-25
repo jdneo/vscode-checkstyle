@@ -6,6 +6,7 @@ import * as fse from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { checkstyleChannel } from '../checkstyleChannel';
 
 export class SyncedFile {
     constructor(
@@ -56,8 +57,7 @@ interface ISyncRequests {
 export class FileSynchronizer implements vscode.Disposable {
 
     private tempStorage: string = this.getTempStorage();
-    private tempPathMap: Map<string, string> = new Map(); // file path -> temp path
-    private managedFiles: Set<string> = new Set(); // owns managed real files
+    private tempFilePool: Map<string, string> = new Map(); // managed file path -> temp path
     private pending: ISyncRequests = { open: new Set(), change: new Map(), close: new Set() };
     private pendingPromises: Map<string, Promise<void>> = new Map();
 
@@ -68,12 +68,12 @@ export class FileSynchronizer implements vscode.Disposable {
     }
 
     public hasTempUri(realUri: vscode.Uri): boolean {
-        return this.managedFiles.has(realUri.fsPath);
+        return this.tempFilePool.has(realUri.fsPath);
     }
 
     public getTempUri(realUri: vscode.Uri): vscode.Uri | undefined {
-        const tempPath: string | undefined = this.tempPathMap.get(realUri.fsPath);
-        if (this.hasTempUri(realUri) && tempPath) {
+        const tempPath: string | undefined = this.tempFilePool.get(realUri.fsPath);
+        if (tempPath) {
             return vscode.Uri.file(tempPath);
         }
         return undefined;
@@ -86,7 +86,7 @@ export class FileSynchronizer implements vscode.Disposable {
             this.pending.close.delete(document.fileName);
         }
         // Skip if already open
-        if (!this.managedFiles.has(document.fileName)) {
+        if (!this.tempFilePool.has(document.fileName)) {
             this.pending.open.add(document.fileName);
         }
     }
@@ -98,7 +98,7 @@ export class FileSynchronizer implements vscode.Disposable {
             return;
         }
         // Skip if not already open and will not be open in the pending requests
-        if (this.managedFiles.has(document.fileName) || this.pending.open.has(document.fileName)) {
+        if (this.tempFilePool.has(document.fileName) || this.pending.open.has(document.fileName)) {
             this.pending.change.set(document.fileName, document.getText());
         }
     }
@@ -113,7 +113,7 @@ export class FileSynchronizer implements vscode.Disposable {
             this.pending.change.delete(document.fileName);
         }
         // Skip if already closed
-        if (this.managedFiles.has(document.fileName)) {
+        if (this.tempFilePool.has(document.fileName)) {
             this.pending.close.add(document.fileName);
         }
     }
@@ -121,17 +121,24 @@ export class FileSynchronizer implements vscode.Disposable {
     // Do the actual IO operartion, sending out all pending requests
     public async flush(): Promise<void> {
         for (const filePath of this.pending.open.values()) {
-            this.setSyncPromise(filePath, fse.createFile);
-            this.managedFiles.add(filePath);
+            this.setSyncPromise(filePath, async (tempPath: string) => {
+                await fse.createFile(tempPath);
+                this.tempFilePool.set(filePath, tempPath);
+            });
         }
 
         for (const [filePath, content] of this.pending.change.entries()) {
-            this.setSyncPromise(filePath, (temp: string) => fse.writeFile(temp, content));
+            this.setSyncPromise(filePath, async (tempPath: string) => {
+                await fse.writeFile(tempPath, content);
+                this.tempFilePool.set(filePath, tempPath); // Maybe tempPath is updated
+            });
         }
 
         for (const filePath of this.pending.close.values()) {
-            this.setSyncPromise(filePath, fse.remove);
-            this.managedFiles.delete(filePath);
+            this.setSyncPromise(filePath, async (tempPath: string) => {
+                await fse.remove(tempPath);
+                this.tempFilePool.delete(filePath);
+            });
         }
 
         this.pending = { open: new Set(), change: new Map(), close: new Set() };
@@ -141,23 +148,29 @@ export class FileSynchronizer implements vscode.Disposable {
     private setSyncPromise(filePath: string, syncTask: (temp: string) => Promise<void>): void {
         this.pendingPromises.set(filePath, (async (): Promise<void> => {
             await this.pendingPromises.get(filePath); // Ensure IO sequence
-            let tempPath: string = this.getTempPath(filePath);
-            try {
-                await syncTask(tempPath);
-            } catch (error) { // Error in IO task, e.g. file occupied
-                tempPath = this.getTempPath(tempPath); // Compute a new temp path
-                this.tempPathMap.set(filePath, tempPath);
-                await syncTask(tempPath); // If fails again, postpone to next flush for new temp path
+            let tempPath: string = this.ensureTempPath(filePath);
+            let failCount: number = 0;
+            while (failCount < 5) {
+                try {
+                    await syncTask(tempPath);
+                    break;
+                } catch (error) { // Error in IO task, e.g. file occupied
+                    checkstyleChannel.appendLine(error.toString());
+                    tempPath = this.ensureTempPath(tempPath); // Compute a new temp path
+                    failCount += 1;
+                }
+            }
+            if (failCount === 5) {
+                vscode.window.showErrorMessage('Sync file IO error after 5 trials.');
             }
         })());
     }
 
-    private getTempPath(realPath: string): string {
-        let tempPath: string | undefined = this.tempPathMap.get(realPath);
+    private ensureTempPath(realPath: string): string {
+        let tempPath: string | undefined = this.tempFilePool.get(realPath);
         if (!tempPath) {
             const tempHash: string = crypto.createHash('md5').update(realPath).digest('hex');
             tempPath = path.join(this.tempStorage, `${tempHash}.${path.extname(realPath)}`);
-            this.tempPathMap.set(realPath, tempPath);
         }
         return tempPath;
     }
