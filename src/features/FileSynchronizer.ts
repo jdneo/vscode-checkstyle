@@ -117,9 +117,9 @@ export class FileSynchronizer implements vscode.Disposable {
     // Do the actual IO operartion, sending out all pending requests
     public async flush(): Promise<void> {
         for (const [filePath, content] of this.pending.write.entries()) {
-            this.setSyncPromise(filePath, async (tempPath: string) => {
+            this.setSyncPromise(filePath, async (tempPath: string) => { // When IO faliure occurs, temp path will be updated
                 await fse.writeFile(tempPath, content);
-                this.tempFilePool.set(filePath, tempPath); // Maybe tempPath is updated
+                this.tempFilePool.set(filePath, tempPath); // Set or update temp path mapping
             });
         }
 
@@ -149,7 +149,7 @@ export class FileSynchronizer implements vscode.Disposable {
                     failCount += 1;
                 }
             }
-            if (failCount === 5) {
+            if (failCount >= 5) {
                 vscode.window.showErrorMessage('Sync file IO error after 5 trials.');
             }
         })());

@@ -93,7 +93,6 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 return;
             }
 
-            checkstyleDiagnosticCollector.delete(file.realUri);
             try {
                 const results: ICheckstyleResult[] | undefined = await executeJavaLanguageServerCommand<ICheckstyleResult[]>(
                     CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, file.syncUri.toString(), configurationPath, getCheckstyleProperties(file.realUri));
@@ -101,6 +100,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                     checkstyleChannel.appendLine('Unable to get results from Language Server.');
                     return;
                 }
+                checkstyleDiagnosticCollector.delete(file.realUri);
                 checkstyleDiagnosticCollector.addDiagnostics(file.realUri, results);
                 checkstyleStatusBar.showStatus();
             } catch (error) {
