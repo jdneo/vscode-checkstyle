@@ -17,16 +17,18 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     private context: vscode.ExtensionContext;
     private listeners: vscode.Disposable[];
+    private pendingDiagnostics: Set<SyncedFile>;
     private syncedFiles: Map<string, SyncedFile>;
     private synchronizer: FileSynchronizer;
-    private diagnosticDelayer: ((file: SyncedFile) => Promise<void>) & _.Cancelable;
+    private diagnosticDelayTrigger: (() => Promise<void>) & _.Cancelable;
 
     public initialize(context: vscode.ExtensionContext): void {
         this.context = context;
         this.listeners = [];
+        this.pendingDiagnostics = new Set();
         this.syncedFiles = new Map();
         this.synchronizer = new FileSynchronizer(this.context);
-        this.diagnosticDelayer = _.debounce(this.sendDiagnostic.bind(this), 200);
+        this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
         vscode.workspace.onDidOpenTextDocument(this.onDidOpenTextDocument, this, this.listeners);
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this.listeners);
         vscode.workspace.onDidCloseTextDocument(this.onDidCloseTextDocument, this, this.listeners);
@@ -37,35 +39,6 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.synchronizer.dispose();
         for (const listener of this.listeners) {
             listener.dispose();
-        }
-    }
-
-    public requestDiagnostic(file: SyncedFile): void {
-        this.diagnosticDelayer(file);
-    }
-
-    public async sendDiagnostic(file: SyncedFile): Promise<void> {
-        await this.synchronizer.flush();
-
-        checkstyleDiagnosticCollector.delete(file.realUri);
-
-        const configurationPath: string = getCheckstyleConfigurationPath(file.realUri);
-        if (configurationPath === '') {
-            checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
-            return;
-        }
-
-        try {
-            const results: ICheckstyleResult[] | undefined = await executeJavaLanguageServerCommand<ICheckstyleResult[]>(
-                CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, file.syncUri.toString(), configurationPath, getCheckstyleProperties(file.realUri));
-            if (!results) {
-                checkstyleChannel.appendLine('Unable to get results from Language Server.');
-                return;
-            }
-            checkstyleDiagnosticCollector.addDiagnostics(file.realUri, results);
-            checkstyleStatusBar.showStatus();
-        } catch (error) {
-            handleErrors(error);
         }
     }
 
@@ -103,6 +76,38 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         }
         this.syncedFiles.delete(filePath);
         syncedFile.close();
+    }
+
+    private requestDiagnostic(file: SyncedFile): void {
+        this.pendingDiagnostics.add(file);
+        this.diagnosticDelayTrigger();
+    }
+
+    private async sendPendingDiagnostics(): Promise<void> {
+        await this.synchronizer.flush();
+
+        for (const file of this.pendingDiagnostics.values()) {
+            const configurationPath: string = getCheckstyleConfigurationPath(file.realUri);
+            if (configurationPath === '') {
+                checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
+                return;
+            }
+
+            try {
+                const results: ICheckstyleResult[] | undefined = await executeJavaLanguageServerCommand<ICheckstyleResult[]>(
+                    CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, file.syncUri.toString(), configurationPath, getCheckstyleProperties(file.realUri));
+                if (!results) {
+                    checkstyleChannel.appendLine('Unable to get results from Language Server.');
+                    return;
+                }
+                checkstyleDiagnosticCollector.delete(file.realUri);
+                checkstyleDiagnosticCollector.addDiagnostics(file.realUri, results);
+                checkstyleStatusBar.showStatus();
+            } catch (error) {
+                handleErrors(error);
+            }
+        }
+        this.pendingDiagnostics.clear();
     }
 }
 
