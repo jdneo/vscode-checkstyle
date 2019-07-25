@@ -107,6 +107,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 handleErrors(error);
             }
         }
+        this.pendingDiagnostics.clear();
     }
 }
 
