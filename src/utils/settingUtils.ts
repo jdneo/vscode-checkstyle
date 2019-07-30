@@ -4,15 +4,15 @@
 import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
 import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/configs';
 
-export function getCheckstyleConfigurationPath(uri: Uri): string {
+export function getCheckstyleConfigurationPath(uri?: Uri): string {
     const configurationPath: string = getConfiguration(uri).get<string>(JAVA_CHECKSTYLE_CONFIGURATION, '');
-    return resolveVariables(uri, configurationPath);
+    return resolveVariables(configurationPath, uri);
 }
 
-export function getCheckstyleProperties(uri: Uri): object {
+export function getCheckstyleProperties(uri?: Uri): object {
     const properties: {} = workspace.getConfiguration(undefined, uri).get(JAVA_CHECKSTYLE_PROPERTIES, {});
     for (const key of Object.keys(properties)) {
-        properties[key] = resolveVariables(uri, resolveVariables(uri, properties[key]));
+        properties[key] = resolveVariables(resolveVariables(properties[key], uri), uri);
     }
     return properties;
 }
@@ -26,7 +26,13 @@ export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void 
 }
 
 const workspaceRegexp: RegExp = /\$\{workspacefolder\}/i;
-function resolveVariables(resourceUri: Uri, value: string): string {
+function resolveVariables(value: string, resourceUri?: Uri): string {
+    if (!resourceUri) {
+        if (!window.activeTextEditor) {
+            return value;
+        }
+        resourceUri = window.activeTextEditor.document.uri;
+    }
     const workspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(resourceUri);
     if (!workspaceFolder) {
         return value;
