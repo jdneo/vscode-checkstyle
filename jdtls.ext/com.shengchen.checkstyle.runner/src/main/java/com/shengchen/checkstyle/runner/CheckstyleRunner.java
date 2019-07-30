@@ -41,25 +41,25 @@ import org.eclipse.text.edits.TextEdit;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("restriction")
 public class CheckstyleRunner {
-    public static List<CheckResult> check(List<Object> arguments)
-            throws UnsupportedEncodingException, CoreException, CheckstyleException {
-        if (arguments == null || arguments.size() < 3) {
-            throw new RuntimeException("Illegal arguments for checking.");
-        }
-        final String fileToCheckUri = (String) arguments.get(0);
-        final String configurationFsPath = (String) arguments.get(1);
-        final Map<String, String> properties = (Map) arguments.get(2);
-        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
+    public static Map<String, List<CheckResult>> checkCode(
+        List<String> filesToCheckUris,
+        String configurationFsPath,
+        Map<String, String> properties            
+    ) throws UnsupportedEncodingException, CoreException, CheckstyleException {
+        final List<File> filesToCheck = filesToCheckUris.stream()
+                .map(file -> new File(file))
+                .collect(Collectors.toList());
 
         final Checker checker = new Checker();
+        
+        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(filesToCheck.get(0).toURI());
         checker.setCharset(unit.getJavaProject().getProject().getDefaultCharset());
 
         // reset the basedir if it is set so it won't get into the plugins way
@@ -68,29 +68,25 @@ public class CheckstyleRunner {
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
         checker.setModuleClassLoader(Checker.class.getClassLoader());
+        
         final Properties checkstyleProperties = new Properties();
         checkstyleProperties.putAll(properties);
         final Configuration configuration = ConfigurationLoader.loadConfiguration(configurationFsPath,
                 new PropertiesExpander(checkstyleProperties), IgnoredModulesOptions.OMIT);
         checker.configure(configuration);
+        
         final CheckstyleExecutionListener listener = new CheckstyleExecutionListener();
         checker.addListener(listener);
-        final List<File> filesToCheck = new ArrayList<>();
-        filesToCheck.add(new File(URI.create(fileToCheckUri)));
         checker.process(filesToCheck);
 
         return listener.getResult();
     }
 
-    public static WorkspaceEdit quickFix(List<Object> arguments)
-            throws JavaModelException, IllegalArgumentException, BadLocationException {
-        if (arguments == null || arguments.size() < 3) {
-            throw new RuntimeException("Illegal arguments for checking.");
-        }
-        final String fileToCheckUri = (String) arguments.get(0);
-        final int offset = ((Double) arguments.get(1)).intValue();
-        final String sourceName = (String) arguments.get(2);
-
+    public static WorkspaceEdit quickFix(
+        String fileToCheckUri,
+        int offset,
+        String sourceName
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException {
         final BaseQuickFix quickFix = QuickFixProvider.getQuickFix(sourceName);
         if (quickFix == null) {
             throw new RuntimeException("Unsupported quick fix.");
