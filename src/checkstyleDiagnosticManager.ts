@@ -111,6 +111,8 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
             return;
         }
 
+        fileCheckMap.forEach((diagUri: vscode.Uri) => checkstyleDiagnosticCollector.delete(diagUri));
+
         try {
             // tslint:disable-next-line: typedef
             const results = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
@@ -126,7 +128,6 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                     checkstyleChannel.appendLine(`Unable to map check file ${checkFile} back to real uri.`);
                     continue;
                 }
-                checkstyleDiagnosticCollector.delete(diagUri);
                 checkstyleDiagnosticCollector.addDiagnostics(diagUri, diagnostics);
             }
             checkstyleStatusBar.showStatus();
