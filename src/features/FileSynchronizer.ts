@@ -57,7 +57,7 @@ export class FileSynchronizer implements vscode.Disposable {
 
     private tempStorage: string = this.getTempStorage();
     private tempFilePool: Map<string, string> = new Map(); // managed file path -> temp path
-    private pending: ISyncRequests = { write: new Map(), remove: new Set() };
+    private pendingRequests: ISyncRequests = { write: new Map(), remove: new Set() };
     private pendingPromises: Map<string, Promise<void>> = new Map();
 
     constructor(private context: vscode.ExtensionContext) {}
@@ -81,56 +81,56 @@ export class FileSynchronizer implements vscode.Disposable {
     // Ensure a file created in temp folder and managed by synchronizer
     public open(document: vscode.TextDocument): void {
         // Cancel pending remove request
-        if (this.pending.remove.has(document.fileName)) {
-            this.pending.remove.delete(document.fileName);
+        if (this.pendingRequests.remove.has(document.fileName)) {
+            this.pendingRequests.remove.delete(document.fileName);
         }
         // Skip if already open
         if (!this.tempFilePool.has(document.fileName)) {
-            this.pending.write.set(document.fileName, document.getText());
+            this.pendingRequests.write.set(document.fileName, document.getText());
         }
     }
 
     // Change content of temp file that already exists
     public change(document: vscode.TextDocument, _event?: vscode.TextDocumentContentChangeEvent[]): void {
         // Skip if there's pending remove request
-        if (this.pending.remove.has(document.fileName)) {
+        if (this.pendingRequests.remove.has(document.fileName)) {
             return;
         }
         // Skip if not open
         if (this.tempFilePool.has(document.fileName)) {
-            this.pending.write.set(document.fileName, document.getText());
+            this.pendingRequests.write.set(document.fileName, document.getText());
         }
     }
 
     // Delete the temp file, release the management of synchronizer
     public close(document: vscode.TextDocument): void {
         // Cancel the pending write request
-        if (this.pending.write.has(document.fileName)) {
-            this.pending.write.delete(document.fileName);
+        if (this.pendingRequests.write.has(document.fileName)) {
+            this.pendingRequests.write.delete(document.fileName);
         }
         // Skip if already closed
         if (this.tempFilePool.has(document.fileName)) {
-            this.pending.remove.add(document.fileName);
+            this.pendingRequests.remove.add(document.fileName);
         }
     }
 
     // Do the actual IO operartion, sending out all pending requests
     public async flush(): Promise<void> {
-        for (const [filePath, content] of this.pending.write.entries()) {
+        for (const [filePath, content] of this.pendingRequests.write.entries()) {
             this.setSyncPromise(filePath, async (tempPath: string) => { // When IO faliure occurs, temp path will be updated
                 await fse.writeFile(tempPath, content);
                 this.tempFilePool.set(filePath, tempPath); // Set or update temp path mapping
             });
         }
 
-        for (const filePath of this.pending.remove.values()) {
+        for (const filePath of this.pendingRequests.remove.values()) {
             this.setSyncPromise(filePath, async (tempPath: string) => {
                 await fse.remove(tempPath);
                 this.tempFilePool.delete(filePath);
             });
         }
 
-        this.pending = { write: new Map(), remove: new Set() };
+        this.pendingRequests = { write: new Map(), remove: new Set() };
         await Promise.all(this.pendingPromises.values());
     }
 
