@@ -7,7 +7,7 @@ import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
-import { checkstyle } from './commands/check';
+import { checkCode } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
@@ -39,7 +39,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkstyle(uri)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),
     );
 }
