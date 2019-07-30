@@ -118,6 +118,7 @@ export class FileSynchronizer implements vscode.Disposable {
     public async flush(): Promise<void> {
         for (const [filePath, content] of this.pendingRequests.write.entries()) {
             this.setSyncPromise(filePath, async (tempPath: string) => { // When IO faliure occurs, temp path will be updated
+                await fse.ensureFile(tempPath);
                 await fse.writeFile(tempPath, content);
                 this.tempFilePool.set(filePath, tempPath); // Set or update temp path mapping
             });
