@@ -45,7 +45,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     public getDiagnostics(uris: vscode.Uri[]): void {
         for (const uri of uris) {
-            if (uri.scheme === 'file' && path.extname(uri.fsPath) === '.java') {
+            if (uri.scheme === 'file' && path.extname(uri.fsPath).toLowerCase() === '.java') {
                 this.pendingDiagnostics.add(this.syncedFiles.get(uri.fsPath) || uri);
             }
         }
@@ -98,7 +98,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
         const fileCheckMap: Map<string, vscode.Uri> = new Map(); // Check path -> real uri
         for (const file of this.pendingDiagnostics.values()) {
-            if ('syncUri' in file) {
+            if (file instanceof SyncedFile) {
                 fileCheckMap.set(file.syncUri.fsPath, file.realUri);
             } else {
                 fileCheckMap.set(file.fsPath, file);
@@ -111,11 +111,10 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
             return;
         }
 
-        fileCheckMap.forEach((diagUri: vscode.Uri) => checkstyleDiagnosticCollector.delete(diagUri));
+        fileCheckMap.forEach((uri: vscode.Uri) => checkstyleDiagnosticCollector.delete(uri));
 
         try {
-            // tslint:disable-next-line: typedef
-            const results = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
+            const results: { [file: string]: ICheckstyleResult[] } | undefined = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
                 CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, [...fileCheckMap.keys()], configurationPath, getCheckstyleProperties(),
             );
             if (!results) {
@@ -123,12 +122,12 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 return;
             }
             for (const [checkFile, diagnostics] of Object.entries(results)) {
-                const diagUri: vscode.Uri | undefined = fileCheckMap.get(checkFile);
-                if (!diagUri) {
+                const diagnosticUri: vscode.Uri | undefined = fileCheckMap.get(checkFile);
+                if (!diagnosticUri) {
                     checkstyleChannel.appendLine(`Unable to map check file ${checkFile} back to real uri.`);
                     continue;
                 }
-                checkstyleDiagnosticCollector.addDiagnostics(diagUri, diagnostics);
+                checkstyleDiagnosticCollector.addDiagnostics(diagnosticUri, diagnostics);
             }
             checkstyleStatusBar.showStatus();
         } catch (error) {

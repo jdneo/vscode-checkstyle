@@ -13,7 +13,7 @@ export async function checkCode(uri?: Uri): Promise<void> {
         uri = window.activeTextEditor.document.uri;
     }
     let filesToCheck: Uri[];
-    if (fse.statSync(uri.fsPath).isDirectory()) {
+    if ((await fse.stat(uri.fsPath)).isDirectory()) {
         filesToCheck = await workspace.findFiles(`${workspace.asRelativePath(uri)}/**/*.java`);
     } else {
         filesToCheck = [uri];

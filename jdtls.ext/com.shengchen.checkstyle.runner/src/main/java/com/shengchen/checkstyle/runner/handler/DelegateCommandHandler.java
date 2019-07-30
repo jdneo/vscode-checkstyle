@@ -32,10 +32,10 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
     
     @Override
     public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
-        if (commandId.startsWith(CHECKSTYLE_PREFIX)) {
-            final String command = commandId.substring(CHECKSTYLE_PREFIX.length());
+        if (commandId.startsWith(CHECKSTYLE_PREFIX)) { 
+            final String command = commandId.substring(CHECKSTYLE_PREFIX.length()); // Remove id's prefix as command name
             for (final Method handler : CheckstyleRunner.class.getDeclaredMethods()) {
-                if (handler.getName().equals(command)) {
+                if (handler.getName().equals(command)) { // Dispatch to CheckStyleRunner's handler with corresponding name
                     return handler.invoke(null, arguments.toArray());
                 }
             }
