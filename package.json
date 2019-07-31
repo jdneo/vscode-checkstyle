@@ -28,7 +28,7 @@
         "onLanguage:java",
         "onCommand:java.checkstyle.quickFix",
         "onCommand:java.checkstyle.checkCode",
-        "onCommand:java.checkstyle.set.configuration"
+        "onCommand:java.checkstyle.setConfiguration"
     ],
     "main": "./dist/extension",
     "contributes": {
@@ -48,7 +48,7 @@
                     "group": "Checkstyle@1"
                 },
                 {
-                    "command": "java.checkstyle.set.configuration",
+                    "command": "java.checkstyle.setConfiguration",
                     "when": "!explorerResourceIsFolder && resourceLangId == xml",
                     "group": "Checkstyle@2"
                 }
@@ -61,8 +61,8 @@
                 "category": "Checkstyle"
             },
             {
-                "command": "java.checkstyle.set.configuration",
-                "title": "%contributes.commands.java.checkstyle.set.configuration.title%",
+                "command": "java.checkstyle.setConfiguration",
+                "title": "%contributes.commands.java.checkstyle.setConfiguration.title%",
                 "category": "Checkstyle"
             }
         ],
