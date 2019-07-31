@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CheckstyleExecutionListener implements AuditListener {
 
@@ -37,9 +39,9 @@ public class CheckstyleExecutionListener implements AuditListener {
             return;
         }
         fileErrors.get(error.getFileName()).add(new CheckResult(
-            error.getLine(), 
-            error.getColumn(), 
-            error.getMessage(), 
+            error.getLine(),
+            error.getColumn(),
+            error.getMessage(),
             severity.toString(),
             error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
     }
@@ -69,7 +71,9 @@ public class CheckstyleExecutionListener implements AuditListener {
         return;
     }
 
-    public Map<String, List<CheckResult>> getResult() {
-        return fileErrors;
+    public Map<String, List<CheckResult>> getResult(List<String> filesToCheck) {
+        return filesToCheck.stream()
+            .filter(fileErrors::containsKey)
+            .collect(Collectors.toMap(Function.identity(), fileErrors::get));
     }
 }

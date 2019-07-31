@@ -52,15 +52,18 @@ import java.util.stream.Collectors;
 public class CheckstyleRunner {
 
     private static final Checker checker;
+    private static final CheckstyleExecutionListener listener;
 
     static {
         checker = new Checker();
+        listener = new CheckstyleExecutionListener();
 
         // reset the basedir if it is set so it won't get into the plugins way
         // of determining workspace resources from checkstyle reported file names, see
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
         checker.setModuleClassLoader(Checker.class.getClassLoader());
+        checker.addListener(listener);
     }
 
     public static void setConfiguration(
@@ -87,14 +90,8 @@ public class CheckstyleRunner {
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(filesToCheck.get(0).toURI());
         checker.setCharset(unit.getJavaProject().getProject().getDefaultCharset());
 
-        final CheckstyleExecutionListener listener = new CheckstyleExecutionListener();
-        checker.addListener(listener);
-        try {
-            checker.process(filesToCheck);
-            return listener.getResult();
-        } finally {
-            checker.removeListener(listener);
-        }
+        checker.process(filesToCheck);
+        return listener.getResult(filesToCheckUris);
     }
 
     public static WorkspaceEdit quickFix(
