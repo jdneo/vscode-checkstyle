@@ -26,8 +26,8 @@
     ],
     "activationEvents": [
         "onLanguage:java",
-        "onCommand:java.checkstyle.quickfix",
-        "onCommand:java.checkstyle.checkcode",
+        "onCommand:java.checkstyle.quickFix",
+        "onCommand:java.checkstyle.checkCode",
         "onCommand:java.checkstyle.set.configuration"
     ],
     "main": "./dist/extension",
@@ -38,8 +38,13 @@
         "menus": {
             "explorer/context": [
                 {
-                    "command": "java.checkstyle.checkcode",
+                    "command": "java.checkstyle.checkCode",
                     "when": "resourceLangId == java",
+                    "group": "Checkstyle@1"
+                },
+                {
+                    "command": "java.checkstyle.checkCode",
+                    "when": "explorerResourceIsFolder",
                     "group": "Checkstyle@1"
                 },
                 {
@@ -51,8 +56,8 @@
         },
         "commands": [
             {
-                "command": "java.checkstyle.checkcode",
-                "title": "%contributes.commands.java.checkstyle.checkcode.title%",
+                "command": "java.checkstyle.checkCode",
+                "title": "%contributes.commands.java.checkstyle.checkCode.title%",
                 "category": "Checkstyle"
             },
             {

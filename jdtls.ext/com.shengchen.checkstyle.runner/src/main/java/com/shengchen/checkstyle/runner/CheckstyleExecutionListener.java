@@ -21,12 +21,14 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CheckstyleExecutionListener implements AuditListener {
 
-    private List<CheckResult> result = new LinkedList<>();
+    private Map<String, List<CheckResult>> fileErrors = new HashMap<>();
 
     @Override
     public void addError(AuditEvent error) {
@@ -34,19 +36,21 @@ public class CheckstyleExecutionListener implements AuditListener {
         if (severity.equals(SeverityLevel.IGNORE)) {
             return;
         }
-        final String sourceName = error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1);
-        result.add(new CheckResult(error.getLine(), error.getColumn(), error.getMessage(), severity.toString(),
-                sourceName));
+        fileErrors.get(error.getFileName()).add(new CheckResult(
+            error.getLine(), 
+            error.getColumn(), 
+            error.getMessage(), 
+            severity.toString(),
+            error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
     }
 
     @Override
-    public void addException(AuditEvent arg0, Throwable arg1) {
-        return;
-
+    public void fileStarted(AuditEvent event) {
+        fileErrors.put(event.getFileName(), new ArrayList<>());
     }
 
     @Override
-    public void auditFinished(AuditEvent arg0) {
+    public void fileFinished(AuditEvent arg0) {
         return;
     }
 
@@ -56,16 +60,16 @@ public class CheckstyleExecutionListener implements AuditListener {
     }
 
     @Override
-    public void fileFinished(AuditEvent arg0) {
+    public void auditFinished(AuditEvent arg0) {
         return;
     }
 
     @Override
-    public void fileStarted(AuditEvent arg0) {
+    public void addException(AuditEvent arg0, Throwable arg1) {
         return;
     }
 
-    public List<CheckResult> getResult() {
-        return this.result;
+    public Map<String, List<CheckResult>> getResult() {
+        return fileErrors;
     }
 }

@@ -7,8 +7,8 @@ export namespace JavaLanguageServerCommands {
 
 export namespace CheckstyleExtensionCommands {
     export const SET_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.set.configuration';
-    export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkcode';
-    export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickfix';
+    export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkCode';
+    export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickFix';
     export const OPEN_OUTPUT_CHANNEL: string = 'java.checkstyle.open.output.channel';
 }
 
