@@ -29,6 +29,12 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.pendingDiagnostics = new Set();
         this.syncedFiles = new Map();
         this.synchronizer = new FileSynchronizer(this.context);
+    }
+
+    public listen(): void {
+        if (this.listeners.length > 0) {
+            return; // Already started to listen
+        }
         this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
         vscode.workspace.onDidOpenTextDocument(this.onDidOpenTextDocument, this, this.listeners);
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this.listeners);
@@ -37,10 +43,15 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
     }
 
     public dispose(): void {
+        if (this.listeners.length === 0) {
+            return; // Already disposed
+        }
+        this.diagnosticDelayTrigger = _.debounce(() => Promise.resolve(), 200);
         this.synchronizer.dispose();
         for (const listener of this.listeners) {
             listener.dispose();
         }
+        this.listeners = [];
     }
 
     public getDiagnostics(uris: vscode.Uri[]): void {
@@ -105,17 +116,11 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
             }
         }
 
-        const configurationPath: string = getCheckstyleConfigurationPath();
-        if (configurationPath === '') {
-            checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
-            return;
-        }
-
         fileCheckMap.forEach((uri: vscode.Uri) => checkstyleDiagnosticCollector.delete(uri));
 
         try {
             const results: { [file: string]: ICheckstyleResult[] } | undefined = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
-                CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, [...fileCheckMap.keys()], configurationPath, getCheckstyleProperties(),
+                CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, [...fileCheckMap.keys()],
             );
             if (!results) {
                 checkstyleChannel.appendLine('Unable to get results from Language Server.');
