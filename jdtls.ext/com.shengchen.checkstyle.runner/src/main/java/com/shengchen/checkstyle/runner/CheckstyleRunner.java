@@ -41,7 +41,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -55,7 +55,7 @@ public class CheckstyleRunner {
         Map<String, String> properties            
     ) throws UnsupportedEncodingException, CoreException, CheckstyleException {
         if (filesToCheckUris.isEmpty()) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
         
         final List<File> filesToCheck = filesToCheckUris.stream()
