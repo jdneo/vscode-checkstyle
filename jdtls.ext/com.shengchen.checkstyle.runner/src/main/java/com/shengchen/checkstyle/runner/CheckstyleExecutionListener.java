@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class CheckstyleExecutionListener implements AuditListener {
 
@@ -72,8 +70,8 @@ public class CheckstyleExecutionListener implements AuditListener {
     }
 
     public Map<String, List<CheckResult>> getResult(List<String> filesToCheck) {
-        Map<String, List<CheckResult>> result = new HashMap<>();
-        for (String file: filesToCheck) {
+        final Map<String, List<CheckResult>> result = new HashMap<>();
+        for (final String file: filesToCheck) {
             result.put(file, fileErrors.get(file));
         }
         return result;
