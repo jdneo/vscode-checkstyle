@@ -3,9 +3,9 @@
 <plugin>
   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
     <delegateCommandHandler class="com.shengchen.checkstyle.runner.handler.DelegateCommandHandler">
-    	<command id="java.checkstyle.setConfiguration"/>
+      <command id="java.checkstyle.setConfiguration"/>
       <command id="java.checkstyle.checkCode"/>
-    	<command id="java.checkstyle.quickFix"/>
+      <command id="java.checkstyle.quickFix"/>
     </delegateCommandHandler>
   </extension>
 </plugin>

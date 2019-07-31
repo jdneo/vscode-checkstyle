@@ -72,8 +72,10 @@ public class CheckstyleExecutionListener implements AuditListener {
     }
 
     public Map<String, List<CheckResult>> getResult(List<String> filesToCheck) {
-        return filesToCheck.stream()
-            .filter(fileErrors::containsKey)
-            .collect(Collectors.toMap(Function.identity(), fileErrors::get));
+        Map<String, List<CheckResult>> result = new HashMap<>();
+        for (String file: filesToCheck) {
+            result.put(file, fileErrors.get(file));
+        }
+        return result;
     }
 }

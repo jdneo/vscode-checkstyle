@@ -12,7 +12,6 @@ import { CheckstyleExtensionCommands } from './constants/commands';
 import { FileSynchronizer, SyncedFile } from './features/FileSynchronizer';
 import { ICheckstyleResult } from './models';
 import { handleErrors } from './utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties } from './utils/settingUtils';
 
 class CheckstyleDiagnosticManager implements vscode.Disposable {
 
@@ -21,7 +20,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
     private pendingDiagnostics: Set<SyncedFile | vscode.Uri>;
     private syncedFiles: Map<string, SyncedFile>;
     private synchronizer: FileSynchronizer;
-    private diagnosticDelayTrigger: (() => Promise<void>) & _.Cancelable;
+    private diagnosticDelayTrigger: () => Promise<void>;
 
     public initialize(context: vscode.ExtensionContext): void {
         this.context = context;
@@ -31,7 +30,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.synchronizer = new FileSynchronizer(this.context);
     }
 
-    public listen(): void {
+    public startListening(): void {
         if (this.listeners.length > 0) {
             return; // Already started to listen
         }
@@ -46,7 +45,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         if (this.listeners.length === 0) {
             return; // Already disposed
         }
-        this.diagnosticDelayTrigger = _.debounce(() => Promise.resolve(), 200);
+        this.diagnosticDelayTrigger = async (): Promise<void> => { /* Do nothing */ };
         this.synchronizer.dispose();
         for (const listener of this.listeners) {
             listener.dispose();

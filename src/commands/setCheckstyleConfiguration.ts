@@ -106,7 +106,7 @@ enum ConfigurationSelction {
 
 export async function setServerConfiguration(): Promise<void> {
     const configurationPath: string = getCheckstyleConfigurationPath();
-    if (configurationPath === '') {
+    if (!configurationPath) {
         checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
         checkstyleDiagnosticManager.dispose();
         return;
@@ -117,7 +117,7 @@ export async function setServerConfiguration(): Promise<void> {
             configurationPath,
             getCheckstyleProperties(),
         );
-        checkstyleDiagnosticManager.listen();
+        checkstyleDiagnosticManager.startListening();
     } catch (error) {
         handleErrors(error);
         checkstyleDiagnosticManager.dispose();
