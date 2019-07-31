@@ -22,7 +22,6 @@ import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader.IgnoredModulesOptions;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.shengchen.checkstyle.runner.quickfix.BaseQuickFix;
 import com.shengchen.checkstyle.runner.utils.EditUtils;
 
@@ -40,6 +39,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
@@ -49,42 +49,48 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("restriction")
 public class CheckstyleRunner {
-    public static Map<String, List<CheckResult>> checkCode(
-        List<String> filesToCheckUris,
+
+    private static final Checker checker;
+    private static final CheckstyleExecutionListener listener;
+
+    static {
+        checker = new Checker();
+        listener = new CheckstyleExecutionListener();
+
+        // reset the basedir if it is set so it won't get into the plugins way
+        // of determining workspace resources from checkstyle reported file names, see
+        // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
+        checker.setBasedir(null);
+        checker.setModuleClassLoader(Checker.class.getClassLoader());
+        checker.addListener(listener);
+    }
+
+    public static void setConfiguration(
         String configurationFsPath,
-        Map<String, String> properties            
+        Map<String, String> properties
+    ) throws IOException, CheckstyleException {
+        final Properties checkstyleProperties = new Properties();
+        checkstyleProperties.putAll(properties);
+        checker.configure(ConfigurationLoader.loadConfiguration(
+            configurationFsPath,
+            new PropertiesExpander(checkstyleProperties),
+            IgnoredModulesOptions.OMIT
+        ));
+    }
+
+    public static Map<String, List<CheckResult>> checkCode(
+        List<String> filesToCheckUris
     ) throws UnsupportedEncodingException, CoreException, CheckstyleException {
         if (filesToCheckUris.isEmpty()) {
             return Collections.emptyMap();
         }
-        
-        final List<File> filesToCheck = filesToCheckUris.stream()
-                .map(file -> new File(file))
-                .collect(Collectors.toList());
+        final List<File> filesToCheck = filesToCheckUris.stream().map(File::new).collect(Collectors.toList());
 
-        final Checker checker = new Checker();
-        
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(filesToCheck.get(0).toURI());
         checker.setCharset(unit.getJavaProject().getProject().getDefaultCharset());
 
-        // reset the basedir if it is set so it won't get into the plugins way
-        // of determining workspace resources from checkstyle reported file
-        // names, see
-        // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
-        checker.setBasedir(null);
-        checker.setModuleClassLoader(Checker.class.getClassLoader());
-        
-        final Properties checkstyleProperties = new Properties();
-        checkstyleProperties.putAll(properties);
-        final Configuration configuration = ConfigurationLoader.loadConfiguration(configurationFsPath,
-                new PropertiesExpander(checkstyleProperties), IgnoredModulesOptions.OMIT);
-        checker.configure(configuration);
-        
-        final CheckstyleExecutionListener listener = new CheckstyleExecutionListener();
-        checker.addListener(listener);
         checker.process(filesToCheck);
-
-        return listener.getResult();
+        return listener.getResult(filesToCheckUris);
     }
 
     public static WorkspaceEdit quickFix(

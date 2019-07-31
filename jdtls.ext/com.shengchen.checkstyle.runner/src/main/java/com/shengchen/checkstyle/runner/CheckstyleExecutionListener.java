@@ -37,9 +37,9 @@ public class CheckstyleExecutionListener implements AuditListener {
             return;
         }
         fileErrors.get(error.getFileName()).add(new CheckResult(
-            error.getLine(), 
-            error.getColumn(), 
-            error.getMessage(), 
+            error.getLine(),
+            error.getColumn(),
+            error.getMessage(),
             severity.toString(),
             error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
     }
@@ -69,7 +69,11 @@ public class CheckstyleExecutionListener implements AuditListener {
         return;
     }
 
-    public Map<String, List<CheckResult>> getResult() {
-        return fileErrors;
+    public Map<String, List<CheckResult>> getResult(List<String> filesToCheck) {
+        final Map<String, List<CheckResult>> result = new HashMap<>();
+        for (final String file: filesToCheck) {
+            result.put(file, fileErrors.get(file));
+        }
+        return result;
     }
 }

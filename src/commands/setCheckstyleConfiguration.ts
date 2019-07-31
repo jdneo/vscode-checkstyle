@@ -3,8 +3,14 @@
 
 import * as path from 'path';
 import { OpenDialogOptions, QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import { checkstyleChannel } from '../checkstyleChannel';
+import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
-import { setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { CheckstyleExtensionCommands } from '../constants/commands';
+import { ICheckstyleResult } from '../models';
+import { handleErrors } from '../utils/errorUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleProperties, setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
 export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -96,4 +102,24 @@ enum ConfigurationSelction {
     GoogleStyle = "Google's Style",
     SunStyle = "Sun's Style",
     Browse = '$(file-text) Browse...',
+}
+
+export async function setServerConfiguration(): Promise<void> {
+    const configurationPath: string = getCheckstyleConfigurationPath();
+    if (!configurationPath) {
+        checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
+        checkstyleDiagnosticManager.dispose();
+        return;
+    }
+    try {
+        await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
+            CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION,
+            configurationPath,
+            getCheckstyleProperties(),
+        );
+        checkstyleDiagnosticManager.startListening();
+    } catch (error) {
+        handleErrors(error);
+        checkstyleDiagnosticManager.dispose();
+    }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
+import { ConfigurationChangeEvent, ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
@@ -9,7 +9,7 @@ import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkCode } from './commands/check';
 import { fixCheckstyleViolation } from './commands/fix';
-import { setCheckstyleConfiguration } from './commands/setCheckstyleConfiguration';
+import { setCheckstyleConfiguration, setServerConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
 
@@ -26,6 +26,14 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
     const watcher: FileSystemWatcher = workspace.createFileSystemWatcher('**/*.{[jJ][aA][vV][aA]}', true /* ignoreCreateEvents */);
 
     checkstyleDiagnosticManager.initialize(context);
+    await setServerConfiguration();
+
+    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+        if (e.affectsConfiguration('java.checkstyle.configuration') ||
+            e.affectsConfiguration('java.checkstyle.properties')) {
+            setServerConfiguration();
+        }
+    }, null, context.subscriptions);
 
     watcher.onDidDelete((uri: Uri) => {
         checkstyleDiagnosticCollector.delete(uri);
