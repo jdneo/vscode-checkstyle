@@ -160,7 +160,7 @@ export class FileSynchronizer implements vscode.Disposable {
         let tempPath: string | undefined = this.tempFilePool.get(realPath);
         if (!tempPath) {
             const tempHash: string = crypto.createHash('md5').update(realPath).digest('hex');
-            tempPath = path.join(this.tempStorage, `${tempHash}${path.extname(realPath)}`);
+            tempPath = path.join(this.tempStorage, tempHash, path.basename(realPath));
         }
         return tempPath;
     }
