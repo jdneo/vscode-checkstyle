@@ -4,6 +4,7 @@
 import * as path from 'path';
 import { OpenDialogOptions, QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
+import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
 import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from '../constants/commands';
@@ -109,6 +110,7 @@ export async function setServerConfiguration(): Promise<void> {
     if (!configurationPath) {
         checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
         checkstyleDiagnosticManager.dispose();
+        checkstyleDiagnosticCollector.clear();
         return;
     }
     try {
@@ -118,8 +120,10 @@ export async function setServerConfiguration(): Promise<void> {
             getCheckstyleProperties(),
         );
         checkstyleDiagnosticManager.startListening();
+        checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
     } catch (error) {
         handleErrors(error);
         checkstyleDiagnosticManager.dispose();
+        checkstyleDiagnosticCollector.clear();
     }
 }
