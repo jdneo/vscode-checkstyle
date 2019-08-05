@@ -63,7 +63,7 @@ public class CheckstyleRunner {
         }
         checker = new Checker();
         listener = new CheckstyleExecutionListener();
-        
+
         // reset the basedir if it is set so it won't get into the plugins way
         // of determining workspace resources from checkstyle reported file names, see
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
