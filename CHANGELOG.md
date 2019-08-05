@@ -3,6 +3,11 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.0]
+### Added
+- Support the live linting experience. Now the users do **not** need to save the file to refresh the linting results. ([#175](https://github.com/jdneo/vscode-checkstyle/issues/175))
+- Support batch check. ([#178](https://github.com/jdneo/vscode-checkstyle/issues/178))
+
 ## [1.0.3]
 ### Added
 - Support loading CheckStyle Configuration via URL. ([#181](https://github.com/jdneo/vscode-checkstyle/issues/181))
