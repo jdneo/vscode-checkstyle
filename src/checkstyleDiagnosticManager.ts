@@ -12,10 +12,12 @@ import { CheckstyleExtensionCommands } from './constants/commands';
 import { FileSynchronizer, SyncedFile } from './features/FileSynchronizer';
 import { ICheckstyleResult } from './models';
 import { handleErrors } from './utils/errorUtils';
+import { isAutoCheckEnabled } from './utils/settingUtils';
 
 class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     private context: vscode.ExtensionContext;
+    private enabled: boolean;
     private listeners: vscode.Disposable[];
     private pendingDiagnostics: Set<SyncedFile | vscode.Uri>;
     private syncedFiles: Map<string, SyncedFile>;
@@ -24,33 +26,41 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     public initialize(context: vscode.ExtensionContext): void {
         this.context = context;
+        this.enabled = true;
         this.listeners = [];
         this.pendingDiagnostics = new Set();
         this.syncedFiles = new Map();
         this.synchronizer = new FileSynchronizer(this.context);
+        this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
     }
 
     public startListening(): void {
-        if (this.listeners.length > 0) {
-            return; // Already started to listen
+        if (this.listeners.length === 0 && isAutoCheckEnabled()) {
+            vscode.workspace.onDidOpenTextDocument(this.onDidOpenTextDocument, this, this.listeners);
+            vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this.listeners);
+            vscode.workspace.onDidCloseTextDocument(this.onDidCloseTextDocument, this, this.listeners);
+            vscode.workspace.textDocuments.forEach(this.onDidOpenTextDocument, this);
         }
-        this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
-        vscode.workspace.onDidOpenTextDocument(this.onDidOpenTextDocument, this, this.listeners);
-        vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this.listeners);
-        vscode.workspace.onDidCloseTextDocument(this.onDidCloseTextDocument, this, this.listeners);
-        vscode.workspace.textDocuments.forEach(this.onDidOpenTextDocument, this);
+    }
+
+    public stopListening(): void {
+        if (this.listeners.length !== 0) {
+            for (const listener of this.listeners) {
+                listener.dispose();
+            }
+            this.listeners = [];
+            this.synchronizer.dispose();
+        }
+    }
+
+    public activate(): void {
+        this.enabled = true;
+        this.startListening();
     }
 
     public dispose(): void {
-        if (this.listeners.length === 0) {
-            return; // Already disposed
-        }
-        this.diagnosticDelayTrigger = async (): Promise<void> => { /* Do nothing */ };
-        this.synchronizer.dispose();
-        for (const listener of this.listeners) {
-            listener.dispose();
-        }
-        this.listeners = [];
+        this.enabled = false;
+        this.stopListening();
     }
 
     public getDiagnostics(uris: vscode.Uri[]): void {
@@ -59,7 +69,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 this.pendingDiagnostics.add(this.syncedFiles.get(uri.fsPath) || uri);
             }
         }
-        this.diagnosticDelayTrigger();
+        this.triggerDiagnostics();
     }
 
     private onDidOpenTextDocument(document: vscode.TextDocument): void {
@@ -100,7 +110,13 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     private requestDiagnostic(file: SyncedFile): void {
         this.pendingDiagnostics.add(file);
-        this.diagnosticDelayTrigger();
+        this.triggerDiagnostics();
+    }
+
+    private triggerDiagnostics(): void {
+        if (this.enabled) {
+            this.diagnosticDelayTrigger();
+        }
     }
 
     private async sendPendingDiagnostics(): Promise<void> {

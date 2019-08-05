@@ -119,7 +119,7 @@ export async function setServerConfiguration(): Promise<void> {
             configurationPath,
             getCheckstyleProperties(),
         );
-        checkstyleDiagnosticManager.startListening();
+        checkstyleDiagnosticManager.activate();
         checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
     } catch (error) {
         handleErrors(error);
