@@ -50,25 +50,27 @@ import java.util.stream.Collectors;
 @SuppressWarnings("restriction")
 public class CheckstyleRunner {
 
-    private static final Checker checker;
-    private static final CheckstyleExecutionListener listener;
+    private static Checker checker = null;
+    private static CheckstyleExecutionListener listener = null;
 
-    static {
+    public static void setConfiguration(
+        String configurationFsPath,
+        Map<String, String> properties
+    ) throws IOException, CheckstyleException {
+        if (checker != null) {
+            checker.removeListener(listener);
+            checker.destroy();
+        }
         checker = new Checker();
         listener = new CheckstyleExecutionListener();
-
+        
         // reset the basedir if it is set so it won't get into the plugins way
         // of determining workspace resources from checkstyle reported file names, see
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
         checker.setModuleClassLoader(Checker.class.getClassLoader());
         checker.addListener(listener);
-    }
 
-    public static void setConfiguration(
-        String configurationFsPath,
-        Map<String, String> properties
-    ) throws IOException, CheckstyleException {
         final Properties checkstyleProperties = new Properties();
         checkstyleProperties.putAll(properties);
         checker.configure(ConfigurationLoader.loadConfiguration(
