@@ -50,10 +50,17 @@ import java.util.stream.Collectors;
 @SuppressWarnings("restriction")
 public class CheckstyleRunner {
 
-    private static final Checker checker;
-    private static final CheckstyleExecutionListener listener;
+    private static Checker checker = null;
+    private static CheckstyleExecutionListener listener = null;
 
-    static {
+    public static void setConfiguration(
+        String configurationFsPath,
+        Map<String, String> properties
+    ) throws IOException, CheckstyleException {
+        if (checker != null) {
+            checker.removeListener(listener);
+            checker.destroy();
+        }
         checker = new Checker();
         listener = new CheckstyleExecutionListener();
 
@@ -63,12 +70,7 @@ public class CheckstyleRunner {
         checker.setBasedir(null);
         checker.setModuleClassLoader(Checker.class.getClassLoader());
         checker.addListener(listener);
-    }
 
-    public static void setConfiguration(
-        String configurationFsPath,
-        Map<String, String> properties
-    ) throws IOException, CheckstyleException {
         final Properties checkstyleProperties = new Properties();
         checkstyleProperties.putAll(properties);
         checker.configure(ConfigurationLoader.loadConfiguration(

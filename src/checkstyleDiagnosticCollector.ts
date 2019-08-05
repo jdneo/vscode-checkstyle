@@ -27,12 +27,26 @@ class CheckstyleDiagnosticCollector implements Disposable {
         this.diagnosticCollection.set(uri, diagnostics);
     }
 
-    public getDiagnostics(uri: Uri): Diagnostic[] | undefined {
-        return this.diagnosticCollection.get(uri);
+    public getAllDiagnostics(): Diagnostic[][] {
+        const allDiagnostics: Diagnostic[][] = [];
+        this.diagnosticCollection.forEach((_uri: Uri, diagnostics: Diagnostic[]) => {
+            allDiagnostics.push(diagnostics);
+        });
+        return allDiagnostics;
+    }
+
+    public getResourceUris(): Uri[] {
+        const uris: Uri[] = [];
+        this.diagnosticCollection.forEach((uri: Uri) => uris.push(uri));
+        return uris;
     }
 
     public delete(uri: Uri): void {
         this.diagnosticCollection.delete(uri);
+    }
+
+    public clear(): void {
+        this.diagnosticCollection.clear();
     }
 
     public dispose(): void {
