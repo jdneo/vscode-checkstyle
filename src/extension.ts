@@ -12,6 +12,7 @@ import { fixCheckstyleViolation } from './commands/fix';
 import { setCheckstyleConfiguration, setServerConfiguration } from './commands/setCheckstyleConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
+import { isAutoCheckEnabled } from './utils/settingUtils';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'));
@@ -32,6 +33,13 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         if (e.affectsConfiguration('java.checkstyle.configuration') ||
             e.affectsConfiguration('java.checkstyle.properties')) {
             setServerConfiguration();
+        }
+        if (e.affectsConfiguration('java.checkstyle.autocheck')) {
+            if (isAutoCheckEnabled()) {
+                checkstyleDiagnosticManager.startListening();
+            } else {
+                checkstyleDiagnosticManager.stopListening();
+            }
         }
     }, null, context.subscriptions);
 
