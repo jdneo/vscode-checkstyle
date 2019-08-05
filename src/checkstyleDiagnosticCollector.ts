@@ -27,10 +27,6 @@ class CheckstyleDiagnosticCollector implements Disposable {
         this.diagnosticCollection.set(uri, diagnostics);
     }
 
-    public getDiagnostics(uri: Uri): Diagnostic[] | undefined {
-        return this.diagnosticCollection.get(uri);
-    }
-
     public getAllDiagnostics(): Diagnostic[][] {
         const allDiagnostics: Diagnostic[][] = [];
         this.diagnosticCollection.forEach((_uri: Uri, diagnostics: Diagnostic[]) => {
@@ -38,7 +34,7 @@ class CheckstyleDiagnosticCollector implements Disposable {
         });
         return allDiagnostics;
     }
-  
+
     public getResourceUris(): Uri[] {
         const uris: Uri[] = [];
         this.diagnosticCollection.forEach((uri: Uri) => uris.push(uri));
