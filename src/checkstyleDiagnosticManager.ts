@@ -35,7 +35,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
     }
 
     public startListening(): void {
-        if (this.listeners.length === 0 && isAutoCheckEnabled()) {
+        if (this.listeners.length === 0 && this.enabled && isAutoCheckEnabled()) {
             vscode.workspace.onDidOpenTextDocument(this.onDidOpenTextDocument, this, this.listeners);
             vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this.listeners);
             vscode.workspace.onDidCloseTextDocument(this.onDidCloseTextDocument, this, this.listeners);
