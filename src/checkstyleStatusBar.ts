@@ -14,25 +14,24 @@ class CheckstyleStatusBar implements Disposable {
     }
 
     public showStatus(): void {
-        if (!window.activeTextEditor) {
-            this.statusBar.hide();
-            return;
-        }
         this.clearStatus();
-        const diagnostics: Diagnostic[] | undefined = checkstyleDiagnosticCollector.getDiagnostics(window.activeTextEditor.document.uri);
-        if (!diagnostics) {
-            this.statusBar.hide();
-            return;
+        let violations: number = 0;
+        for (const diagnostics of checkstyleDiagnosticCollector.getAllDiagnostics()) {
+            violations += diagnostics.length;
         }
-
-        this.statusBar.text = diagnostics.length !== 0 ? '$(bug)' : '$(check)';
-        this.statusBar.tooltip = `[Checkstyle] ${diagnostics.length} violation${diagnostics.length === 1 ? '' : 's'} found`;
+        if (!violations) {
+            this.statusBar.text = '$(check)';
+            this.statusBar.tooltip = '[Checkstyle] no violation found';
+        } else {
+            this.statusBar.text = '$(bug)';
+            this.statusBar.tooltip = `[Checkstyle] ${violations} violation${violations === 1 ? '' : 's'} found`;
+        }
         this.statusBar.show();
     }
 
-    public showError(): void {
+    public showError(reason?: string): void {
         this.statusBar.text = '$(stop)';
-        this.statusBar.tooltip = `[Checkstyle] Internal error occurred`;
+        this.statusBar.tooltip = `[Checkstyle] ${reason || 'Internal error occurred'}`;
         this.statusBar.command = CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL;
         this.statusBar.show();
     }
