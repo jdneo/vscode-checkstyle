@@ -69,7 +69,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 this.pendingDiagnostics.add(this.syncedFiles.get(uri.fsPath) || uri);
             }
         }
-        this.triggerDiagnostics();
+        this.diagnosticDelayTrigger();
     }
 
     private onDidOpenTextDocument(document: vscode.TextDocument): void {
@@ -110,30 +110,28 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     private requestDiagnostic(file: SyncedFile): void {
         this.pendingDiagnostics.add(file);
-        this.triggerDiagnostics();
-    }
-
-    private triggerDiagnostics(): void {
-        if (this.enabled) {
-            this.diagnosticDelayTrigger();
-        }
+        this.diagnosticDelayTrigger();
     }
 
     private async sendPendingDiagnostics(): Promise<void> {
-        await this.synchronizer.flush();
-
-        const fileCheckMap: Map<string, vscode.Uri> = new Map(); // Check path -> real uri
-        for (const file of this.pendingDiagnostics.values()) {
-            if (file instanceof SyncedFile) {
-                fileCheckMap.set(file.syncUri.fsPath, file.realUri);
-            } else {
-                fileCheckMap.set(file.fsPath, file);
-            }
-        }
-
-        fileCheckMap.forEach((uri: vscode.Uri) => checkstyleDiagnosticCollector.delete(uri));
-
         try {
+            if (!this.enabled) {
+                return;
+            }
+
+            await this.synchronizer.flush(); // Sync with the file system before sending
+
+            const fileCheckMap: Map<string, vscode.Uri> = new Map(); // Check path -> real uri
+            for (const file of this.pendingDiagnostics.values()) {
+                if (file instanceof SyncedFile) {
+                    fileCheckMap.set(file.syncUri.fsPath, file.realUri);
+                } else {
+                    fileCheckMap.set(file.fsPath, file);
+                }
+            }
+
+            fileCheckMap.forEach((uri: vscode.Uri) => checkstyleDiagnosticCollector.delete(uri));
+
             const results: { [file: string]: ICheckstyleResult[] } | undefined = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
                 CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, [...fileCheckMap.keys()],
             );
