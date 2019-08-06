@@ -4,7 +4,7 @@
 import { Uri } from 'vscode';
 import * as ls from 'vscode-languageserver-protocol';
 import { checkstyleChannel } from '../checkstyleChannel';
-import { CheckstyleExtensionCommands, CheckstyleServerCommands } from '../constants/commands';
+import { CheckstyleServerCommands } from '../constants/commands';
 import { applyWorkspaceEdit } from '../utils/editUtils';
 import { handleErrors } from '../utils/errorUtils';
 import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
