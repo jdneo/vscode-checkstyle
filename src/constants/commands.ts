@@ -12,6 +12,12 @@ export namespace CheckstyleExtensionCommands {
     export const OPEN_OUTPUT_CHANNEL: string = 'java.checkstyle.open.output.channel';
 }
 
+export namespace CheckstyleServerCommands {
+    export const SET_CONFIGURATION: string = 'java.checkstyle.server.setConfiguration';
+    export const CHECK_CODE: string = 'java.checkstyle.server.checkCode';
+    export const QUICK_FIX: string = 'java.checkstyle.server.quickFix';
+}
+
 export namespace VsCodeCommands {
     export const OPEN: string = 'vscode.open';
 }

@@ -7,7 +7,7 @@ import { checkstyleChannel } from '../checkstyleChannel';
 import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
 import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
 import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
-import { CheckstyleExtensionCommands } from '../constants/commands';
+import { CheckstyleServerCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
 import { handleErrors } from '../utils/errorUtils';
 import { getCheckstyleConfigurationPath, getCheckstyleProperties, setCheckstyleConfigurationPath } from '../utils/settingUtils';
@@ -115,7 +115,7 @@ export async function setServerConfiguration(): Promise<void> {
     }
     try {
         await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
-            CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION,
+            CheckstyleServerCommands.SET_CONFIGURATION,
             configurationPath,
             getCheckstyleProperties(),
         );
