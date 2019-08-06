@@ -28,7 +28,7 @@ import java.util.List;
 @SuppressWarnings("restriction")
 public class DelegateCommandHandler implements IDelegateCommandHandler {
 
-    private static final String CHECKSTYLE_PREFIX = "java.checkstyle.";
+    private static final String CHECKSTYLE_PREFIX = "java.checkstyle.server.";
     
     @Override
     public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {

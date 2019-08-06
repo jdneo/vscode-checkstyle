@@ -8,7 +8,7 @@ import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { executeJavaLanguageServerCommand } from './commands/executeJavaLanguageServerCommand';
-import { CheckstyleExtensionCommands } from './constants/commands';
+import { CheckstyleServerCommands } from './constants/commands';
 import { FileSynchronizer, SyncedFile } from './features/FileSynchronizer';
 import { ICheckstyleResult } from './models';
 import { handleErrors } from './utils/errorUtils';
@@ -133,7 +133,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
             fileCheckMap.forEach((uri: vscode.Uri) => checkstyleDiagnosticCollector.delete(uri));
 
             const results: { [file: string]: ICheckstyleResult[] } | undefined = await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
-                CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, [...fileCheckMap.keys()],
+                CheckstyleServerCommands.CHECK_CODE, [...fileCheckMap.keys()],
             );
             if (!results) {
                 checkstyleChannel.appendLine('Unable to get results from Language Server.');
