@@ -10,7 +10,7 @@ import { checkstyleChannel } from '../checkstyleChannel';
 
 export class SyncedFile {
     constructor(
-        private readonly document: vscode.TextDocument,
+        public readonly document: vscode.TextDocument,
         private readonly synchronizer: FileSynchronizer,
     ) { }
 
