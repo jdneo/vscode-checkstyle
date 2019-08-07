@@ -14,6 +14,10 @@ export class SyncedFile {
         private readonly synchronizer: FileSynchronizer,
     ) { }
 
+    public get textDocument(): vscode.TextDocument {
+        return this.document;
+    }
+
     public get realUri(): vscode.Uri {
         return this.document.uri;
     }

@@ -50,6 +50,9 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
             }
             this.listeners = [];
             this.synchronizer.dispose();
+            for (const file of this.syncedFiles.values()) {
+                this.onDidCloseTextDocument(file.textDocument);
+            }
         }
     }
 
