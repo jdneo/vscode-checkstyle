@@ -39,7 +39,8 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
             configWatcher.dispose();
             configWatcher = undefined;
         }
-        const configUri: Uri = Uri.parse(getCheckstyleConfigurationPath());
+        const configPath: string = getCheckstyleConfigurationPath();
+        const configUri: Uri = /^([c-zC-Z]:)?[/\\]/.test(configPath) ? Uri.file(configPath) : Uri.parse(configPath);
         if (configUri.scheme === 'file' && !Object.values(BuiltinConfiguration).includes(configUri.fsPath)) {
             configWatcher = workspace.createFileSystemWatcher(configUri.fsPath);
             configWatcher.onDidCreate((_uri: Uri) => setServerConfiguration());
