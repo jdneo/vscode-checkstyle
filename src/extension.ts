@@ -47,7 +47,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
             configWatcher.onDidDelete((_uri: Uri) => setServerConfiguration());
             context.subscriptions.push(configWatcher);
         }
-     }
+    }
     await refreshConfiguraiton();
 
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
