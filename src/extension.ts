@@ -13,7 +13,7 @@ import { setCheckstyleConfiguration, setServerConfiguration } from './commands/s
 import { BuiltinConfiguration } from './constants/BuiltinConfiguration';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
-import { getCheckstyleConfigurationPath, isAutoCheckEnabled } from './utils/settingUtils';
+import { getCheckstyleConfigurationUri, isAutoCheckEnabled } from './utils/settingUtils';
 
 export async function activate(context: ExtensionContext): Promise<void> {
     await initializeFromJsonFile(context.asAbsolutePath('./package.json'));
@@ -39,7 +39,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
             configWatcher.dispose();
             configWatcher = undefined;
         }
-        const configUri: Uri = Uri.parse(getCheckstyleConfigurationPath());
+        const configUri: Uri = getCheckstyleConfigurationUri();
         if (configUri.scheme === 'file' && !Object.values(BuiltinConfiguration).includes(configUri.fsPath)) {
             configWatcher = workspace.createFileSystemWatcher(configUri.fsPath);
             configWatcher.onDidCreate((_uri: Uri) => setServerConfiguration());
