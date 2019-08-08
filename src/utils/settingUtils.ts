@@ -11,7 +11,7 @@ export function getCheckstyleConfigurationPath(uri?: Uri): string {
 
 export function getCheckstyleConfigurationUri(uri?: Uri): Uri {
     const configPath: string = getCheckstyleConfigurationPath(uri);
-    if (/^([c-zC-Z]:)?[/\\]/.test(configPath)) { // Starts with / or X:/ or X:\\
+    if (/^([c-zC-Z]:)?[/\\]/.test(configPath)) { // // Starts with / or X:/ or X:\, where X is a Windows disk drive
         return Uri.file(configPath);
     } else {
         return Uri.parse(configPath);
