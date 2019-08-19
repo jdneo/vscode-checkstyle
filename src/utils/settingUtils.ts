@@ -60,11 +60,5 @@ function setConfiguration(section: string, value: any, uri?: Uri): void {
     if (!uri && window.activeTextEditor) {
         uri = window.activeTextEditor.document.uri;
     }
-    let target: ConfigurationTarget;
-    if (uri && workspace.getWorkspaceFolder(uri)) {
-        target = ConfigurationTarget.WorkspaceFolder;
-    } else {
-        target = ConfigurationTarget.Global;
-    }
-    getConfiguration(uri).update(section, value, target);
+    getConfiguration(uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
 }

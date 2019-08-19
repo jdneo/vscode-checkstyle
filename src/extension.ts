@@ -1,6 +1,8 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
+import * as chokidar from 'chokidar';
+import * as path from 'path';
 import { ConfigurationChangeEvent, ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
@@ -32,20 +34,16 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         checkstyleDiagnosticCollector.delete(uri);
     }, null, context.subscriptions);
 
-    let configWatcher: FileSystemWatcher | undefined;
+    const configWatcher: chokidar.FSWatcher = chokidar.watch('');
+    configWatcher.on('all', (_event: string) => setServerConfiguration());
     async function refreshConfiguraiton(): Promise<void> {
         await setServerConfiguration();
-        if (configWatcher) {
-            configWatcher.dispose();
-            configWatcher = undefined;
+        for (const [dir, files] of Object.entries(configWatcher.getWatched())) {
+            configWatcher.unwatch(files.map((file: string) => path.join(dir, file)));
         }
         const configUri: Uri = getCheckstyleConfigurationUri();
         if (configUri.scheme === 'file' && !Object.values(BuiltinConfiguration).includes(configUri.fsPath)) {
-            configWatcher = workspace.createFileSystemWatcher(configUri.fsPath);
-            configWatcher.onDidCreate((_uri: Uri) => setServerConfiguration());
-            configWatcher.onDidChange((_uri: Uri) => setServerConfiguration());
-            configWatcher.onDidDelete((_uri: Uri) => setServerConfiguration());
-            context.subscriptions.push(configWatcher);
+            configWatcher.add(configUri.fsPath);
         }
     }
     await refreshConfiguraiton();
@@ -71,6 +69,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         checkstyleStatusBar,
         checkstyleDiagnosticManager,
         codeWatcher,
+        { dispose: (): void => { configWatcher.close(); } },
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
