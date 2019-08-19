@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
+import { Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
 import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/configs';
 
 export function getCheckstyleConfigurationPath(uri?: Uri): string {
@@ -60,11 +60,5 @@ function setConfiguration(section: string, value: any, uri?: Uri): void {
     if (!uri && window.activeTextEditor) {
         uri = window.activeTextEditor.document.uri;
     }
-    let target: ConfigurationTarget;
-    if (uri && workspace.getWorkspaceFolder(uri)) {
-        target = ConfigurationTarget.WorkspaceFolder;
-    } else {
-        target = ConfigurationTarget.Global;
-    }
-    getConfiguration(uri).update(section, value, target);
+    getConfiguration(uri).update(section, value);
 }
