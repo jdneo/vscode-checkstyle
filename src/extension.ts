@@ -69,7 +69,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         checkstyleStatusBar,
         checkstyleDiagnosticManager,
         codeWatcher,
-        { dispose: (): void => { configWatcher!.close(); } },
+        { dispose: (): void => { configWatcher.close(); } },
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
