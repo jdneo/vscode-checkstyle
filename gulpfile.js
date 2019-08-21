@@ -5,10 +5,10 @@ const gulp = require('gulp');
 const cp = require('child_process');
 const tslint = require('gulp-tslint');
 const decompress = require('gulp-decompress');
-const download = require('gulp-download');
 const path = require('path');
 const fse = require('fs-extra');
 const os = require('os');
+const remoteSrc = require('gulp-remote-src');
 
 const serverDir = path.join(__dirname, 'jdtls.ext');
 const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
@@ -16,7 +16,7 @@ const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
 // Build required jar files.
 const checkstyleVersion = '8.18';
 gulp.task('download-checkstyle', (done) => {
-    download(`https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${checkstyleVersion}/checkstyle-${checkstyleVersion}-all.jar`)
+    remoteSrc([`checkstyle-${checkstyleVersion}-all.jar`], { base: `https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${checkstyleVersion}/` })
         .pipe(gulp.dest(path.join(serverDir, 'com.shengchen.checkstyle.runner', 'lib')))
         .on('end', done);
 });
