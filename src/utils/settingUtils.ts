@@ -19,7 +19,7 @@ export function getCheckstyleConfigurationUri(uri?: Uri): Uri {
 }
 
 export function getCheckstyleProperties(uri?: Uri): object {
-    const properties: {} = workspace.getConfiguration(undefined, uri).get(JAVA_CHECKSTYLE_PROPERTIES, {});
+    const properties: {} = getConfiguration(uri).get(JAVA_CHECKSTYLE_PROPERTIES, {});
     for (const key of Object.keys(properties)) {
         properties[key] = resolveVariables(resolveVariables(properties[key], uri), uri);
     }
@@ -53,7 +53,7 @@ function resolveVariables(value: string, resourceUri?: Uri): string {
 }
 
 function getConfiguration(uri?: Uri): WorkspaceConfiguration {
-    return workspace.getConfiguration(undefined, uri);
+    return workspace.getConfiguration(undefined, uri || null);
 }
 
 function setConfiguration(section: string, value: any, uri?: Uri): void {
