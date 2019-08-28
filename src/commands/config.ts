@@ -3,15 +3,8 @@
 
 import * as path from 'path';
 import { OpenDialogOptions, QuickPickItem, Uri, window, WorkspaceFolder } from 'vscode';
-import { checkstyleChannel } from '../checkstyleChannel';
-import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
-import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
 import { BuiltinConfiguration } from '../constants/checkstyleConfigs';
-import { CheckstyleServerCommands } from '../constants/commands';
-import { ICheckstyleResult } from '../models';
-import { handleErrors } from '../utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
-import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
+import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
 
 export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -89,27 +82,4 @@ enum ConfigurationSelction {
     GoogleStyle = "Google's Style",
     SunStyle = "Sun's Style",
     Browse = '$(file-text) Browse...',
-}
-
-export async function setServerConfiguration(): Promise<void> {
-    const configurationPath: string = getCheckstyleConfigurationPath();
-    if (!configurationPath) {
-        checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
-        checkstyleDiagnosticManager.dispose();
-        checkstyleDiagnosticCollector.clear();
-        return;
-    }
-    try {
-        await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
-            CheckstyleServerCommands.SET_CONFIGURATION,
-            configurationPath,
-            getCheckstyleProperties(),
-        );
-        checkstyleDiagnosticManager.activate();
-        checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
-    } catch (error) {
-        handleErrors(error);
-        checkstyleDiagnosticManager.dispose();
-        checkstyleDiagnosticCollector.clear();
-    }
 }
