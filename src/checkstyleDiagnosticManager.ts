@@ -32,7 +32,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.syncedFiles = new Map();
         this.synchronizer = new FileSynchronizer(this.context);
         this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
-        vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this, this.context.subscriptions);
+        vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this, context.subscriptions);
     }
 
     public startListening(): void {

@@ -8,3 +8,8 @@ export interface ICheckstyleResult {
     severity: string;
     sourceName: string;
 }
+
+export interface ICheckstyleConfiguration {
+    path: string;
+    properties: object;
+}

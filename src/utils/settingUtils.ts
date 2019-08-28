@@ -13,15 +13,6 @@ export function getCheckstyleConfigurationPath(uri?: Uri): string {
     return resolveVariables(configurationPath, uri);
 }
 
-export function getCheckstyleConfigurationUri(uri?: Uri): Uri {
-    const configPath: string = getCheckstyleConfigurationPath(uri);
-    if (/^([c-zC-Z]:)?[/\\]/.test(configPath)) { // Starts with / or X:/ or X:\, where X is a Windows disk drive
-        return Uri.file(configPath);
-    } else {
-        return Uri.parse(configPath);
-    }
-}
-
 export function getCheckstyleProperties(uri?: Uri): object {
     const properties: {} = getConfiguration(uri).get(JAVA_CHECKSTYLE_PROPERTIES, {});
     for (const key of Object.keys(properties)) {
