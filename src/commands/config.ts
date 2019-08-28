@@ -6,7 +6,7 @@ import { OpenDialogOptions, QuickPickItem, Uri, window, WorkspaceFolder } from '
 import { checkstyleChannel } from '../checkstyleChannel';
 import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
 import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
-import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
+import { BuiltinConfiguration } from '../constants/checkstyleConfigs';
 import { CheckstyleServerCommands } from '../constants/commands';
 import { ICheckstyleResult } from '../models';
 import { handleErrors } from '../utils/errorUtils';
