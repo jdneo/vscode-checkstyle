@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
+import { ConfigurationChangeEvent, ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleConfigurationManager } from './checkstyleConfigurationManager';
@@ -26,6 +26,11 @@ export async function deactivate(): Promise<void> {
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
     checkstyleDiagnosticManager.initialize(context);
     checkstyleConfigurationManager.initialize(context);
+
+    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+        checkstyleDiagnosticManager.onDidChangeConfiguration(e);
+        checkstyleConfigurationManager.onDidChangeConfiguration(e);
+    });
 
     const codeWatcher: FileSystemWatcher = workspace.createFileSystemWatcher('**/*.{[jJ][aA][vV][aA]}', true /* ignoreCreateEvents */);
     codeWatcher.onDidDelete((uri: Uri) => {

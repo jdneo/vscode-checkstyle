@@ -32,7 +32,6 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.syncedFiles = new Map();
         this.synchronizer = new FileSynchronizer(this.context);
         this.diagnosticDelayTrigger = _.debounce(this.sendPendingDiagnostics.bind(this), 200);
-        vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this, context.subscriptions);
     }
 
     public startListening(): void {
@@ -76,7 +75,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.diagnosticDelayTrigger();
     }
 
-    private onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
+    public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
         if (e.affectsConfiguration('java.checkstyle.autocheck')) {
             if (isAutoCheckEnabled()) {
                 this.startListening();

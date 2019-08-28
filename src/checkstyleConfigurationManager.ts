@@ -1,3 +1,6 @@
+// Copyright (c) jdneo. All rights reserved.
+// Licensed under the GNU LGPLv3 license.
+
 import * as chokidar from 'chokidar';
 import * as vscode from 'vscode';
 import { checkstyleChannel } from './checkstyleChannel';
@@ -15,8 +18,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     private config: ICheckstyleConfiguration;
     private configWatcher: chokidar.FSWatcher | undefined;
 
-    public initialize(context: vscode.ExtensionContext): void {
-        vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this, context.subscriptions);
+    public initialize(_context: vscode.ExtensionContext): void {
         this.refresh();
     }
 
@@ -35,7 +37,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         }
     }
 
-    private onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
+    public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
         if (e.affectsConfiguration('java.checkstyle.configuration') ||
             e.affectsConfiguration('java.checkstyle.properties')) {
             this.refresh();
