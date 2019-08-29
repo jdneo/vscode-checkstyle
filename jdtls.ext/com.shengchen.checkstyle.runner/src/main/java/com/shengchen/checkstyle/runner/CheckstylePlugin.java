@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
 
 public class CheckstylePlugin implements BundleActivator {
 
-    public static final String PLUGIN_ID = "com.microsoft.java.debug.plugin";
+    public static final String PLUGIN_ID = "com.shengchen.checkstyle.runner";
     public static BundleContext context = null;
 
     @Override
