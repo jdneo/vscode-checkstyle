@@ -75,6 +75,16 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
         this.diagnosticDelayTrigger();
     }
 
+    public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
+        if (e.affectsConfiguration('java.checkstyle.autocheck')) {
+            if (isAutoCheckEnabled()) {
+                this.startListening();
+            } else {
+                this.stopListening();
+            }
+        }
+    }
+
     private onDidOpenTextDocument(document: vscode.TextDocument): void {
         if (!(document.languageId === 'java' && document.uri.scheme === 'file')) {
             return;

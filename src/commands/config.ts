@@ -2,16 +2,9 @@
 // Licensed under the GNU LGPLv3 license.
 
 import * as path from 'path';
-import { OpenDialogOptions, QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
-import { checkstyleChannel } from '../checkstyleChannel';
-import { checkstyleDiagnosticCollector } from '../checkstyleDiagnosticCollector';
-import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
-import { BuiltinConfiguration } from '../constants/BuiltinConfiguration';
-import { CheckstyleServerCommands } from '../constants/commands';
-import { ICheckstyleResult } from '../models';
-import { handleErrors } from '../utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, setCheckstyleConfigurationPath } from '../utils/settingUtils';
-import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
+import { OpenDialogOptions, QuickPickItem, Uri, window, WorkspaceFolder } from 'vscode';
+import { BuiltinConfiguration } from '../constants/checkstyleConfigs';
+import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
 
 export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -47,21 +40,6 @@ export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
     window.showInformationMessage('Successfully set the Checkstyle configuration.');
 }
 
-function getDefaultUri(): Uri | undefined {
-    const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
-    if (workspaceFolders === undefined) {
-        return undefined;
-    }
-    if (workspaceFolders.length === 1) {
-        return workspaceFolders[0].uri;
-    }
-    if (window.activeTextEditor) {
-        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
-        return activeWorkspaceFolder ? activeWorkspaceFolder.uri : undefined;
-    }
-    return undefined;
-}
-
 async function selectConfigurationSource(): Promise<string | undefined> {
     const items: QuickPickItem[] = [
         {
@@ -83,7 +61,8 @@ async function selectConfigurationSource(): Promise<string | undefined> {
 }
 
 async function browseForConfiguration(): Promise<Uri | undefined> {
-    const defaultUri: Uri | undefined = getDefaultUri();
+    const workspaceFolder: WorkspaceFolder | undefined = getDefaultWorkspaceFolder();
+    const defaultUri: Uri | undefined = workspaceFolder && workspaceFolder.uri;
     const options: OpenDialogOptions = {
         defaultUri,
         canSelectFiles: true,
@@ -103,27 +82,4 @@ enum ConfigurationSelction {
     GoogleStyle = "Google's Style",
     SunStyle = "Sun's Style",
     Browse = '$(file-text) Browse...',
-}
-
-export async function setServerConfiguration(): Promise<void> {
-    const configurationPath: string = getCheckstyleConfigurationPath();
-    if (!configurationPath) {
-        checkstyleChannel.appendLine('Checkstyle configuration file not set yet, skip the check.');
-        checkstyleDiagnosticManager.dispose();
-        checkstyleDiagnosticCollector.clear();
-        return;
-    }
-    try {
-        await executeJavaLanguageServerCommand<{ [file: string]: ICheckstyleResult[] }>(
-            CheckstyleServerCommands.SET_CONFIGURATION,
-            configurationPath,
-            getCheckstyleProperties(),
-        );
-        checkstyleDiagnosticManager.activate();
-        checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
-    } catch (error) {
-        handleErrors(error);
-        checkstyleDiagnosticManager.dispose();
-        checkstyleDiagnosticCollector.clear();
-    }
 }
