@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { Disposable, StatusBarAlignment, StatusBarItem, window, commands } from 'vscode';
+import { Disposable, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from './constants/commands';
 
