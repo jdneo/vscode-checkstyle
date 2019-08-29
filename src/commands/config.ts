@@ -1,15 +1,17 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
+import * as fse from 'fs-extra';
 import * as path from 'path';
-import { QuickPickItem, Uri, window, WorkspaceFolder } from 'vscode';
-import { BuiltinConfiguration } from '../constants/checkstyleConfigs';
-import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import * as xmljs from 'xml-js';
+import { BuiltinConfiguration, DoctypePublicIds } from '../constants/checkstyleConfigs';
+import { asWorkspaceEnvPath as tryAsWorkspaceEnvPath, getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
 
 export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
         if (path.extname(uri.fsPath).toLowerCase() === '.xml') {
-            setCheckstyleConfigurationPath(uri.fsPath, uri);
+            setCheckstyleConfigurationPath(tryAsWorkspaceEnvPath(uri.fsPath), uri);
         } else {
             window.showErrorMessage('Invalid Checkstyle configuration file');
             return;
@@ -25,7 +27,9 @@ export async function setConfiguration(uri?: Uri): Promise<void> {
 }
 
 async function queryForConfiguration(): Promise<string | undefined> {
+    const detectedConfigurations: QuickPickItem[] = await detectConfigurations();
     const items: QuickPickItem[] = [
+        ...detectedConfigurations,
         {
             label: BuiltinConfiguration.GoogleCheck,
             detail: "(Built-in) Google's Style",
@@ -75,4 +79,27 @@ async function inputConfiguration(): Promise<string | undefined> {
         ignoreFocusOut: true,
     });
     return configPath && configPath.trim();
+}
+
+async function detectConfigurations(): Promise<QuickPickItem[]> {
+    const detected: QuickPickItem[] = [];
+    for (const xml of await workspace.findFiles('**/*.xml')) {
+        const relativeXml: string = tryAsWorkspaceEnvPath(xml.fsPath);
+        function doctypeFn(doctype: string): void {
+            const [name, type] = doctype.split(/\s+/, 2);
+            if (type.toUpperCase() === 'PUBLIC') {
+                const pubid: string = doctype.match(/"(.+)"/)![1];
+                if (DoctypePublicIds.includes(pubid)) {
+                    detected.push({ label: relativeXml, detail: xml.fsPath });
+                }
+            }
+            if (type.toUpperCase() === 'SYSTEM') {
+                if (name === 'module') {
+                    detected.push({ label: relativeXml, detail: xml.fsPath });
+                }
+            }
+        }
+        xmljs.xml2js(await fse.readFile(xml.fsPath, 'utf8'), { doctypeFn });
+    }
+    return detected;
 }
