@@ -9,7 +9,7 @@ import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkCode } from './commands/check';
-import { setCheckstyleConfiguration } from './commands/config';
+import { setConfiguration } from './commands/config';
 import { fixCheckstyleViolation } from './commands/fix';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
@@ -45,7 +45,7 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         codeWatcher,
         languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setCheckstyleConfiguration(uri)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setConfiguration(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),
     );

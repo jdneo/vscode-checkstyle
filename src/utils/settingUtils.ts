@@ -1,6 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
+import * as path from 'path';
 import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
 import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES } from '../constants/settings';
 
@@ -38,6 +39,15 @@ export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
 
 export function isAutoCheckEnabled(): boolean {
     return getConfiguration().get<boolean>(JAVA_CHECKSTYLE_AUTOCHECK, true);
+}
+
+export function tryUseWorkspaceFolder(fsPath: string): string {
+    const result: string = workspace.asRelativePath(fsPath);
+    if (result === fsPath) {
+        return result;
+    } else {
+        return path.join('${workspaceFolder}', result);
+    }
 }
 
 function getConfiguration(uri?: Uri): WorkspaceConfiguration {
