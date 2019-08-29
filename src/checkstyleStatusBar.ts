@@ -25,6 +25,7 @@ class CheckstyleStatusBar implements Disposable {
         } else {
             this.statusBar.text = '$(bug)';
             this.statusBar.tooltip = `[Checkstyle] ${violations} violation${violations === 1 ? '' : 's'} found`;
+            this.statusBar.command = 'workbench.action.problems.focus';
         }
         this.statusBar.show();
     }
