@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { Disposable, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { Disposable, StatusBarAlignment, StatusBarItem, window, commands } from 'vscode';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from './constants/commands';
 
@@ -25,6 +25,7 @@ class CheckstyleStatusBar implements Disposable {
         } else {
             this.statusBar.text = '$(bug)';
             this.statusBar.tooltip = `[Checkstyle] ${violations} violation${violations === 1 ? '' : 's'} found`;
+            this.statusBar.command = 'workbench.action.problems.focus';
         }
         this.statusBar.show();
     }
