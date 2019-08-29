@@ -2,11 +2,11 @@
 // Licensed under the GNU LGPLv3 license.
 
 import * as path from 'path';
-import { OpenDialogOptions, QuickPickItem, Uri, window, WorkspaceFolder } from 'vscode';
+import { QuickPickItem, Uri, window, WorkspaceFolder } from 'vscode';
 import { BuiltinConfiguration } from '../constants/checkstyleConfigs';
 import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
 
-export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
+export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
         if (path.extname(uri.fsPath).toLowerCase() === '.xml') {
             setCheckstyleConfigurationPath(uri.fsPath, uri);
@@ -15,71 +15,64 @@ export async function setCheckstyleConfiguration(uri?: Uri): Promise<void> {
             return;
         }
     } else {
-        const choice: string | undefined = await selectConfigurationSource();
+        const choice: string | undefined = await queryForConfiguration();
         if (!choice) {
             return;
         }
-        switch (choice) {
-            case ConfigurationSelction.Browse:
-                const selectedConfig: Uri | undefined = await browseForConfiguration();
-                if (!selectedConfig) {
-                    return;
-                }
-                setCheckstyleConfigurationPath(selectedConfig.fsPath, selectedConfig);
-                break;
-            case ConfigurationSelction.GoogleStyle:
-                setCheckstyleConfigurationPath(BuiltinConfiguration.GoogleCheck);
-                break;
-            case ConfigurationSelction.SunStyle:
-                setCheckstyleConfigurationPath(BuiltinConfiguration.SunCheck);
-                break;
-            default:
-                return;
-        }
+        setCheckstyleConfigurationPath(choice);
     }
     window.showInformationMessage('Successfully set the Checkstyle configuration.');
 }
 
-async function selectConfigurationSource(): Promise<string | undefined> {
+async function queryForConfiguration(): Promise<string | undefined> {
     const items: QuickPickItem[] = [
         {
-            label: ConfigurationSelction.Browse,
-            detail: 'Select a Checkstyle configuration file in your file system.',
+            label: BuiltinConfiguration.GoogleCheck,
+            detail: "(Built-in) Google's Style",
         },
         {
-            label: ConfigurationSelction.GoogleStyle,
+            label: BuiltinConfiguration.SunCheck,
+            detail: "(Built-in) Sun's Style",
         },
         {
-            label: ConfigurationSelction.SunStyle,
+            label: '$(pencil) Write directly...',
+            detail: 'Write your configuration path in input box (e.g. from HTTP URL).',
+        },
+        {
+            label: '$(file-text) Browse...',
+            detail: 'Select a configuration file from your file system.',
         },
     ];
     const result: QuickPickItem | undefined = await window.showQuickPick(items, { ignoreFocusOut: true });
-    if (result) {
-        return result.label;
+    if (result === items.slice(-1)[0]) {
+        return await browseForConfiguration();
+    } else if (result === items.slice(-2)[0]) {
+        return await inputConfiguration();
+    } else {
+        return result && result.label;
     }
-    return undefined;
 }
 
-async function browseForConfiguration(): Promise<Uri | undefined> {
+async function browseForConfiguration(): Promise<string | undefined> {
     const workspaceFolder: WorkspaceFolder | undefined = getDefaultWorkspaceFolder();
     const defaultUri: Uri | undefined = workspaceFolder && workspaceFolder.uri;
-    const options: OpenDialogOptions = {
+    const results: Uri[] | undefined = await window.showOpenDialog({
         defaultUri,
         canSelectFiles: true,
         canSelectFolders: false,
         canSelectMany: false,
         openLabel: 'Select',
         filters: { 'Checkstyle Configuration': ['xml'] },
-    };
-    const result: Uri[] | undefined = await window.showOpenDialog(options);
-    if (result && result.length > 0) {
-        return result[0];
-    }
-    return undefined;
+    });
+    return results && results[0].path;
 }
 
-enum ConfigurationSelction {
-    GoogleStyle = "Google's Style",
-    SunStyle = "Sun's Style",
-    Browse = '$(file-text) Browse...',
+async function inputConfiguration(): Promise<string | undefined> {
+    const configPath: string | undefined = await window.showInputBox({
+        prompt: 'Enter configuration path here.',
+        placeHolder: 'Supports http(s)://...',
+        value: 'https://',
+        ignoreFocusOut: true,
+    });
+    return configPath && configPath.trim();
 }
