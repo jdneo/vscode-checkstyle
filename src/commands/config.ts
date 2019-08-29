@@ -6,7 +6,7 @@ import * as path from 'path';
 import { QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import * as xmljs from 'xml-js';
 import { BuiltinConfiguration, DoctypePublicIds } from '../constants/checkstyleConfigs';
-import { asWorkspaceEnvPath as tryAsWorkspaceEnvPath, getDefaultWorkspaceFolder, setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryAsWorkspaceEnvPath } from '../utils/settingUtils';
 
 export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -92,8 +92,7 @@ async function detectConfigurations(): Promise<QuickPickItem[]> {
                 if (DoctypePublicIds.includes(pubid)) {
                     detected.push({ label: relativeXml, detail: xml.fsPath });
                 }
-            }
-            if (type.toUpperCase() === 'SYSTEM') {
+            } else if (type.toUpperCase() === 'SYSTEM') {
                 if (name === 'module') {
                     detected.push({ label: relativeXml, detail: xml.fsPath });
                 }
