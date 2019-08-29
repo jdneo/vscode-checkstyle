@@ -68,7 +68,7 @@ async function browseForConfiguration(): Promise<string | undefined> {
         openLabel: 'Select',
         filters: { 'Checkstyle Configuration': ['xml'] },
     });
-    return results && results[0].path;
+    return results && results[0] && tryAsWorkspaceEnvPath(results[0].path);
 }
 
 async function inputConfiguration(): Promise<string | undefined> {
