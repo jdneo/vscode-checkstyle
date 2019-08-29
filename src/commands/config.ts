@@ -5,13 +5,13 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import * as xmljs from 'xml-js';
-import { BuiltinConfiguration, DoctypePublicIds } from '../constants/checkstyleConfigs';
-import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryAsWorkspaceEnvPath } from '../utils/settingUtils';
+import { BuiltinConfiguration, checkstyleDoctypeIds } from '../constants/checkstyleConfigs';
+import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryUseWorkspaceFolder } from '../utils/settingUtils';
 
 export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
         if (path.extname(uri.fsPath).toLowerCase() === '.xml') {
-            setCheckstyleConfigurationPath(tryAsWorkspaceEnvPath(uri.fsPath), uri);
+            setCheckstyleConfigurationPath(tryUseWorkspaceFolder(uri.fsPath), uri);
         } else {
             window.showErrorMessage('Invalid Checkstyle configuration file');
             return;
@@ -26,9 +26,13 @@ export async function setConfiguration(uri?: Uri): Promise<void> {
     window.showInformationMessage('Successfully set the Checkstyle configuration.');
 }
 
+interface IQuickPickItemEx<T = string> extends QuickPickItem {
+    value?: T;
+}
+
 async function queryForConfiguration(): Promise<string | undefined> {
-    const detectedConfigurations: QuickPickItem[] = await detectConfigurations();
-    const items: QuickPickItem[] = [
+    const detectedConfigurations: IQuickPickItemEx[] = await detectConfigurations();
+    const items: IQuickPickItemEx[] = [
         ...detectedConfigurations,
         {
             label: BuiltinConfiguration.GoogleCheck,
@@ -41,19 +45,23 @@ async function queryForConfiguration(): Promise<string | undefined> {
         {
             label: '$(pencil) Write directly...',
             detail: 'Write your configuration path in input box (e.g. from HTTP URL).',
+            value: ':input',
         },
         {
             label: '$(file-text) Browse...',
             detail: 'Select a configuration file from your file system.',
+            value: ':browse',
         },
     ];
-    const result: QuickPickItem | undefined = await window.showQuickPick(items, { ignoreFocusOut: true });
-    if (result === items.slice(-1)[0]) {
+    const result: IQuickPickItemEx | undefined = await window.showQuickPick(items, { ignoreFocusOut: true });
+    if (!result) {
+        return undefined;
+    } else if (result.value === ':browse') {
         return await browseForConfiguration();
-    } else if (result === items.slice(-2)[0]) {
+    } else if (result.value === ':input') {
         return await inputConfiguration();
     } else {
-        return result && result.label;
+        return result.label;
     }
 }
 
@@ -68,7 +76,7 @@ async function browseForConfiguration(): Promise<string | undefined> {
         openLabel: 'Select',
         filters: { 'Checkstyle Configuration': ['xml'] },
     });
-    return results && results[0] && tryAsWorkspaceEnvPath(results[0].path);
+    return results && results[0] && tryUseWorkspaceFolder(results[0].path);
 }
 
 async function inputConfiguration(): Promise<string | undefined> {
@@ -81,15 +89,15 @@ async function inputConfiguration(): Promise<string | undefined> {
     return configPath && configPath.trim();
 }
 
-async function detectConfigurations(): Promise<QuickPickItem[]> {
-    const detected: QuickPickItem[] = [];
+async function detectConfigurations(): Promise<IQuickPickItemEx[]> {
+    const detected: IQuickPickItemEx[] = [];
     for (const xml of await workspace.findFiles('**/*.xml')) {
-        const relativeXml: string = tryAsWorkspaceEnvPath(xml.fsPath);
+        const relativeXml: string = tryUseWorkspaceFolder(xml.fsPath);
         function doctypeFn(doctype: string): void {
             const [name, type] = doctype.split(/\s+/, 2);
             if (type.toUpperCase() === 'PUBLIC') {
                 const pubid: string = doctype.match(/"(.+)"/)![1];
-                if (DoctypePublicIds.includes(pubid)) {
+                if (checkstyleDoctypeIds.includes(pubid)) {
                     detected.push({ label: relativeXml, detail: xml.fsPath });
                 }
             } else if (type.toUpperCase() === 'SYSTEM') {

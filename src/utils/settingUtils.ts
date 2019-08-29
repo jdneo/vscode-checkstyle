@@ -41,7 +41,7 @@ export function isAutoCheckEnabled(): boolean {
     return getConfiguration().get<boolean>(JAVA_CHECKSTYLE_AUTOCHECK, true);
 }
 
-export function tryAsWorkspaceEnvPath(fsPath: string): string {
+export function tryUseWorkspaceFolder(fsPath: string): string {
     const result: string = workspace.asRelativePath(fsPath);
     if (result === fsPath) {
         return result;

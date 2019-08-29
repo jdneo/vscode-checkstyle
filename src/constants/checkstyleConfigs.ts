@@ -6,7 +6,7 @@ export enum BuiltinConfiguration {
     SunCheck = '/sun_checks.xml',
 }
 
-export const DoctypePublicIds: string[] = [
+export const checkstyleDoctypeIds: string[] = [
     '-//Checkstyle//DTD Checkstyle Configuration 1.0//EN',
     '-//Checkstyle//DTD Checkstyle Configuration 1.1//EN',
     '-//Checkstyle//DTD Checkstyle Configuration 1.2//EN',
