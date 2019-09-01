@@ -2,7 +2,7 @@
     "name": "vscode-checkstyle",
     "displayName": "Checkstyle for Java",
     "description": "%description%",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "author": "Sheng Chen",
     "publisher": "shengchen",
     "license": "GNU LGPL V3.0",
@@ -33,7 +33,7 @@
     "main": "./dist/extension",
     "contributes": {
         "javaExtensions": [
-            "./server/com.shengchen.checkstyle.runner-1.1.0.jar"
+            "./server/com.shengchen.checkstyle.runner-1.2.0.jar"
         ],
         "menus": {
             "explorer/context": [

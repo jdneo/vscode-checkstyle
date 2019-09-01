@@ -3,6 +3,16 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+##[1.2.0]
+### Added
+- Open the Problems panel when click the status icon in the status bar. ([#176](https://github.com/jdneo/vscode-checkstyle/issues/176))
+
+### Changed
+- Automatically detect potential Checkstyle configuration files when using command to set the configuration. ([#PR215](https://github.com/jdneo/vscode-checkstyle/pull/215))
+
+### Fixed
+- [Bugs fixed](https://github.com/jdneo/vscode-checkstyle/issues?q=is%3Aissue+is%3Aclosed+milestone%3A1.2.0+label%3Abug)
+
 ## [1.1.0]
 ### Added
 - Support the live linting experience. Now the users do **not** need to save the file to refresh the linting results. ([#175](https://github.com/jdneo/vscode-checkstyle/issues/175))
