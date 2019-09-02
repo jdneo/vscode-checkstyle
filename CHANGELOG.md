@@ -3,7 +3,7 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-##[1.2.0]
+## [1.2.0]
 ### Added
 - Open the Problems panel when click the status icon in the status bar. ([#176](https://github.com/jdneo/vscode-checkstyle/issues/176))
 
@@ -104,4 +104,4 @@ Initial release for the new Checkstyle extension, the new extension contains fol
 - Add setting ```checkstyle.autocheck```.
 
 ### Fixed
-- Fix the issue that the checkstyle output may not be correctly parsed. 
+- Fix the issue that the checkstyle output may not be correctly parsed.

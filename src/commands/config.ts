@@ -44,7 +44,7 @@ async function queryForConfiguration(): Promise<string | undefined> {
         },
         {
             label: '$(link) Use URL...',
-            detail: 'Use a Checkstyle file accessible via HTTP.',
+            detail: 'Use a Checkstyle configuration accessible via HTTP.',
             value: ':input',
         },
         {
@@ -81,7 +81,7 @@ async function browseForConfiguration(): Promise<string | undefined> {
 
 async function inputConfiguration(): Promise<string | undefined> {
     const configPath: string | undefined = await window.showInputBox({
-        prompt: 'Enter configuration path here.',
+        prompt: 'Enter configuration URL here.',
         placeHolder: 'Supports http(s)://...',
         value: 'https://',
         ignoreFocusOut: true,
