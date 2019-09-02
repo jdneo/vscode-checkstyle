@@ -28,13 +28,18 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         }
     }
 
-    public get configUri(): vscode.Uri {
-        // Starts with / or X:/ or X:\, where X is a Windows disk drive
-        if (/^([c-zC-Z]:)?[/\\]/.test(this.config.path)) {
+    public get configUri(): vscode.Uri | undefined {
+        if (!this.config.path) {
+            return undefined;
+        } else if (/^([c-zC-Z]:)?[/\\]/.test(this.config.path)) { // Starts with / or X:/ or X:\, where X is a Windows disk drive
             return vscode.Uri.file(this.config.path);
         } else {
             return vscode.Uri.parse(this.config.path);
         }
+    }
+    public get isConfigFromLocalFs(): boolean {
+        return !!(this.configUri && this.configUri.scheme === 'file'
+            && !Object.values(BuiltinConfiguration).includes(this.config.path));
     }
 
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
@@ -54,7 +59,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             this.configWatcher.close();
             this.configWatcher = undefined;
         }
-        if (this.configUri.scheme === 'file' && !Object.values(BuiltinConfiguration).includes(this.config.path)) {
+        if (this.isConfigFromLocalFs) {
             this.configWatcher = chokidar.watch(this.config.path);
             this.configWatcher.on('all', (_event: string) => { this.syncServer(); });
         }
