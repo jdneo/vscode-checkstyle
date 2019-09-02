@@ -43,8 +43,8 @@ async function queryForConfiguration(): Promise<string | undefined> {
             detail: "(Built-in) Sun's Style",
         },
         {
-            label: '$(pencil) Write directly...',
-            detail: 'Write your configuration path in input box (e.g. from HTTP URL).',
+            label: '$(link) Use URL...',
+            detail: 'Use a Checkstyle file accessible via HTTP.',
             value: ':input',
         },
         {
