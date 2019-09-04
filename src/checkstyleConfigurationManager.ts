@@ -39,7 +39,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     }
     public get isConfigFromLocalFs(): boolean {
         return !!(this.configUri && this.configUri.scheme === 'file'
-            && !Object.values(BuiltinConfiguration).includes(this.config.path));
+            && !(Object.values(BuiltinConfiguration) as string[]).includes(this.config.path));
     }
 
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
