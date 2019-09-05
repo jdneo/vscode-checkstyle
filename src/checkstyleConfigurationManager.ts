@@ -37,6 +37,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             return vscode.Uri.parse(this.config.path);
         }
     }
+
     public get isConfigFromLocalFs(): boolean {
         return !!(this.configUri && this.configUri.scheme === 'file'
             && !Object.values(BuiltinConfiguration).includes(this.config.path));
@@ -73,9 +74,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             return;
         }
         try {
-            await executeJavaLanguageServerCommand(CheckstyleServerCommands.SET_CONFIGURATION,
-                this.config.path, this.config.properties,
-            );
+            await executeJavaLanguageServerCommand(CheckstyleServerCommands.SET_CONFIGURATION, this.config);
             checkstyleDiagnosticManager.activate();
             checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
         } catch (error) {

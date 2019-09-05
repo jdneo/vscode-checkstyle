@@ -35,14 +35,29 @@ import com.shengchen.checkstyle.quickfix.misc.UncommentedMainQuickFix;
 import com.shengchen.checkstyle.quickfix.misc.UpperEllQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.ModifierOrderQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.RedundantModifierQuickFix;
+import com.shengchen.checkstyle.quickfix.utils.EditUtils;
+import com.shengchen.checkstyle.runner.api.IQuickFixService;
+
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
+import org.eclipse.jdt.ls.core.internal.JDTUtils;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class QuickFixProvider {
-    private static final Map<String, BaseQuickFix> quickFixMap;
+public class QuickFixService implements IQuickFixService {
 
-    static {
+    private final Map<String, BaseQuickFix> quickFixMap;
+
+    public QuickFixService() {
         quickFixMap = new HashMap<>();
         quickFixMap.put(FixableCheck.FINAL_LOCAL_VARIABLE_CHECK.toString(), new FinalLocalVariableQuickFix());
         quickFixMap.put(FixableCheck.MODIFIER_ORDER_CHECK.toString(), new ModifierOrderQuickFix());
@@ -64,7 +79,29 @@ public class QuickFixProvider {
         quickFixMap.put(FixableCheck.STRING_LITERAL_EQUALITY.toString(), new StringLiteralEqualityQuickFix());
     }
 
-    public static BaseQuickFix getQuickFix(String sourceName) {
+    public BaseQuickFix getQuickFix(String sourceName) {
         return quickFixMap.get(sourceName);
+    }
+
+    public WorkspaceEdit quickFix(
+        String fileToCheckUri,
+        Double offset,
+        String sourceName
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException {
+        final BaseQuickFix quickFix = getQuickFix(sourceName);
+        if (quickFix == null) {
+            throw new RuntimeException("Unsupported quick fix.");
+        }
+        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
+        final Document document = new Document(unit.getSource());
+        final IRegion lineInfo = document.getLineInformationOfOffset(offset.intValue());
+        final ASTParser astParser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
+        astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+        astParser.setSource(unit);
+        final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
+        astRoot.recordModifications();
+        astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset.intValue()));
+        final TextEdit edit = astRoot.rewrite(document, null);
+        return EditUtils.convertToWorkspaceEdit(unit, edit);
     }
 }

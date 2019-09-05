@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CheckstyleExecutionListener implements AuditListener {
+public class CheckerListener implements AuditListener {
 
     private Map<String, List<CheckResult>> fileErrors = new HashMap<>();
 

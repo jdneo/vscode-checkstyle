@@ -17,29 +17,62 @@
 
 package com.shengchen.checkstyle.runner;
 
-import com.shengchen.checkstyle.runner.api.CheckstyleRunner;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.shengchen.checkstyle.checker.CheckerService;
+import com.shengchen.checkstyle.quickfix.QuickFixService;
+import com.shengchen.checkstyle.runner.api.CheckResult;
+import com.shengchen.checkstyle.runner.api.ICheckerService;
+import com.shengchen.checkstyle.runner.api.IQuickFixService;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ls.core.internal.IDelegateCommandHandler;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.lsp4j.WorkspaceEdit;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("restriction")
 public class DelegateCommandHandler implements IDelegateCommandHandler {
 
     private static final String CHECKSTYLE_PREFIX = "java.checkstyle.server.";
 
+    private ICheckerService checkerService = new CheckerService();
+    private IQuickFixService quickfixService = new QuickFixService();
+
     @Override
     public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
         if (commandId.startsWith(CHECKSTYLE_PREFIX)) { // Only handle commands with specific id prefix
             final String command = commandId.substring(CHECKSTYLE_PREFIX.length()); // Remove prefix as handler name
-            for (final Method handler : CheckstyleRunner.class.getDeclaredMethods()) {
+            for (final Method handler : this.getClass().getDeclaredMethods()) {
                 if (handler.getName().equals(command)) { // Dispatch to CheckStyleRunner's corresponding handler
-                    return handler.invoke(null, arguments.toArray());
+                    return handler.invoke(this, arguments.toArray());
                 }
             }
         }
         return null;
+    }
+
+    public void setConfiguration(Map<String, Object> config) throws IOException, CheckstyleException {
+        checkerService.setConfiguration(config);
+    }
+
+    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException {
+        if (filesToCheckUris.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return checkerService.checkCode(filesToCheckUris);
+    }
+
+    public WorkspaceEdit quickFix(
+        String fileToCheckUri,
+        Double offset,
+        String sourceName
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException {
+        return quickfixService.quickFix(fileToCheckUri, offset, sourceName);
     }
 }
