@@ -8,5 +8,7 @@
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",
+    // Use workspace's typescript version to provide correct language service
+    "typescript.tsdk": "node_modules/typescript/lib",
     "java.checkstyle.configuration": "${workspaceFolder}/jdtls.ext/checkstyle.xml"
 }
