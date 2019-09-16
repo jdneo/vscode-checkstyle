@@ -87,7 +87,7 @@
                 },
                 "java.checkstyle.version": {
                     "type": "string",
-                    "description": "Set the used Checkstyle version",
+                    "description": "%configuration.java.checkstyle.properties.description%",
                     "scope": "resource"
                 },
                 "java.checkstyle.autocheck": {

@@ -4,6 +4,7 @@
     "contributes.commands.java.checkstyle.setVersion.title": "Set the Checkstyle Version",
     "contributes.commands.java.checkstyle.checkCode.title": "Check Code with Checkstyle",
     "configuration.java.checkstyle.configuration.description": "Specify the path of the Checkstyle configuration file",
+    "configuration.java.checkstyle.version.description": "Specify the version of the Checkstyle dependency",
     "configuration.java.checkstyle.properties.description": "Specify the customized properties used in the Checkstyle configuration",
     "configuration.java.checkstyle.autocheck.description": "Specify if the extension will check the format automatically or not"
 }
