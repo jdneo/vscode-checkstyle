@@ -95,7 +95,7 @@ export class FileSynchronizer implements vscode.Disposable {
     }
 
     // Change content of temp file that already exists
-    public change(document: vscode.TextDocument, _event?: vscode.TextDocumentContentChangeEvent[]): void {
+    public change(document: vscode.TextDocument, _event?: readonly vscode.TextDocumentContentChangeEvent[]): void {
         // Skip if there's pending remove request
         if (this.pendingRequests.remove.has(document.fileName)) {
             return;

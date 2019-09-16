@@ -1,6 +1,7 @@
 {
     "description": "Provide real-time feedback about Checkstyle violations and quick fix actions",
     "contributes.commands.java.checkstyle.setConfiguration.title": "Set the Checkstyle Configuration File",
+    "contributes.commands.java.checkstyle.setVersion.title": "Set the Checkstyle Version",
     "contributes.commands.java.checkstyle.checkCode.title": "Check Code with Checkstyle",
     "configuration.java.checkstyle.configuration.description": "Specify the path of the Checkstyle configuration file",
     "configuration.java.checkstyle.properties.description": "Specify the customized properties used in the Checkstyle configuration",

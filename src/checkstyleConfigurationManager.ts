@@ -2,6 +2,9 @@
 // Licensed under the GNU LGPLv3 license.
 
 import * as chokidar from 'chokidar';
+import * as fse from 'fs-extra';
+import fetch, { Response } from 'node-fetch';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
@@ -9,16 +12,19 @@ import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { executeJavaLanguageServerCommand } from './commands/executeJavaLanguageServerCommand';
 import { BuiltinConfiguration } from './constants/checkstyleConfigs';
 import { CheckstyleServerCommands } from './constants/commands';
+import { JAVA_CHECKSTYLE_CONFIGURATIONS } from './constants/settings';
 import { ICheckstyleConfiguration } from './models';
 import { handleErrors } from './utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties } from './utils/settingUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString } from './utils/settingUtils';
 
 class CheckstyleConfigurationManager implements vscode.Disposable {
 
+    private context: vscode.ExtensionContext;
     private config: ICheckstyleConfiguration;
     private configWatcher: chokidar.FSWatcher | undefined;
 
-    public initialize(_context: vscode.ExtensionContext): void {
+    public initialize(context: vscode.ExtensionContext): void {
+        this.context = context;
         this.refresh();
     }
 
@@ -40,21 +46,42 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
 
     public get isConfigFromLocalFs(): boolean {
         return !!(this.configUri && this.configUri.scheme === 'file'
-            && !Object.values(BuiltinConfiguration).includes(this.config.path));
+            && !(Object.values(BuiltinConfiguration) as string[]).includes(this.config.path));
+    }
+
+    public async getCurrentVersion(): Promise<string | undefined> {
+        return await executeJavaLanguageServerCommand<string>(CheckstyleServerCommands.GET_VERSION);
+    }
+
+    public async getBuiltinVersion(): Promise<string> {
+        return vscode.extensions.getExtension('shengchen.vscode-checkstyle')!.packageJSON['contributes']['builtinVersion'];
+    }
+
+    public async getDownloadedVersions(): Promise<string[]> {
+        const versions: string[] = [];
+        for (const file of await fse.readdir(this.context.globalStoragePath)) {
+            const match: RegExpMatchArray | null = file.match(/checkstyle-([\d.]+)-all\.jar/);
+            if (match) {
+                versions.push(match[1]);
+            }
+        }
+        return versions;
     }
 
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
-        if (e.affectsConfiguration('java.checkstyle.configuration') ||
-            e.affectsConfiguration('java.checkstyle.properties')) {
+        if (JAVA_CHECKSTYLE_CONFIGURATIONS.some((setting: string) => e.affectsConfiguration(setting))) {
             this.refresh();
         }
     }
 
     private async refresh(): Promise<void> {
         this.config = {
+            jarStorage: this.context.globalStoragePath,
+            version: getCheckstyleVersionString(),
             path: getCheckstyleConfigurationPath(),
             properties: getCheckstyleProperties(),
         };
+        await this.ensureCheckstyleJarFile();
         await this.syncServer();
         if (this.configWatcher) {
             this.configWatcher.close();
@@ -63,6 +90,27 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         if (this.isConfigFromLocalFs) {
             this.configWatcher = chokidar.watch(this.config.path);
             this.configWatcher.on('all', (_event: string) => { this.syncServer(); });
+        }
+    }
+
+    private async ensureCheckstyleJarFile(): Promise<void> {
+        const version: string = this.config.version;
+        const builtinVersion: string = await this.getBuiltinVersion();
+        if (!version || version === builtinVersion) { // If not set, use built-in version
+            this.config.jarStorage = path.join(this.context.extensionPath, 'server', 'checkstyle', 'lib');
+            this.config.version = builtinVersion;
+            return;
+        }
+        const jarPath: string = path.join(this.context.globalStoragePath, `checkstyle-${version}-all.jar`);
+        if (!await fse.pathExists(jarPath)) { // Ensure specified version downloaded on disk
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Downloading checkstyle dependency for version ${version}...`,
+            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
+                await fse.ensureDir(this.context.globalStoragePath);
+                const response: Response = await fetch(`https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${version}/checkstyle-${version}-all.jar`);
+                await fse.writeFile(jarPath, await response.buffer());
+            });
         }
     }
 

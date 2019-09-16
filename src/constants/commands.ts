@@ -7,6 +7,7 @@ export namespace JavaLanguageServerCommands {
 
 export namespace CheckstyleExtensionCommands {
     export const SET_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.setConfiguration';
+    export const SET_CHECKSTYLE_VERSION: string = 'java.checkstyle.setVersion';
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkCode';
     export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickFix';
     export const OPEN_OUTPUT_CHANNEL: string = 'java.checkstyle.open.output.channel';
@@ -14,6 +15,7 @@ export namespace CheckstyleExtensionCommands {
 
 export namespace CheckstyleServerCommands {
     export const SET_CONFIGURATION: string = 'java.checkstyle.server.setConfiguration';
+    export const GET_VERSION: string = 'java.checkstyle.server.getVersion';
     export const CHECK_CODE: string = 'java.checkstyle.server.checkCode';
     export const QUICK_FIX: string = 'java.checkstyle.server.quickFix';
 }

@@ -3,9 +3,10 @@
 
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { QuickPickItem, Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import * as xmljs from 'xml-js';
 import { BuiltinConfiguration, checkstyleDoctypeIds } from '../constants/checkstyleConfigs';
+import { IQuickPickItemEx } from '../models';
 import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryUseWorkspaceFolder } from '../utils/settingUtils';
 
 export async function setConfiguration(uri?: Uri): Promise<void> {
@@ -24,10 +25,6 @@ export async function setConfiguration(uri?: Uri): Promise<void> {
         setCheckstyleConfigurationPath(choice);
     }
     window.showInformationMessage('Successfully set the Checkstyle configuration.');
-}
-
-interface IQuickPickItemEx<T = string> extends QuickPickItem {
-    value?: T;
 }
 
 async function queryForConfiguration(): Promise<string | undefined> {
