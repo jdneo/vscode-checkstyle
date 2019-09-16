@@ -120,6 +120,7 @@
     "dependencies": {
         "chokidar": "^3.0.2",
         "fs-extra": "^7.0.1",
+        "gulp-rename": "^1.4.0",
         "lodash": "^4.17.14",
         "vscode-extension-telemetry-wrapper": "^0.3.9",
         "vscode-languageclient": "^5.2.1",

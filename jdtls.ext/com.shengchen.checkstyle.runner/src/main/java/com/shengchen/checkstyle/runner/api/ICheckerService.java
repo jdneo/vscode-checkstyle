@@ -17,16 +17,19 @@
 
 package com.shengchen.checkstyle.runner.api;
 
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 public interface ICheckerService {
 
-    public void setConfiguration(Map<String, Object> config) throws IOException, CheckstyleException;
+    public void initialize() throws Exception;
 
-    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException;
+    public void dispose() throws Exception;
+
+    public void setConfiguration(Map<String, Object> config) throws Exception;
+
+    public String getVersion() throws Exception;
+
+    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws Exception;
 
 }

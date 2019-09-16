@@ -9,6 +9,7 @@ const path = require('path');
 const fse = require('fs-extra');
 const os = require('os');
 const remoteSrc = require('gulp-remote-src');
+const rename = require('gulp-rename');
 
 const serverDir = path.join(__dirname, 'jdtls.ext');
 const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
@@ -17,14 +18,19 @@ const vscodeExtensionsPath = path.join(os.homedir(), '.vscode', 'extensions');
 const checkstyleVersion = '8.18';
 gulp.task('download-checkstyle', (done) => {
     remoteSrc([`checkstyle-${checkstyleVersion}-all.jar`], { base: `https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${checkstyleVersion}/` })
+        .pipe(gulp.dest('./server/checkstyle/lib'))
+        .pipe(rename('checkstyle-all.jar'))
         .pipe(gulp.dest(path.join(serverDir, 'com.shengchen.checkstyle.runner', 'lib')))
         .on('end', done);
 });
 
 gulp.task('build-jar', (done) => {
     cp.execSync(`${mvnw()} clean package`, { cwd: serverDir, stdio: [0, 1, 2] });
-    gulp.src(path.join(serverDir, 'com.shengchen.checkstyle.runner/target/*.jar'))
+    const targetDir = path.join(serverDir, 'com.shengchen.checkstyle.runner/target');
+    gulp.src(path.join(targetDir, '*.jar'))
         .pipe(gulp.dest('./server'));
+    gulp.src(path.join(targetDir, '.checker-classes/**/*.class'))
+        .pipe(gulp.dest('./server/checkstyle'));
     done();
 });
 

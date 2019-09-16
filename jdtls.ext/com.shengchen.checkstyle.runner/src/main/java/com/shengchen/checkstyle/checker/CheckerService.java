@@ -20,6 +20,7 @@ package com.shengchen.checkstyle.checker;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader.IgnoredModulesOptions;
+import com.puppycrawl.tools.checkstyle.Main;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.shengchen.checkstyle.runner.api.CheckResult;
@@ -32,6 +33,7 @@ import org.eclipse.jdt.ls.core.internal.JDTUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,24 +45,28 @@ public class CheckerService implements ICheckerService {
     private Checker checker = null;
     private CheckerListener listener = null;
 
-    public void setConfiguration(Map<String, Object> config) throws IOException, CheckstyleException {
-        if (checker != null) {
-            checker.removeListener(listener);
-            checker.destroy();
-        }
+    public void initialize() {
         checker = new Checker();
         listener = new CheckerListener();
-
-        final String configurationFsPath = (String) config.get("path");
-        final Map<String, String> properties = (Map<String, String>) config.get("properties");
-
         // reset the basedir if it is set so it won't get into the plugins way
         // of determining workspace resources from checkstyle reported file names, see
         // https://sourceforge.net/tracker/?func=detail&aid=2880044&group_id=80344&atid=559497
         checker.setBasedir(null);
         checker.setModuleClassLoader(Checker.class.getClassLoader());
         checker.addListener(listener);
+    }
 
+    public void dispose() {
+        checker.removeListener(listener);
+        checker.destroy();
+        checker = null;
+        listener = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setConfiguration(Map<String, Object> config) throws IOException, CheckstyleException {
+        final String configurationFsPath = (String) config.get("path");
+        final Map<String, String> properties = (Map<String, String>) config.get("properties");
         final Properties checkstyleProperties = new Properties();
         checkstyleProperties.putAll(properties);
         checker.configure(ConfigurationLoader.loadConfiguration(
@@ -68,6 +74,13 @@ public class CheckerService implements ICheckerService {
             new PropertiesExpander(checkstyleProperties),
             IgnoredModulesOptions.OMIT
         ));
+    }
+
+    public String getVersion() throws Exception {
+        final Method getVersionString = Main.class.getDeclaredMethod("getVersionString");
+        getVersionString.setAccessible(true);
+        final String versionString = (String) getVersionString.invoke(null);
+        return versionString.substring("Checkstyle version: ".length());
     }
 
     public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException {

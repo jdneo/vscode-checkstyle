@@ -47,3 +47,4 @@ jdtls/
 .DS_Store
 
 !jdtls.ext/.mvn/wrapper/maven-wrapper.jar
+.checker
