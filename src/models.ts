@@ -15,7 +15,6 @@ export interface ICheckstyleResult {
 }
 
 export interface ICheckstyleConfiguration {
-    jarStorage: string;
     version: string;
     path: string;
     properties: object;

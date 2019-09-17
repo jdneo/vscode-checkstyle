@@ -22,6 +22,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     private context: vscode.ExtensionContext;
     private config: ICheckstyleConfiguration;
     private configWatcher: chokidar.FSWatcher | undefined;
+    private jarStorage: string;
 
     public initialize(context: vscode.ExtensionContext): void {
         this.context = context;
@@ -75,12 +76,16 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
 
     private async refresh(): Promise<void> {
         this.config = {
-            jarStorage: this.context.globalStoragePath,
             version: getCheckstyleVersionString(),
             path: getCheckstyleConfigurationPath(),
             properties: getCheckstyleProperties(),
         };
-        await this.ensureCheckstyleJarFile();
+        if (this.config.version !== this.getBuiltinVersion()) {
+            this.jarStorage = this.context.globalStoragePath;
+            await this.ensureCheckstyleJarFile();
+        } else { // If equal to built-in version, directly use it
+            this.jarStorage = path.join(this.context.extensionPath, 'server', 'checkstyle', 'lib');
+        }
         await this.syncServer();
         if (this.configWatcher) {
             this.configWatcher.close();
@@ -94,13 +99,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
 
     private async ensureCheckstyleJarFile(): Promise<void> {
         const version: string = this.config.version;
-        const builtinVersion: string = this.getBuiltinVersion();
-        if (!version || version === builtinVersion) { // If not set, use built-in version
-            this.config.jarStorage = path.join(this.context.extensionPath, 'server', 'checkstyle', 'lib');
-            this.config.version = builtinVersion;
-            return;
-        }
-        const jarPath: string = path.join(this.context.globalStoragePath, `checkstyle-${version}-all.jar`);
+        const jarPath: string = path.join(this.jarStorage, `checkstyle-${version}-all.jar`);
         if (!await fse.pathExists(jarPath)) { // Ensure specified version downloaded on disk
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -121,7 +120,9 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             return;
         }
         try {
-            await executeJavaLanguageServerCommand(CheckstyleServerCommands.SET_CONFIGURATION, this.config);
+            await executeJavaLanguageServerCommand(CheckstyleServerCommands.SET_CONFIGURATION, {
+                ...this.config,
+            });
             checkstyleDiagnosticManager.activate();
             checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());
         } catch (error) {
