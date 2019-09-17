@@ -82,10 +82,10 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         };
         if (this.config.version !== this.getBuiltinVersion()) {
             this.jarStorage = this.context.globalStoragePath;
-            await this.ensureCheckstyleJarFile();
         } else { // If equal to built-in version, directly use it
             this.jarStorage = path.join(this.context.extensionPath, 'server', 'checkstyle', 'lib');
         }
+        await this.ensureCheckstyleJarFile();
         await this.syncServer();
         if (this.configWatcher) {
             this.configWatcher.close();
