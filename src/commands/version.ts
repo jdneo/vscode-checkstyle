@@ -28,7 +28,7 @@ async function queryForVersion(): Promise<string | undefined> {
     if (!result) {
         return undefined;
     } else if (result.value === ':list') {
-        return await window.showQuickPick(await getAllSupportedVersion(), { ignoreFocusOut: true });
+        return await window.showQuickPick(await getAllSupportedVersions(), { ignoreFocusOut: true });
     } else {
         return result.label;
     }
@@ -55,11 +55,11 @@ async function getRecommendedVersions(): Promise<IQuickPickItemEx[]> {
 }
 
 async function getLatestVersion(): Promise<string> {
-    const response: Response = await fetch('https://github.com/checkstyle/checkstyle/releases/latest', { redirect: 'manual' });
-    return (await response.text()).match(/checkstyle-([\d.]+)/)![1];
+    const response: Response = await fetch('https://api.github.com/repos/checkstyle/checkstyle/releases/latest');
+    return (await response.json()).tag_name.match(/checkstyle-([\d.]+)/)![1];
 }
 
-async function getAllSupportedVersion(): Promise<string[]> {
+async function getAllSupportedVersions(): Promise<string[]> {
     const response: Response = await fetch('https://api.github.com/repos/checkstyle/checkstyle/git/refs/tags');
     const tags: Array<{ ref: string }> = await response.json();
     const versions: string[] = [];
