@@ -19,7 +19,7 @@ export function setCheckstyleVersionString(version: string, uri?: Uri): void {
 }
 
 export function getCheckstyleVersionString(uri?: Uri): string {
-    const version: string = getConfiguration(uri).get<string>(JAVA_CHECKSTYLE_VERSION, '');
+    const version: string = getConfiguration(uri).get<string>(JAVA_CHECKSTYLE_VERSION)!;
     return resolveVariables(version, uri);
 }
 
@@ -59,7 +59,7 @@ export function tryUseWorkspaceFolder(fsPath: string): string {
     }
 }
 
-function getConfiguration(uri?: Uri): WorkspaceConfiguration {
+export function getConfiguration(uri?: Uri): WorkspaceConfiguration {
     return workspace.getConfiguration(undefined, uri || null);
 }
 

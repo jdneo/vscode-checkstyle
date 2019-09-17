@@ -43,7 +43,7 @@ async function getRecommendedVersions(): Promise<IQuickPickItemEx[]> {
     for (const version of await checkstyleConfigurationManager.getDownloadedVersions()) {
         setDescription(version, 'downloaded');
     }
-    setDescription(await checkstyleConfigurationManager.getBuiltinVersion(), 'built-in');
+    setDescription(checkstyleConfigurationManager.getBuiltinVersion(), 'built-in');
     const currentVersion: string | undefined = await checkstyleConfigurationManager.getCurrentVersion();
     if (currentVersion) {
         setDescription(currentVersion, 'current');

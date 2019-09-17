@@ -32,7 +32,6 @@
     ],
     "main": "./dist/extension",
     "contributes": {
-        "builtinVersion": "8.18",
         "javaExtensions": [
             "./server/com.shengchen.checkstyle.runner-1.2.0.jar"
         ],
@@ -88,6 +87,7 @@
                 "java.checkstyle.version": {
                     "type": "string",
                     "description": "%configuration.java.checkstyle.properties.description%",
+                    "default": "8.18",
                     "scope": "resource"
                 },
                 "java.checkstyle.autocheck": {

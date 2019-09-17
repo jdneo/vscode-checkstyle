@@ -12,10 +12,10 @@ import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { executeJavaLanguageServerCommand } from './commands/executeJavaLanguageServerCommand';
 import { BuiltinConfiguration } from './constants/checkstyleConfigs';
 import { CheckstyleServerCommands } from './constants/commands';
-import { JAVA_CHECKSTYLE_CONFIGURATIONS } from './constants/settings';
+import { JAVA_CHECKSTYLE_CONFIGURATIONS, JAVA_CHECKSTYLE_VERSION } from './constants/settings';
 import { ICheckstyleConfiguration } from './models';
 import { handleErrors } from './utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString } from './utils/settingUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString, getConfiguration } from './utils/settingUtils';
 
 class CheckstyleConfigurationManager implements vscode.Disposable {
 
@@ -48,12 +48,12 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             && !(Object.values(BuiltinConfiguration) as string[]).includes(this.config.path));
     }
 
-    public async getCurrentVersion(): Promise<string | undefined> {
-        return await executeJavaLanguageServerCommand<string>(CheckstyleServerCommands.GET_VERSION);
+    public getBuiltinVersion(): string {
+        return getConfiguration().inspect<string>(JAVA_CHECKSTYLE_VERSION)!.defaultValue!;
     }
 
-    public async getBuiltinVersion(): Promise<string> {
-        return vscode.extensions.getExtension('shengchen.vscode-checkstyle')!.packageJSON['contributes']['builtinVersion'];
+    public async getCurrentVersion(): Promise<string | undefined> {
+        return await executeJavaLanguageServerCommand<string>(CheckstyleServerCommands.GET_VERSION);
     }
 
     public async getDownloadedVersions(): Promise<string[]> {
@@ -94,7 +94,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
 
     private async ensureCheckstyleJarFile(): Promise<void> {
         const version: string = this.config.version;
-        const builtinVersion: string = await this.getBuiltinVersion();
+        const builtinVersion: string = this.getBuiltinVersion();
         if (!version || version === builtinVersion) { // If not set, use built-in version
             this.config.jarStorage = path.join(this.context.extensionPath, 'server', 'checkstyle', 'lib');
             this.config.version = builtinVersion;
