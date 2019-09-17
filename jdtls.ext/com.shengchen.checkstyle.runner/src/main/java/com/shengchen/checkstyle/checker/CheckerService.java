@@ -19,7 +19,6 @@ package com.shengchen.checkstyle.checker;
 
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
-import com.puppycrawl.tools.checkstyle.ConfigurationLoader.IgnoredModulesOptions;
 import com.puppycrawl.tools.checkstyle.Main;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -33,7 +32,6 @@ import org.eclipse.jdt.ls.core.internal.JDTUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -71,16 +69,12 @@ public class CheckerService implements ICheckerService {
         checkstyleProperties.putAll(properties);
         checker.configure(ConfigurationLoader.loadConfiguration(
             configurationFsPath,
-            new PropertiesExpander(checkstyleProperties),
-            IgnoredModulesOptions.OMIT
+            new PropertiesExpander(checkstyleProperties)
         ));
     }
 
     public String getVersion() throws Exception {
-        final Method getVersionString = Main.class.getDeclaredMethod("getVersionString");
-        getVersionString.setAccessible(true);
-        final String versionString = (String) getVersionString.invoke(null);
-        return versionString.substring("Checkstyle version: ".length());
+        return Main.class.getPackage().getImplementationVersion();
     }
 
     public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException {
@@ -91,7 +85,9 @@ public class CheckerService implements ICheckerService {
         } catch (UnsupportedEncodingException | CoreException e) {
             e.printStackTrace();
         }
-        checker.process(filesToCheck);
+        synchronized (checker) {
+            checker.process(filesToCheck);
+        }
         return listener.getResult(filesToCheckUris);
     }
 }

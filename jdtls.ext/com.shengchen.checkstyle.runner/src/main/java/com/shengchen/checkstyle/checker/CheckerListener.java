@@ -41,7 +41,7 @@ public class CheckerListener implements AuditListener {
             error.getLine(),
             error.getColumn(),
             error.getMessage(),
-            severity.toString(),
+            severity.toString().toLowerCase(),
             error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
     }
 

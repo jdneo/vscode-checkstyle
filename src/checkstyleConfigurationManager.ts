@@ -121,7 +121,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         }
         try {
             await executeJavaLanguageServerCommand(CheckstyleServerCommands.SET_CONFIGURATION, {
-                ...this.config,
+                jarStorage: this.jarStorage, ...this.config,
             });
             checkstyleDiagnosticManager.activate();
             checkstyleDiagnosticManager.getDiagnostics(checkstyleDiagnosticCollector.getResourceUris());

@@ -14,6 +14,9 @@ class CheckstyleDiagnosticCollector implements Disposable {
     public addDiagnostics(uri: Uri, violations: ICheckstyleResult[]): void {
         const diagnostics: Diagnostic[] = [];
         for (const violation of violations) {
+            if (violation.severity === 'ignore') {
+                continue; // Do not report ignored diagnostics
+            }
             const startLine: number = Math.max(violation.line - 1, 0);
             const startCharacter: number = Math.max(violation.column - 1, 0);
             diagnostics.push({
@@ -56,8 +59,8 @@ class CheckstyleDiagnosticCollector implements Disposable {
         }
     }
 
-    private parseDiagnosticSeverity(severity: string): DiagnosticSeverity {
-        switch (severity.toLocaleLowerCase()) {
+    private parseDiagnosticSeverity(severity: ICheckstyleResult['severity']): DiagnosticSeverity {
+        switch (severity) {
             case 'info':
                 return DiagnosticSeverity.Information;
             case 'warning':

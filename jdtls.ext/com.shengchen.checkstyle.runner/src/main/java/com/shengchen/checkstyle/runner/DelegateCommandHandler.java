@@ -58,13 +58,13 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         final String jarStorage = (String) config.get("jarStorage");
         final String version = (String) config.get("version");
         final String jarPath = String.format("%s/checkstyle-%s-all.jar", jarStorage, version);
-        if (!version.equals(getVersion())) { // If not equal, load new version
-            if (checkerService != null) {
-                checkerService.dispose();
-            }
-            checkerService = checkstyleLoader.loadCheckerService(jarPath);
-            checkerService.initialize();
+        if (checkerService != null) {
+            checkerService.dispose();
         }
+        if (!version.equals(getVersion())) { // If not equal, load new version
+            checkerService = checkstyleLoader.loadCheckerService(jarPath);
+        }
+        checkerService.initialize();
         checkerService.setConfiguration(config);
     }
 
@@ -72,11 +72,11 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         if (checkerService != null) {
             return checkerService.getVersion();
         }
-        return "";
+        return null;
     }
 
     public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws Exception {
-        if (filesToCheckUris.isEmpty()) {
+        if (filesToCheckUris.isEmpty() || checkerService == null) {
             return Collections.emptyMap();
         }
         return checkerService.checkCode(filesToCheckUris);
@@ -88,7 +88,7 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         String sourceName
     ) throws JavaModelException, IllegalArgumentException, BadLocationException {
         if (quickfixService == null) {
-            // quickfixService = checkstyleLoader.loadQuickFixService();
+            quickfixService = checkstyleLoader.loadQuickFixService();
         }
         return quickfixService.quickFix(fileToCheckUri, offset, sourceName);
     }

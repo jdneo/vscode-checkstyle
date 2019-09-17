@@ -10,7 +10,7 @@ export interface ICheckstyleResult {
     line: number;
     column: number;
     message: string;
-    severity: string;
+    severity: 'ignore' | 'info' | 'warning' | 'error';
     sourceName: string;
 }
 
