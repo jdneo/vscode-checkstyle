@@ -26,7 +26,7 @@ export async function deactivate(): Promise<void> {
 
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
     checkstyleDiagnosticManager.initialize(context);
-    checkstyleConfigurationManager.initialize(context);
+    await checkstyleConfigurationManager.initialize(context);
 
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
         checkstyleDiagnosticManager.onDidChangeConfiguration(e);

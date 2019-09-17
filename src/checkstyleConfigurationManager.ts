@@ -24,9 +24,9 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     private configWatcher: chokidar.FSWatcher | undefined;
     private jarStorage: string;
 
-    public initialize(context: vscode.ExtensionContext): void {
+    public async initialize(context: vscode.ExtensionContext): Promise<void> {
         this.context = context;
-        this.refresh();
+        await this.refresh();
     }
 
     public dispose(): void {
