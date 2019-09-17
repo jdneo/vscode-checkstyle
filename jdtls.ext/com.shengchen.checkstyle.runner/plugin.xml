@@ -2,8 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
-    <delegateCommandHandler class="com.shengchen.checkstyle.runner.handler.DelegateCommandHandler">
+    <delegateCommandHandler class="com.shengchen.checkstyle.runner.DelegateCommandHandler">
       <command id="java.checkstyle.server.setConfiguration"/>
+      <command id="java.checkstyle.server.getVersion"/>
       <command id="java.checkstyle.server.checkCode"/>
       <command id="java.checkstyle.server.quickFix"/>
     </delegateCommandHandler>

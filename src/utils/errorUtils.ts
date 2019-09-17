@@ -8,7 +8,7 @@ export async function handleErrors(error: Error): Promise<void> {
     if (error['data']) {
         checkstyleChannel.appendLine(JSON.stringify(error['data']));
     } else {
-        checkstyleChannel.appendLine(error.toString());
+        checkstyleChannel.appendLine(error.stack || error.toString());
     }
 
     checkstyleStatusBar.showError();

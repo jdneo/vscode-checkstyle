@@ -72,7 +72,9 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
                 this.pendingDiagnostics.add(this.syncedFiles.get(uri.fsPath) || uri);
             }
         }
-        this.diagnosticDelayTrigger();
+        if (uris.length !== 0) {
+            this.diagnosticDelayTrigger();
+        }
     }
 
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
