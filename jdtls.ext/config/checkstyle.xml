@@ -9,6 +9,12 @@ what the following rules do, please see the checkstyle configuration
 page at http://checkstyle.sourceforge.net/config.html -->
 
 <module name="Checker">
+    <!-- Headers -->
+    <module name="Header">
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="fileExtensions" value="java"/>
+        <property name="id" value="header"/>
+    </module>
 
     <module name="FileTabCharacter">
         <!-- Checks that there are no tab characters in the file.
