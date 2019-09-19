@@ -28,9 +28,14 @@ async function queryForVersion(): Promise<string | undefined> {
     if (!result) {
         return undefined;
     } else if (result.value === ':list') {
-        return await window.showQuickPick(await getAllSupportedVersions(), { ignoreFocusOut: true });
+        try {
+            return await window.showQuickPick(await getAllSupportedVersions(), { ignoreFocusOut: true });
+        } catch (error) {
+            window.showQuickPick(['Network error']);
+            return undefined;
+        }
     } else {
-        return result.label;
+        return result.value;
     }
 }
 
@@ -39,18 +44,18 @@ async function getRecommendedVersions(): Promise<IQuickPickItemEx[]> {
     function setDescription(version: string, description: string): void {
         versions.set(version, [...(versions.get(version) || []), description]);
     }
-    setDescription(await getLatestVersion(), 'latest version');
+    try { // Do not set latest version if there's network issue
+        setDescription(await getLatestVersion(), 'latest version');
+    } catch (error) { /* Skip */ }
     for (const version of await checkstyleConfigurationManager.getDownloadedVersions()) {
         setDescription(version, 'downloaded');
     }
     setDescription(checkstyleConfigurationManager.getBuiltinVersion(), 'built-in');
     const currentVersion: string | undefined = await checkstyleConfigurationManager.getCurrentVersion();
-    if (currentVersion) {
-        setDescription(currentVersion, 'current');
-    }
     return sortVersions([...versions.keys()]).map((version: string) => ({
-        label: version,
+        label: (version === currentVersion ? '$(check) ' : '') + version,
         description: versions.get(version)!.join(', '),
+        value: version,
     }));
 }
 

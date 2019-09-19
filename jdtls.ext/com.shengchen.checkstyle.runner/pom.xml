@@ -40,7 +40,8 @@
 					</dependency>
 				</dependencies>
 				<configuration>
-					<configLocation>${project.parent.basedir}/checkstyle.xml</configLocation>
+					<configLocation>${project.parent.basedir}/config/checkstyle.xml</configLocation>
+					<propertyExpansion>checkstyle.header.file=${project.parent.basedir}/config/java.header</propertyExpansion>
 					<failOnViolation>true</failOnViolation>
 				</configuration>
 			</plugin>

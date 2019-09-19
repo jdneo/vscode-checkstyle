@@ -33,6 +33,13 @@
 				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "npm: watch"
+		},
+		{
+			"type": "java",
+			"name": "Attach to Checkstyle Plugin",
+			"request": "attach",
+			"hostName": "localhost",
+			"port": 1044
 		}
 	]
 }
