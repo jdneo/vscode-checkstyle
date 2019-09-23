@@ -42,7 +42,11 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
     private IQuickFixService quickfixService = null;
 
     @Override
-    public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
+    public synchronized Object executeCommand(
+        String commandId,
+        List<Object> arguments,
+        IProgressMonitor monitor
+    ) throws Exception {
         if (commandId.startsWith(CHECKSTYLE_PREFIX)) { // Only handle commands with specific id prefix
             final String command = commandId.substring(CHECKSTYLE_PREFIX.length()); // Remove prefix as handler name
             for (final Method handler : this.getClass().getDeclaredMethods()) {
