@@ -68,6 +68,30 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         return versions;
     }
 
+    public async fetchApiData<T = any>(api: string): Promise<T> {
+        const apiFile: string = `${api.split('/').slice(-1)[0]}.json`;
+        const apiPath: string = path.join(this.context.globalStoragePath, 'api', apiFile);
+        async function ensureLatestApiData(): Promise<T> {
+            const response: Response = await fetch(`https://api.github.com/repos/checkstyle/checkstyle${api}`);
+            const apiData: T = await response.json();
+            await fse.ensureFile(apiPath);
+            await fse.writeJSON(apiPath, apiData);
+            return apiData;
+        }
+        if (await fse.pathExists(apiPath)) {
+            const apiData: T = await fse.readJSON(apiPath); // Load the cached api data
+            ensureLatestApiData(); // Fire and forget, update the latest data without user's notice
+            return apiData;
+        } else {
+            return await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Fetching checkstyle's github api ${api}...`,
+            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
+                return await ensureLatestApiData();
+            });
+        }
+    }
+
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
         if (JAVA_CHECKSTYLE_CONFIGURATIONS.some((setting: string) => e.affectsConfiguration(setting))) {
             this.refresh();
