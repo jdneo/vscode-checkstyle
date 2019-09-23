@@ -8,8 +8,8 @@ import { checkstyleStatusBar } from '../checkstyleStatusBar';
 
 export async function handleErrors(error: Error): Promise<void> {
     if (error['data']) {
-        const message: string = error['data'].message;
-        if (message.startsWith('cannot initialize module')) {
+        const message: string | undefined = error['data'].message;
+        if (message && message.startsWith('cannot initialize module')) {
             handleModuleIntialization(message);
         }
         checkstyleChannel.appendLine(JSON.stringify(error['data']));
