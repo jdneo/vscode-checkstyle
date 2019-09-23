@@ -44,6 +44,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             return vscode.Uri.parse(this.config.path);
         }
     }
+
     public get isConfigFromLocalFs(): boolean {
         return !!(this.configUri && this.configUri.scheme === 'file'
             && !(Object.values(BuiltinConfiguration) as string[]).includes(this.config.path));
@@ -116,7 +117,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             this.configWatcher = undefined;
         }
         if (this.isConfigFromLocalFs) {
-            this.configWatcher = chokidar.watch(this.config.path);
+            this.configWatcher = chokidar.watch(this.config.path, { ignoreInitial: true });
             this.configWatcher.on('all', (_event: string) => { this.syncServer(); });
         }
     }
