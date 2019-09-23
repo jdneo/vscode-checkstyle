@@ -33,15 +33,15 @@ export function getCheckstyleProperties(uri?: Uri): object {
 
 export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
     const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
-    if (window.activeTextEditor) {
-        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
-        return activeWorkspaceFolder;
-    }
     if (workspaceFolders === undefined) {
         return undefined;
     }
     if (workspaceFolders.length === 1) {
         return workspaceFolders[0];
+    }
+    if (window.activeTextEditor) {
+        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
+        return activeWorkspaceFolder;
     }
     return undefined;
 }
