@@ -33,15 +33,15 @@ export function getCheckstyleProperties(uri?: Uri): object {
 
 export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
     const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
+    if (window.activeTextEditor) {
+        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
+        return activeWorkspaceFolder;
+    }
     if (workspaceFolders === undefined) {
         return undefined;
     }
     if (workspaceFolders.length === 1) {
         return workspaceFolders[0];
-    }
-    if (window.activeTextEditor) {
-        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
-        return activeWorkspaceFolder;
     }
     return undefined;
 }
@@ -84,10 +84,10 @@ function resolveVariables(value: string, resourceUri?: Uri): string {
     } else {
         workspaceFolder = getDefaultWorkspaceFolder();
     }
-    if (!workspaceFolder) {
-        return value;
-    }
     if (workspaceRegexp.test(value)) {
+        if (!workspaceFolder) {
+            throw Error('workspaceFolder not loaded when ${workspaceFolder} is present');
+        }
         return value.replace(workspaceRegexp, workspaceFolder.uri.fsPath);
     }
     return value;
