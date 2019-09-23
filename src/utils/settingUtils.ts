@@ -72,12 +72,6 @@ function setConfiguration(section: string, value: any, uri?: Uri): void {
 
 const workspaceRegexp: RegExp = /\$\{workspacefolder\}/i;
 function resolveVariables(value: string, resourceUri?: Uri): string {
-    if (!resourceUri) {
-        if (!window.activeTextEditor) {
-            return value;
-        }
-        resourceUri = window.activeTextEditor.document.uri;
-    }
     let workspaceFolder: WorkspaceFolder | undefined;
     if (resourceUri) {
         workspaceFolder = workspace.getWorkspaceFolder(resourceUri);
