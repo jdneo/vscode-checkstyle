@@ -1,8 +1,11 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
+import * as cp from 'child_process';
+import * as _ from 'lodash';
 import * as path from 'path';
 import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import { checkstyleChannel } from '../checkstyleChannel';
 
 export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
     const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
@@ -44,4 +47,41 @@ export function resolveVariables(value: string, resourceUri?: Uri): string {
         return value.replace(workspaceRegexp, workspaceFolder.uri.fsPath);
     }
     return value;
+}
+
+// workspace.findFiles only defaults to exclude entires in files.exclude
+// so it is not even able to exclude node_modules
+// Refer to: https://github.com/Microsoft/vscode/issues/48674
+export async function findNonIgnoredFiles(pattern: string, checkGitIgnore: boolean = true): Promise<Uri[]> {
+    let uris: Uri[] = await workspace.findFiles(pattern, `{${[
+        ...Object.keys(await workspace.getConfiguration('search', null).get('exclude') || {}),
+        ...Object.keys(await workspace.getConfiguration('files', null).get('exclude') || {}),
+    ].join(',')}}`);
+
+    const workspaceFolder: WorkspaceFolder | undefined = getDefaultWorkspaceFolder();
+    if (checkGitIgnore && workspaceFolder) {
+        try { // tslint:disable-next-line: typedef
+            const result: string = await new Promise<string>((resolve, reject) => {
+                cp.exec(`git check-ignore ${uris.map((uri: Uri) => workspace.asRelativePath(uri)).join(' ')}`, {
+                    cwd: workspaceFolder.uri.fsPath,
+                }, (error: Error & { code?: 0 | 1 | 128 }, stdout: string, stderr: string) => {
+                    if (error && (error.code !== 0 && error.code !== 1)) {
+                        reject(error);
+                    } else if (stderr) {
+                        reject(new Error(stderr));
+                    } else {
+                        resolve(stdout);
+                    }
+                });
+            });
+            const excludes: Uri[] = result.trim().split('\n').map((relativePath: string) => {
+                return Uri.file(path.join(workspaceFolder.uri.fsPath, relativePath.replace(/"(.+)"/, '$1')));
+            });
+            uris = _.differenceBy(uris, excludes, 'fsPath');
+        } catch (error) {
+            checkstyleChannel.appendLine(`git check-ignore exec error: ${error.toString()}`);
+        }
+    }
+
+    return uris;
 }
