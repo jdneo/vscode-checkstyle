@@ -55,10 +55,14 @@ public class CheckerService implements ICheckerService {
     }
 
     public void dispose() {
-        checker.removeListener(listener);
-        checker.destroy();
-        checker = null;
-        listener = null;
+        if (checker != null) {
+            if (listener != null) {
+                checker.removeListener(listener);
+                listener = null;
+            }
+            checker.destroy();
+            checker = null;
+        }
     }
 
     @SuppressWarnings("unchecked")

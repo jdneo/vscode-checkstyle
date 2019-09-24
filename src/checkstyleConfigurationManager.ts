@@ -54,7 +54,11 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     }
 
     public async getCurrentVersion(): Promise<string | undefined> {
-        return await executeJavaLanguageServerCommand<string>(CheckstyleServerCommands.GET_VERSION);
+        try {
+            return await executeJavaLanguageServerCommand<string | undefined>(CheckstyleServerCommands.GET_VERSION);
+        } catch (error) {
+            return undefined;
+        }
     }
 
     public async getDownloadedVersions(): Promise<string[]> {
@@ -113,8 +117,10 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
                 let loadedSize: number = 0;
                 for await (const result of response.body as NodeJS.ReadableStream & { [Symbol.asyncIterator](): AsyncIterator<Buffer> }) {
                     if (token.isCancellationRequested) {
-                        setCheckstyleVersionString(await this.getCurrentVersion() || this.getBuiltinVersion());
-                        return; // Stop downloading progress and reset version to before changing
+                        const formerVersion: string = await this.getCurrentVersion() || this.getBuiltinVersion();
+                        setCheckstyleVersionString(formerVersion); // Revert to version to before changing
+                        this.config.version = formerVersion;
+                        return; // Stop downloading progress
                     }
                     result.copy(jarBuffer, loadedSize, 0);
                     loadedSize += result.length;

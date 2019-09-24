@@ -54,7 +54,7 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         return null;
     }
 
-    public void setConfiguration(Map<String, Object> config) throws Exception {
+    public void setConfiguration(Map<String, Object> config) throws Throwable {
         final String jarStorage = (String) config.get("jarStorage");
         final String version = (String) config.get("version");
         final String jarPath = String.format("%s/checkstyle-%s-all.jar", jarStorage, version);
@@ -64,8 +64,14 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         if (!version.equals(getVersion())) { // If not equal, load new version
             checkerService = checkstyleLoader.loadCheckerService(jarPath);
         }
-        checkerService.initialize();
-        checkerService.setConfiguration(config);
+        try {
+            checkerService.initialize();
+            checkerService.setConfiguration(config);
+        } catch (Throwable throwable) { // Initialization faild
+            checkerService.dispose(); // Unwind what's already initialized
+            checkerService = null; // Remove checkerService
+            throw throwable; // Resend the exception out
+        }
     }
 
     public String getVersion() throws Exception {
