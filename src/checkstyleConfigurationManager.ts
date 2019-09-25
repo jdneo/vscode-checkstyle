@@ -44,6 +44,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             return vscode.Uri.parse(this.config.path);
         }
     }
+
     public get isConfigFromLocalFs(): boolean {
         return !!(this.configUri && this.configUri.scheme === 'file'
             && !(Object.values(BuiltinConfiguration) as string[]).includes(this.config.path));
@@ -71,6 +72,30 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             }
         }
         return versions;
+    }
+
+    public async fetchApiData<T = any>(api: string): Promise<T> {
+        const apiFile: string = `${api.split('/').slice(-1)[0]}.json`;
+        const apiPath: string = path.join(this.context.globalStoragePath, 'api', apiFile);
+        const apiUrl: string = `https://api.github.com/repos/checkstyle/checkstyle${api}`;
+        async function ensureLatestApiData(location: vscode.ProgressLocation): Promise<T> {
+            return await vscode.window.withProgress({
+                location, title: `Fetching Checkstyle metadata (${api})...`,
+            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
+                const response: Response = await fetch(apiUrl, { timeout: 30000 });
+                const apiData: T = await response.json();
+                await fse.ensureFile(apiPath);
+                await fse.writeJSON(apiPath, apiData);
+                return apiData;
+            });
+        }
+        if (await fse.pathExists(apiPath)) {
+            const apiData: T = await fse.readJSON(apiPath); // Load the cached api data
+            ensureLatestApiData(vscode.ProgressLocation.Window); // Fire and forget, update the latest data without user's notice
+            return apiData;
+        } else {
+            return await ensureLatestApiData(vscode.ProgressLocation.Notification);
+        }
     }
 
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent): void {
@@ -108,7 +133,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         if (!await fse.pathExists(jarPath)) { // Ensure specified version downloaded on disk
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `Downloading checkstyle dependency for version ${version}...`,
+                title: `Downloading Checkstyle dependency for version ${version}...`,
                 cancellable: true, // tslint:disable-next-line: typedef
             }, async (progress, token: vscode.CancellationToken) => {
                 await fse.ensureDir(this.context.globalStoragePath);

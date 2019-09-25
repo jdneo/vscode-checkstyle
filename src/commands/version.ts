@@ -2,7 +2,6 @@
 // Licensed under the GNU LGPLv3 license.
 
 import * as _ from 'lodash';
-import fetch, { Response } from 'node-fetch';
 import { window } from 'vscode';
 import { checkstyleConfigurationManager } from '../checkstyleConfigurationManager';
 import { IQuickPickItemEx } from '../models';
@@ -21,7 +20,7 @@ async function queryForVersion(): Promise<string | undefined> {
         ...await getRecommendedVersions(),
         {
             label: '$(file-text) All supported versions...',
-            detail: 'List all the checkstyle versions supported by extension.',
+            detail: 'List all the Checkstyle versions supported by extension.',
             value: ':list',
         },
     ], { ignoreFocusOut: true });
@@ -60,13 +59,12 @@ async function getRecommendedVersions(): Promise<IQuickPickItemEx[]> {
 }
 
 async function getLatestVersion(): Promise<string> {
-    const response: Response = await fetch('https://api.github.com/repos/checkstyle/checkstyle/releases/latest');
-    return (await response.json()).tag_name.match(/checkstyle-([\d.]+)/)![1];
+    const { tag_name } = await checkstyleConfigurationManager.fetchApiData<{ tag_name: string }>('/releases/latest');
+    return tag_name.match(/checkstyle-([\d.]+)/)![1];
 }
 
 async function getAllSupportedVersions(): Promise<string[]> {
-    const response: Response = await fetch('https://api.github.com/repos/checkstyle/checkstyle/git/refs/tags');
-    const tags: Array<{ ref: string }> = await response.json();
+    const tags: Array<{ ref: string }> = await checkstyleConfigurationManager.fetchApiData('/git/refs/tags');
     const versions: string[] = [];
     for (const { ref } of tags) {
         const match: RegExpMatchArray | null = ref.match(/checkstyle-([\d.]+)/);
