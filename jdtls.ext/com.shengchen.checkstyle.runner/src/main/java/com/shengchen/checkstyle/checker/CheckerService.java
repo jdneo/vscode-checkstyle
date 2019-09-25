@@ -55,10 +55,14 @@ public class CheckerService implements ICheckerService {
     }
 
     public void dispose() {
-        checker.removeListener(listener);
-        checker.destroy();
-        checker = null;
-        listener = null;
+        if (checker != null) {
+            if (listener != null) {
+                checker.removeListener(listener);
+                listener = null;
+            }
+            checker.destroy();
+            checker = null;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -85,9 +89,7 @@ public class CheckerService implements ICheckerService {
         } catch (UnsupportedEncodingException | CoreException e) {
             e.printStackTrace();
         }
-        synchronized (checker) {
-            checker.process(filesToCheck);
-        }
+        checker.process(filesToCheck);
         return listener.getResult(filesToCheckUris);
     }
 }
