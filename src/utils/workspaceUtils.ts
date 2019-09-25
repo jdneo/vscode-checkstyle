@@ -42,7 +42,7 @@ export function resolveVariables(value: string, resourceUri?: Uri): string {
     }
     if (workspaceRegexp.test(value)) {
         if (!workspaceFolder) {
-            throw Error('workspaceFolder not loaded when ${workspaceFolder} is present');
+            throw Error('No workspace folder is opened in current VS Code workspace when resolving ${workspaceFolder}');
         }
         return value.replace(workspaceRegexp, workspaceFolder.uri.fsPath);
     }

@@ -26,7 +26,7 @@ class CheckstyleDiagnosticManager implements vscode.Disposable {
 
     public initialize(context: vscode.ExtensionContext): void {
         this.context = context;
-        this.enabled = true;
+        this.enabled = false;
         this.listeners = [];
         this.pendingDiagnostics = new Set();
         this.syncedFiles = new Map();
