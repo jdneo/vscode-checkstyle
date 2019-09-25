@@ -8,8 +8,8 @@ import { checkstyleStatusBar } from '../checkstyleStatusBar';
 
 export async function handleErrors(error: Error): Promise<void> {
     if (error['data']) {
-        const message: string = error['data'].message;
-        if (message.startsWith('cannot initialize module')) {
+        const message: string | undefined = error['data'].message;
+        if (message && message.startsWith('cannot initialize module')) {
             handleModuleIntialization(message);
         }
         checkstyleChannel.appendLine(JSON.stringify(error['data']));
@@ -21,7 +21,7 @@ export async function handleErrors(error: Error): Promise<void> {
 }
 
 async function handleModuleIntialization(message: string): Promise<void> {
-    const module: string = message.match(/cannot initialize module (.+) -/)![1];
+    const module: string = message.match(/cannot initialize module (.+?) -/)![1];
     const choice: string | undefined = await vscode.window.showErrorMessage(
         `Module ${module} initialization failed. It may be caused by wrong configuraiton or incompatible version.`,
         'Select another version', 'Open Configuration',
