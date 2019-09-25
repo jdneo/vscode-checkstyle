@@ -57,6 +57,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         try {
             return await executeJavaLanguageServerCommand<string | undefined>(CheckstyleServerCommands.GET_VERSION);
         } catch (error) {
+            handleErrors(error);
             return undefined;
         }
     }
