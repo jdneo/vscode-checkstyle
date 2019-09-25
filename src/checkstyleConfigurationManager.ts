@@ -15,7 +15,7 @@ import { CheckstyleServerCommands } from './constants/commands';
 import { JAVA_CHECKSTYLE_CONFIGURATIONS, JAVA_CHECKSTYLE_VERSION } from './constants/settings';
 import { ICheckstyleConfiguration } from './models';
 import { handleErrors } from './utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString, getConfiguration } from './utils/settingUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString, getConfiguration, setCheckstyleVersionString } from './utils/settingUtils';
 
 class CheckstyleConfigurationManager implements vscode.Disposable {
 
@@ -54,7 +54,12 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     }
 
     public async getCurrentVersion(): Promise<string | undefined> {
-        return await executeJavaLanguageServerCommand<string>(CheckstyleServerCommands.GET_VERSION);
+        try {
+            return await executeJavaLanguageServerCommand<string | undefined>(CheckstyleServerCommands.GET_VERSION);
+        } catch (error) {
+            handleErrors(error);
+            return undefined;
+        }
     }
 
     public async getDownloadedVersions(): Promise<string[]> {
@@ -104,10 +109,25 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `Downloading checkstyle dependency for version ${version}...`,
-            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
+                cancellable: true, // tslint:disable-next-line: typedef
+            }, async (progress, token: vscode.CancellationToken) => {
                 await fse.ensureDir(this.context.globalStoragePath);
                 const response: Response = await fetch(`https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${version}/checkstyle-${version}-all.jar`);
-                await fse.writeFile(jarPath, await response.buffer());
+                const jarSize: number = Number(response.headers.get('content-length'));
+                const jarBuffer: Buffer = Buffer.alloc(jarSize);
+                let loadedSize: number = 0;
+                for await (const result of response.body as NodeJS.ReadableStream & { [Symbol.asyncIterator](): AsyncIterator<Buffer> }) {
+                    if (token.isCancellationRequested) {
+                        const formerVersion: string = await this.getCurrentVersion() || this.getBuiltinVersion();
+                        setCheckstyleVersionString(formerVersion); // Revert to version to before changing
+                        this.config.version = formerVersion;
+                        return; // Stop downloading progress
+                    }
+                    result.copy(jarBuffer, loadedSize, 0);
+                    loadedSize += result.length;
+                    progress.report({ increment: (result.length / jarSize) * 100 });
+                }
+                await fse.writeFile(jarPath, jarBuffer);
             });
         }
     }
