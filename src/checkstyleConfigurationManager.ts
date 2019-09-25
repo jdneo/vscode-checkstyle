@@ -96,7 +96,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
             this.configWatcher = undefined;
         }
         if (this.isConfigFromLocalFs) {
-            this.configWatcher = chokidar.watch(this.config.path);
+            this.configWatcher = chokidar.watch(this.config.path, { ignoreInitial: true });
             this.configWatcher.on('all', (_event: string) => { this.syncServer(); });
         }
     }

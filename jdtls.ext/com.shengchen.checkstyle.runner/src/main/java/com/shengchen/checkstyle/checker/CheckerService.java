@@ -89,9 +89,7 @@ public class CheckerService implements ICheckerService {
         } catch (UnsupportedEncodingException | CoreException e) {
             e.printStackTrace();
         }
-        synchronized (checker) {
-            checker.process(filesToCheck);
-        }
+        checker.process(filesToCheck);
         return listener.getResult(filesToCheckUris);
     }
 }

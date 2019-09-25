@@ -42,7 +42,11 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
     private IQuickFixService quickfixService = null;
 
     @Override
-    public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
+    public synchronized Object executeCommand(
+        String commandId,
+        List<Object> arguments,
+        IProgressMonitor monitor
+    ) throws Exception {
         if (commandId.startsWith(CHECKSTYLE_PREFIX)) { // Only handle commands with specific id prefix
             final String command = commandId.substring(CHECKSTYLE_PREFIX.length()); // Remove prefix as handler name
             for (final Method handler : this.getClass().getDeclaredMethods()) {
@@ -54,7 +58,7 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         return null;
     }
 
-    public void setConfiguration(Map<String, Object> config) throws Throwable {
+    protected void setConfiguration(Map<String, Object> config) throws Throwable {
         final String jarStorage = (String) config.get("jarStorage");
         final String version = (String) config.get("version");
         final String jarPath = String.format("%s/checkstyle-%s-all.jar", jarStorage, version);
@@ -69,26 +73,26 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
             checkerService.setConfiguration(config);
         } catch (Throwable throwable) { // Initialization faild
             checkerService.dispose(); // Unwind what's already initialized
-            checkerService = null; // Remove checkerService
-            throw throwable; // Resend the exception out
+            checkerService = null;    // Remove checkerService
+            throw throwable;          // Resend the exception or error out
         }
     }
 
-    public String getVersion() throws Exception {
+    protected String getVersion() throws Exception {
         if (checkerService != null) {
             return checkerService.getVersion();
         }
         return null;
     }
 
-    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws Exception {
+    protected Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws Exception {
         if (filesToCheckUris.isEmpty() || checkerService == null) {
             return Collections.emptyMap();
         }
         return checkerService.checkCode(filesToCheckUris);
     }
 
-    public WorkspaceEdit quickFix(
+    protected WorkspaceEdit quickFix(
         String fileToCheckUri,
         Double offset,
         String sourceName
