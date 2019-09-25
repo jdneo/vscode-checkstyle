@@ -52,14 +52,14 @@ export function resolveVariables(value: string, resourceUri?: Uri): string {
 // workspace.findFiles only defaults to exclude entires in files.exclude
 // so it is not even able to exclude node_modules
 // Refer to: https://github.com/Microsoft/vscode/issues/48674
-export async function findNonIgnoredFiles(pattern: string, checkGitIgnore: boolean = true): Promise<Uri[]> {
+export async function findNonIgnoredFiles(pattern: string): Promise<Uri[]> {
     let uris: Uri[] = await workspace.findFiles(pattern, `{${[
         ...Object.keys(await workspace.getConfiguration('search', null).get('exclude') || {}),
         ...Object.keys(await workspace.getConfiguration('files', null).get('exclude') || {}),
     ].join(',')}}`);
 
     const workspaceFolder: WorkspaceFolder | undefined = getDefaultWorkspaceFolder();
-    if (checkGitIgnore && workspaceFolder) {
+    if (workspaceFolder) {
         try { // tslint:disable-next-line: typedef
             const result: string = await new Promise<string>((resolve, reject) => {
                 cp.exec(`git check-ignore ${uris.map((uri: Uri) => workspace.asRelativePath(uri)).join(' ')}`, {
