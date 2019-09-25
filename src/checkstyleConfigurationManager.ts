@@ -72,24 +72,24 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
     public async fetchApiData<T = any>(api: string): Promise<T> {
         const apiFile: string = `${api.split('/').slice(-1)[0]}.json`;
         const apiPath: string = path.join(this.context.globalStoragePath, 'api', apiFile);
-        async function ensureLatestApiData(): Promise<T> {
-            const response: Response = await fetch(`https://api.github.com/repos/checkstyle/checkstyle${api}`, { timeout: 30000 });
-            const apiData: T = await response.json();
-            await fse.ensureFile(apiPath);
-            await fse.writeJSON(apiPath, apiData);
-            return apiData;
+        const apiUrl: string = `https://api.github.com/repos/checkstyle/checkstyle${api}`;
+        async function ensureLatestApiData(location: vscode.ProgressLocation): Promise<T> {
+            return await vscode.window.withProgress({
+                location, title: `Fetching checkstyle's github api ${api}...`,
+            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
+                const response: Response = await fetch(apiUrl, { timeout: 30000 });
+                const apiData: T = await response.json();
+                await fse.ensureFile(apiPath);
+                await fse.writeJSON(apiPath, apiData);
+                return apiData;
+            });
         }
         if (await fse.pathExists(apiPath)) {
             const apiData: T = await fse.readJSON(apiPath); // Load the cached api data
-            ensureLatestApiData(); // Fire and forget, update the latest data without user's notice
+            ensureLatestApiData(vscode.ProgressLocation.Window); // Fire and forget, update the latest data without user's notice
             return apiData;
         } else {
-            return await vscode.window.withProgress({
-                location: vscode.ProgressLocation.Notification,
-                title: `Fetching checkstyle's github api ${api}...`,
-            }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
-                return await ensureLatestApiData();
-            });
+            return await ensureLatestApiData(vscode.ProgressLocation.Notification);
         }
     }
 
