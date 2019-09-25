@@ -80,7 +80,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         const apiUrl: string = `https://api.github.com/repos/checkstyle/checkstyle${api}`;
         async function ensureLatestApiData(location: vscode.ProgressLocation): Promise<T> {
             return await vscode.window.withProgress({
-                location, title: `Fetching checkstyle's github api ${api}...`,
+                location, title: `Fetching Checkstyle metadata (${api})...`,
             }, async (_progress: vscode.Progress<{}>, _token: vscode.CancellationToken) => {
                 const response: Response = await fetch(apiUrl, { timeout: 30000 });
                 const apiData: T = await response.json();
@@ -133,7 +133,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
         if (!await fse.pathExists(jarPath)) { // Ensure specified version downloaded on disk
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `Downloading checkstyle dependency for version ${version}...`,
+                title: `Downloading Checkstyle dependency for version ${version}...`,
                 cancellable: true, // tslint:disable-next-line: typedef
             }, async (progress, token: vscode.CancellationToken) => {
                 await fse.ensureDir(this.context.globalStoragePath);

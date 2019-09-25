@@ -20,7 +20,7 @@ async function queryForVersion(): Promise<string | undefined> {
         ...await getRecommendedVersions(),
         {
             label: '$(file-text) All supported versions...',
-            detail: 'List all the checkstyle versions supported by extension.',
+            detail: 'List all the Checkstyle versions supported by extension.',
             value: ':list',
         },
     ], { ignoreFocusOut: true });
