@@ -1,9 +1,9 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import * as path from 'path';
-import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
+import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration } from 'vscode';
 import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES, JAVA_CHECKSTYLE_VERSION } from '../constants/settings';
+import { resolveVariables } from './workspaceUtils';
 
 export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void {
     setConfiguration(JAVA_CHECKSTYLE_CONFIGURATION, fsPath, uri);
@@ -31,32 +31,8 @@ export function getCheckstyleProperties(uri?: Uri): object {
     return properties;
 }
 
-export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
-    const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
-    if (workspaceFolders === undefined) {
-        return undefined;
-    }
-    if (workspaceFolders.length === 1) {
-        return workspaceFolders[0];
-    }
-    if (window.activeTextEditor) {
-        const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
-        return activeWorkspaceFolder;
-    }
-    return undefined;
-}
-
 export function isAutoCheckEnabled(): boolean {
     return getConfiguration().get<boolean>(JAVA_CHECKSTYLE_AUTOCHECK, true);
-}
-
-export function tryUseWorkspaceFolder(fsPath: string): string {
-    const result: string = workspace.asRelativePath(fsPath);
-    if (result === fsPath) {
-        return result;
-    } else {
-        return path.join('${workspaceFolder}', result);
-    }
 }
 
 export function getConfiguration(uri?: Uri): WorkspaceConfiguration {
@@ -68,21 +44,4 @@ function setConfiguration(section: string, value: any, uri?: Uri): void {
         uri = window.activeTextEditor.document.uri;
     }
     getConfiguration(uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
-}
-
-const workspaceRegexp: RegExp = /\$\{workspacefolder\}/i;
-function resolveVariables(value: string, resourceUri?: Uri): string {
-    let workspaceFolder: WorkspaceFolder | undefined;
-    if (resourceUri) {
-        workspaceFolder = workspace.getWorkspaceFolder(resourceUri);
-    } else {
-        workspaceFolder = getDefaultWorkspaceFolder();
-    }
-    if (workspaceRegexp.test(value)) {
-        if (!workspaceFolder) {
-            throw new Error('No workspace folder is opened in current VS Code workspace when resolving ${workspaceFolder}');
-        }
-        return value.replace(workspaceRegexp, workspaceFolder.uri.fsPath);
-    }
-    return value;
 }
