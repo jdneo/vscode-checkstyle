@@ -5,6 +5,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import * as xmljs from 'xml-js';
+import { checkstyleChannel } from '../checkstyleChannel';
 import { BuiltinConfiguration, checkstyleDoctypeIds } from '../constants/checkstyleConfigs';
 import { IQuickPickItemEx } from '../models';
 import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryUseWorkspaceFolder } from '../utils/settingUtils';
@@ -103,7 +104,11 @@ async function detectConfigurations(): Promise<IQuickPickItemEx[]> {
                 }
             }
         }
-        xmljs.xml2js(await fse.readFile(xml.fsPath, 'utf8'), { doctypeFn });
+        try {
+            xmljs.xml2js(await fse.readFile(xml.fsPath, 'utf8'), { doctypeFn });
+        } catch (error) { // Skip this xml, continue detecting process
+            checkstyleChannel.appendLine(`Parse failed: ${xml}`);
+        }
     }
     return detected;
 }
