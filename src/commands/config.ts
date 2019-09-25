@@ -3,12 +3,13 @@
 
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import { Uri, window, WorkspaceFolder } from 'vscode';
 import * as xmljs from 'xml-js';
 import { checkstyleChannel } from '../checkstyleChannel';
 import { BuiltinConfiguration, checkstyleDoctypeIds } from '../constants/checkstyleConfigs';
 import { IQuickPickItemEx } from '../models';
-import { getDefaultWorkspaceFolder, setCheckstyleConfigurationPath, tryUseWorkspaceFolder } from '../utils/settingUtils';
+import { setCheckstyleConfigurationPath } from '../utils/settingUtils';
+import { findNonIgnoredFiles, getDefaultWorkspaceFolder, tryUseWorkspaceFolder } from '../utils/workspaceUtils';
 
 export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
@@ -89,7 +90,7 @@ async function inputConfiguration(): Promise<string | undefined> {
 
 async function detectConfigurations(): Promise<IQuickPickItemEx[]> {
     const detected: IQuickPickItemEx[] = [];
-    for (const xml of await workspace.findFiles('**/*.xml')) {
+    for (const xml of await findNonIgnoredFiles('**/*.xml')) {
         const relativeXml: string = tryUseWorkspaceFolder(xml.fsPath);
         function doctypeFn(doctype: string): void {
             const [name, type] = doctype.split(/\s+/, 2);
