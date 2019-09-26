@@ -25,7 +25,6 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.shengchen.checkstyle.runner.api.CheckResult;
 import com.shengchen.checkstyle.runner.api.ICheckerService;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.ls.core.internal.JDTUtils;
