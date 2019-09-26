@@ -25,8 +25,8 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.shengchen.checkstyle.runner.api.CheckResult;
 import com.shengchen.checkstyle.runner.api.ICheckerService;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.ls.core.internal.JDTUtils;
 
 import java.io.File;
@@ -83,13 +83,9 @@ public class CheckerService implements ICheckerService {
 
     public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException {
         final List<File> filesToCheck = filesToCheckUris.stream().map(File::new).collect(Collectors.toList());
-        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(filesToCheck.get(0).toURI());
+        final IFile resource = JDTUtils.findFile(filesToCheck.get(0).toURI().toString());
         try {
-            if (unit != null) {
-                checker.setCharset(unit.getResource().getProject().getDefaultCharset());
-            } else { // File is not in a java project
-                checker.setCharset(JDTUtils.findFile(filesToCheck.get(0).toURI().toString()).getCharset());
-            }
+            checker.setCharset(resource != null ? resource.getCharset() : "utf8");
         } catch (UnsupportedEncodingException | CoreException e) {
             e.printStackTrace();
         }
