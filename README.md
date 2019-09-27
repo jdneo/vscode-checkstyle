@@ -31,6 +31,14 @@
 ![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/demo.gif)
 
 ## Features
+
+### Set Checkstyle Version
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_version.png" style="border-radius: 15px" alt="Set Checkstyle Configuration File" />
+</p>
+
+- You can use the command `Checkstyle: Set the Checkstyle Version` to manually set the Checkstyle version according to your project preferences. The extension will automatically download the required jar files if they do not exist locally.
+
 ### Set Checkstyle Configuration File
 <p align="center">
   <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_config.png" alt="Set Checkstyle Configuration File" />
@@ -38,7 +46,7 @@
 
 - To set the configuration file, Just Right click the `.xml` file and select `Set the Checkstyle Configuration File`.
 
-- You can also trigger the command **Checkstyle: Set Checkstyle Configuration File** to choose the configuration file in the File Explorer. You will also see the two built-in configurations:
+- You can also trigger the command **Checkstyle: Set Checkstyle Configuration File** to choose the configuration file in the File Explorer. The extension will automatically detect and list the Checkstyle configuration files in your workspace. Besides that, you will also see the two built-in configurations:
   - **Google's Check**
   - **Sun's Check**
 
