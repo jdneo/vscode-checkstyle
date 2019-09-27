@@ -34,7 +34,7 @@
 
 ### Set Checkstyle Version
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/cs/1.3.0/docs/imgs/set_version.png" style="border-radius: 15px" alt="Set Checkstyle Configuration File" />
+  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_version.png" style="border-radius: 15px" alt="Set Checkstyle Configuration File" />
 </p>
 
 - You can use the command `Checkstyle: Set the Checkstyle Version` to manually set the Checkstyle version according to your project preferences. The extension will automatically download the required jar files if they do not exist locally.
