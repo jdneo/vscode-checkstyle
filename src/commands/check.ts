@@ -4,7 +4,6 @@
 import * as fse from 'fs-extra';
 import { Uri, window, workspace } from 'vscode';
 import { checkstyleDiagnosticManager } from '../checkstyleDiagnosticManager';
-import { findNonIgnoredFiles } from '../utils/workspaceUtils';
 
 export async function checkCode(uri?: Uri): Promise<void> {
     if (!uri) { // If not specified, check active editor
@@ -15,7 +14,7 @@ export async function checkCode(uri?: Uri): Promise<void> {
     }
     let filesToCheck: Uri[];
     if ((await fse.stat(uri.fsPath)).isDirectory()) {
-        filesToCheck = await findNonIgnoredFiles(`${workspace.asRelativePath(uri)}/**/*.java`);
+        filesToCheck = await workspace.findFiles(`${workspace.asRelativePath(uri)}/**/*.java`);
     } else {
         filesToCheck = [uri];
     }
