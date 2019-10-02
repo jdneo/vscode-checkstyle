@@ -26,7 +26,7 @@ gulp.task('build-jar', (done) => {
     cp.execSync(`${mvnw()} clean package`, { cwd: serverDir, stdio: [0, 1, 2] });
     for (const module of ['runner', 'checker']) {
         const package = `com.shengchen.checkstyle.${module}`;
-        gulp.src(path.join(serverDir, package,'target', `${package}-*.jar`))
+        gulp.src(path.join(serverDir, package, 'target', `${package}-*.jar`))
             .pipe(rename(`${package}.jar`))
             .pipe(gulp.dest('./server'));
     }
@@ -45,7 +45,7 @@ gulp.task('tslint', (done) => {
     gulp.src(['**/*.ts', '!**/*.d.ts', '!node_modules/**', '!./src/views/node_modules/**'])
         .pipe(tslint())
         .pipe(tslint.report());
-    done()
+    done();
 });
 
 gulp.task('lint', gulp.series('checkstyle', 'tslint'));
