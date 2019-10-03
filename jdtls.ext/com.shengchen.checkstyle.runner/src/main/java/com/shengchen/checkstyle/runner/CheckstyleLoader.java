@@ -50,7 +50,7 @@ public class CheckstyleLoader {
     }
 
     private String getServerDir() throws Exception {
-        final File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+        final File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
         return jarFile.getParentFile().getCanonicalPath();
     }
 }
