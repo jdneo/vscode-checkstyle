@@ -3,6 +3,10 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.3.1]
+### Fixed
+- [Bugs fixed](https://github.com/jdneo/vscode-checkstyle/issues?q=is%3Aissue+is%3Aclosed+milestone%3A1.3.1+label%3Abug)
+
 ## [1.3.0]
 ### Added
 - User can manually set the Checkstyle version used for the project. ([#172](https://github.com/jdneo/vscode-checkstyle/issues/172))
