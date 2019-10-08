@@ -38,7 +38,7 @@ public class CheckstyleLoader {
             checkerClassLoader.close();
         }
         checkerClassLoader = new URLClassLoader(new URL[] {
-            Paths.get(getServerDir(), "checkstyle").toUri().toURL(),
+            Paths.get(getServerDir(), "com.shengchen.checkstyle.checker.jar").toUri().toURL(),
             Paths.get(checkerJarPath).toUri().toURL()
         }, getClass().getClassLoader());
         final Constructor<?> constructor = checkerClassLoader.loadClass(checkerClass).getConstructor();

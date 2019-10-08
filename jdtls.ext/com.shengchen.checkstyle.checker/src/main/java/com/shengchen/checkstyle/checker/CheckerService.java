@@ -25,19 +25,12 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.shengchen.checkstyle.runner.api.CheckResult;
 import com.shengchen.checkstyle.runner.api.ICheckerService;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.ls.core.internal.JDTUtils;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
-@SuppressWarnings("restriction")
 public class CheckerService implements ICheckerService {
 
     private Checker checker = null;
@@ -81,15 +74,9 @@ public class CheckerService implements ICheckerService {
         return Main.class.getPackage().getImplementationVersion();
     }
 
-    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws CheckstyleException {
-        final List<File> filesToCheck = filesToCheckUris.stream().map(File::new).collect(Collectors.toList());
-        final IFile resource = JDTUtils.findFile(filesToCheck.get(0).toURI().toString());
-        try {
-            checker.setCharset(resource != null ? resource.getCharset() : "utf8");
-        } catch (UnsupportedEncodingException | CoreException e) {
-            e.printStackTrace();
-        }
+    public Map<String, List<CheckResult>> checkCode(List<File> filesToCheck, String charset) throws Exception {
+        checker.setCharset(charset);
         checker.process(filesToCheck);
-        return listener.getResult(filesToCheckUris);
+        return listener.getResult(filesToCheck);
     }
 }

@@ -17,6 +17,7 @@
 
 package com.shengchen.checkstyle.runner.api;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,6 @@ public interface ICheckerService {
 
     public String getVersion() throws Exception;
 
-    public Map<String, List<CheckResult>> checkCode(List<String> filesToCheckUris) throws Exception;
+    public Map<String, List<CheckResult>> checkCode(List<File> filesToCheck, String charset) throws Exception;
 
 }

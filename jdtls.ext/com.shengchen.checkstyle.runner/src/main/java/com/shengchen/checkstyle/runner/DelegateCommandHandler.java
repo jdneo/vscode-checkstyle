@@ -21,16 +21,20 @@ import com.shengchen.checkstyle.runner.api.CheckResult;
 import com.shengchen.checkstyle.runner.api.ICheckerService;
 import com.shengchen.checkstyle.runner.api.IQuickFixService;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ls.core.internal.IDelegateCommandHandler;
+import org.eclipse.jdt.ls.core.internal.JDTUtils;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.lsp4j.WorkspaceEdit;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("restriction")
 public class DelegateCommandHandler implements IDelegateCommandHandler {
@@ -89,7 +93,9 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         if (filesToCheckUris.isEmpty() || checkerService == null) {
             return Collections.emptyMap();
         }
-        return checkerService.checkCode(filesToCheckUris);
+        final List<File> filesToCheck = filesToCheckUris.stream().map(File::new).collect(Collectors.toList());
+        final IFile resource = JDTUtils.findFile(filesToCheck.get(0).toURI().toString());
+        return checkerService.checkCode(filesToCheck, resource != null ? resource.getCharset() : "utf8");
     }
 
     protected WorkspaceEdit quickFix(

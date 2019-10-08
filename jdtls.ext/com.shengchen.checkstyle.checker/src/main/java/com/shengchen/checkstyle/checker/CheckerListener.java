@@ -22,6 +22,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import com.shengchen.checkstyle.runner.api.CheckResult;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,10 +71,11 @@ public class CheckerListener implements AuditListener {
         return;
     }
 
-    public Map<String, List<CheckResult>> getResult(List<String> filesToCheck) {
+    public Map<String, List<CheckResult>> getResult(List<File> filesToCheck) {
         final Map<String, List<CheckResult>> result = new HashMap<>();
-        for (final String file: filesToCheck) {
-            result.put(file, fileErrors.get(file));
+        for (final File file: filesToCheck) {
+            final String fileName = file.getAbsolutePath();
+            result.put(fileName, fileErrors.get(fileName));
         }
         return result;
     }
