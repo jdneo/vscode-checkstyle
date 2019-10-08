@@ -10,6 +10,7 @@
         <base.name>Java Checkstyle Runner</base.name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-version>1.2.0</tycho-version>
+        <checkstyle-version>8.18</checkstyle-version>
     </properties>
     <modules>
         <module>com.shengchen.checkstyle.runner</module>
@@ -67,6 +68,32 @@
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>target-platform-configuration</artifactId>
                     <version>${tycho-version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle-version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>${project.parent.basedir}/config/checkstyle.xml</configLocation>
+                        <propertyExpansion>checkstyle.header.file=${project.parent.basedir}/config/java.header</propertyExpansion>
+                        <failOnViolation>true</failOnViolation>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
