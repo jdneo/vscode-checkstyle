@@ -86,7 +86,7 @@
                 },
                 "java.checkstyle.version": {
                     "type": "string",
-                    "description": "%configuration.java.checkstyle.properties.description%",
+                    "description": "%configuration.java.checkstyle.version.description%",
                     "default": "8.18",
                     "scope": "resource"
                 },
