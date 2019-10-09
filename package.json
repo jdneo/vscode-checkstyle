@@ -90,6 +90,12 @@
                     "default": "8.18",
                     "scope": "resource"
                 },
+                "java.checkstyle.modules": {
+                    "type": "array",
+                    "description": "%configuration.java.checkstyle.modules.description%",
+                    "default": [],
+                    "scope": "resource"
+                },
                 "java.checkstyle.autocheck": {
                     "type": "boolean",
                     "description": "%configuration.java.checkstyle.autocheck.description%",

@@ -2,7 +2,7 @@
 // Licensed under the GNU LGPLv3 license.
 
 import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration } from 'vscode';
-import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES, JAVA_CHECKSTYLE_VERSION } from '../constants/settings';
+import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_PROPERTIES, JAVA_CHECKSTYLE_VERSION, JAVA_CHECKSTYLE_MODULES } from '../constants/settings';
 import { resolveVariables } from './workspaceUtils';
 
 export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void {
@@ -21,6 +21,11 @@ export function setCheckstyleVersionString(version: string, uri?: Uri): void {
 export function getCheckstyleVersionString(uri?: Uri): string {
     const version: string = getConfiguration(uri).get<string>(JAVA_CHECKSTYLE_VERSION)!;
     return resolveVariables(version, uri);
+}
+
+export function getCheckstyleExtensionModules(uri?: Uri): string[] {
+    const modules: string[] = getConfiguration(uri).get<string[]>(JAVA_CHECKSTYLE_MODULES)!;
+    return modules.map((mod: string) => resolveVariables(mod, uri));
 }
 
 export function getCheckstyleProperties(uri?: Uri): object {
