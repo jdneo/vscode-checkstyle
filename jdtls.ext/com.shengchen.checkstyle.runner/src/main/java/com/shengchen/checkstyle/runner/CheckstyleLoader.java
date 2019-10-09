@@ -26,6 +26,8 @@ import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckstyleLoader {
 
@@ -33,14 +35,17 @@ public class CheckstyleLoader {
 
     URLClassLoader checkerClassLoader = null;
 
-    public ICheckerService loadCheckerService(String checkerJarPath) throws Exception {
+    public ICheckerService loadCheckerService(String checkstyleJarPath, List<String> modulejarPaths) throws Exception {
         if (checkerClassLoader != null) {
             checkerClassLoader.close();
         }
-        checkerClassLoader = new URLClassLoader(new URL[] {
-            Paths.get(getServerDir(), "com.shengchen.checkstyle.checker.jar").toUri().toURL(),
-            Paths.get(checkerJarPath).toUri().toURL()
-        }, getClass().getClassLoader());
+        final ArrayList<URL> jarUrls = new ArrayList<>();
+        jarUrls.add(Paths.get(getServerDir(), "com.shengchen.checkstyle.checker.jar").toUri().toURL());
+        jarUrls.add(Paths.get(checkstyleJarPath).toUri().toURL());
+        for (final String module: modulejarPaths) {
+            jarUrls.add(Paths.get(module).toUri().toURL());
+        }
+        checkerClassLoader = new URLClassLoader(jarUrls.toArray(new URL[0]), getClass().getClassLoader());
         final Constructor<?> constructor = checkerClassLoader.loadClass(checkerClass).getConstructor();
         return (ICheckerService) constructor.newInstance();
     }

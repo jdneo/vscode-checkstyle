@@ -62,15 +62,17 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     protected void setConfiguration(Map<String, Object> config) throws Throwable {
         final String jarStorage = (String) config.get("jarStorage");
         final String version = (String) config.get("version");
         final String jarPath = String.format("%s/checkstyle-%s-all.jar", jarStorage, version);
+        final List<String> modules = (List<String>) config.get("modules");
         if (checkerService != null) {
             checkerService.dispose();
         }
         if (!version.equals(getVersion())) { // If not equal, load new version
-            checkerService = checkstyleLoader.loadCheckerService(jarPath);
+            checkerService = checkstyleLoader.loadCheckerService(jarPath, modules);
         }
         try {
             checkerService.initialize();
