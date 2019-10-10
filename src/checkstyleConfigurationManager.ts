@@ -15,7 +15,7 @@ import { CheckstyleServerCommands } from './constants/commands';
 import { JAVA_CHECKSTYLE_CONFIGURATIONS, JAVA_CHECKSTYLE_VERSION } from './constants/settings';
 import { ICheckstyleConfiguration } from './models';
 import { handleErrors } from './utils/errorUtils';
-import { getCheckstyleConfigurationPath, getCheckstyleProperties, getCheckstyleVersionString, getConfiguration, setCheckstyleVersionString, getCheckstyleExtensionModules } from './utils/settingUtils';
+import { getCheckstyleConfigurationPath, getCheckstyleExtensionModules, getCheckstyleProperties, getCheckstyleVersionString, getConfiguration, setCheckstyleVersionString } from './utils/settingUtils';
 
 class CheckstyleConfigurationManager implements vscode.Disposable {
 
