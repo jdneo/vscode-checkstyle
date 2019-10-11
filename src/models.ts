@@ -18,4 +18,5 @@ export interface ICheckstyleConfiguration {
     version: string;
     path: string;
     properties: object;
+    modules: string[];
 }
