@@ -62,11 +62,18 @@
 |---|---|---|
 | `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. The path can either be a local file path or a URL. | `""` |
 | `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
+| `java.checkstyle.modules` | Specify the third-party modules used for Checkstyle. | `[]` |
 | `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `true` |
 
 > Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example: 
 
-```javascript
+```json
+"java.checkstyle.modules": [
+    "${workspaceFolder}/src/main/resources/sevntu-checks-1.35.0.jar"
+]
+```
+or
+```json
 "java.checkstyle.properties": {
     "basedir": "${workspaceFolder}"
 }
