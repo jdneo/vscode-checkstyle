@@ -32,17 +32,9 @@
 
 ## Features
 
-### Set Checkstyle Version
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_version.png" style="border-radius: 15px" alt="Set Checkstyle Configuration File" />
-</p>
-
-- You can use the command `Checkstyle: Set the Checkstyle Version` to manually set the Checkstyle version according to your project preferences. The extension will automatically download the required jar files if they do not exist locally.
-
 ### Set Checkstyle Configuration File
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/set_config.png" alt="Set Checkstyle Configuration File" />
-</p>
+
+![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/setConfiguration.gif)
 
 - To set the configuration file, Just Right click the `.xml` file and select `Set the Checkstyle Configuration File`.
 
@@ -50,12 +42,19 @@
   - **Google's Check**
   - **Sun's Check**
 
-### Check the Style and Fix the Violations
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/quick_fix.png" alt="Set Checkstyle Configuration File" />
-</p>
+### Set Checkstyle Version
 
-- When opening or saving a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) button in the editor to show the available quick fixes.
+![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/setVersion(lower).gif)
+
+- You can use the command `Checkstyle: Set the Checkstyle Version` to manually set the Checkstyle version according to your project preferences. The extension will automatically download the required jar files if they do not exist locally.
+
+### Check the Style and Fix the Violations
+
+![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/liveLinting.gif)
+
+- When editing a Java file, the extension will check the file format and provide quick fixes if possible. You can click the ![bulb](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/imgs/btn_bulb.png) button in the editor to show the available quick fixes.
+
+
 
 ## Settings
 | Setting Name | Description | Default Value |
@@ -65,7 +64,7 @@
 | `java.checkstyle.modules` | Specify the third-party modules used for Checkstyle. | `[]` |
 | `java.checkstyle.autocheck` | Specify if the extension will check the format automatically or not. | `true` |
 
-> Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example: 
+> Note: You can use the `${workspaceFolder}` to represent the path of the workspace folder of the file to be checked. For example:
 
 ```json
 "java.checkstyle.modules": [
