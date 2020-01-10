@@ -9,7 +9,7 @@
     <properties>
         <base.name>Java Checkstyle Runner</base.name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tycho-version>1.2.0</tycho-version>
+        <tycho-version>1.5.1</tycho-version>
         <checkstyle-version>8.18</checkstyle-version>
     </properties>
     <modules>
