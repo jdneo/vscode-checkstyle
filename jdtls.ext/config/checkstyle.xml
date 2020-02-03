@@ -42,6 +42,22 @@ page at http://checkstyle.sourceforge.net/config.html -->
                   value='All TODOs should be named.  e.g. "TODO (johndoe): Refactor when v2 is released."'/>
     </module>
 
+    <module name="LineLength">
+            <!-- Checks if a line is too long. -->
+            <property name="max" value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.max}" default="120"/>
+            <property name="severity" value="error"/>
+
+            <!--
+              The default ignore pattern exempts the following elements:
+                - import statements
+                - long URLs inside comments
+            -->
+
+            <property name="ignorePattern"
+                      value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.ignorePattern}"
+                      default="^(package .*;\s*)|(import .*;\s*)|( *\* *https?://.*)$"/>
+        </module>
+
     <!-- All Java AST specific tests live under TreeWalker module. -->
     <module name="TreeWalker">
 
@@ -154,22 +170,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
         LENGTH and CODING CHECKS
 
         -->
-
-        <module name="LineLength">
-            <!-- Checks if a line is too long. -->
-            <property name="max" value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.max}" default="120"/>
-            <property name="severity" value="error"/>
-
-            <!--
-              The default ignore pattern exempts the following elements:
-                - import statements
-                - long URLs inside comments
-            -->
-
-            <property name="ignorePattern"
-                      value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.ignorePattern}"
-                      default="^(package .*;\s*)|(import .*;\s*)|( *\* *https?://.*)$"/>
-        </module>
 
         <module name="LeftCurly">
             <!-- Checks for placement of the left curly brace ('{'). -->
@@ -305,8 +305,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         <module name="CustomImportOrder">
             <property name="customImportOrderRules" value="THIRD_PARTY_PACKAGE###SPECIAL_IMPORTS###STANDARD_JAVA_PACKAGE###STATIC"/>
-            <property name="specialImportsRegExp" value="^javax\."/>
-            <property name="standardPackageRegExp" value="^java\."/>
+            <property name="thirdPartyPackageRegExp" value="^(com)\."/>
+            <property name="specialImportsRegExp" value="^(org\.eclipse)\."/>
+            <property name="standardPackageRegExp" value="^(java|javax)\."/>
             <property name="sortImportsInGroupAlphabetically" value="true"/>
             <property name="separateLineBetweenGroups" value="false"/>
         </module>
