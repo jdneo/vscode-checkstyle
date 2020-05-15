@@ -3,6 +3,10 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.3.3]
+### Changed
+- Update the dependencies.
+
 ## [1.3.2]
 ### Added
 - Support customized Checkstyle modules ([#206](https://github.com/jdneo/vscode-checkstyle/issues/206))
