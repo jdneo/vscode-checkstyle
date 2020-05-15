@@ -16,7 +16,7 @@ import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
 
 export async function activate(context: ExtensionContext): Promise<void> {
-    await initializeFromJsonFile(context.asAbsolutePath('./package.json'));
+    await initializeFromJsonFile(context.asAbsolutePath('./package.json'), { firstParty: true });
     await instrumentOperation('activation', doActivate)(context);
 }
 
