@@ -41,8 +41,7 @@ public class MultipleVariableDeclarationsQuickFix extends BaseQuickFix {
                 if (containsPosition(node, markerStartOffset)) {
                     final Collection<ASTNode> replacements = new ArrayList<>();
                     for (final VariableDeclarationFragment fragment :
-                            (List<VariableDeclarationFragment>) node.fragments())
-                    {
+                            (List<VariableDeclarationFragment>) node.fragments()) {
                         final FieldDeclaration newFieldDeclaration = node.getAST().newFieldDeclaration(copy(fragment));
                         newFieldDeclaration.setType(copy(node.getType()));
                         newFieldDeclaration.modifiers().addAll(copy(node.modifiers()));
