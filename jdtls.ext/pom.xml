@@ -75,6 +75,7 @@
                     <version>3.1.0</version>
                     <executions>
                         <execution>
+                            <?m2e ignore?>
                             <id>validate</id>
                             <phase>validate</phase>
                             <goals>
