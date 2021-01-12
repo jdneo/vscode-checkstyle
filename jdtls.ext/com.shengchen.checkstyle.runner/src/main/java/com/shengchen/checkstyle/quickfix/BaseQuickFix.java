@@ -22,7 +22,9 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jface.text.IRegion;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class BaseQuickFix {
     public abstract ASTVisitor getCorrectingASTVisitor(IRegion lineInfo, int markerStartOffset);
@@ -73,6 +75,16 @@ public abstract class BaseQuickFix {
     }
 
     /**
+     * Returns a deep copy of the list of nodes using {@link #copy(ASTNode)}.
+     * @param <T> the node type.
+     * @param nodes the list of nodes to copy
+     * @return the copied nodes
+     */
+    protected <T extends ASTNode> List<T> copy(final List<T> nodes) {
+        return nodes.stream().map(this::copy).collect(Collectors.toList());
+    }
+
+    /**
      * Replaces a node in an AST with another node. If the replacement is successful
      * the original node is deleted.
      *
@@ -92,6 +104,31 @@ public abstract class BaseQuickFix {
                 @SuppressWarnings("unchecked")
                 final List<ASTNode> children = (List<ASTNode>) parent.getStructuralProperty(descriptor);
                 children.set(children.indexOf(node), replacement);
+                node.delete();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Replaces a node in an AST child list one or more other nodes. If the replacement is successful
+     * the original node is deleted.
+     *
+     * @param node        The node to replace.
+     * @param replacements The replacement nodes.
+     * @return <code>true</code> if the node was successfully replaced.
+     */
+    protected boolean replace(final ASTNode node, final Collection<ASTNode> replacements) {
+        final ASTNode parent = node.getParent();
+        final StructuralPropertyDescriptor descriptor = node.getLocationInParent();
+        if (descriptor != null) {
+            if (descriptor.isChildListProperty()) {
+                @SuppressWarnings("unchecked")
+                final List<ASTNode> children = (List<ASTNode>) parent.getStructuralProperty(descriptor);
+                final int index = children.indexOf(node);
+                children.remove(index);
+                children.addAll(index, replacements);
                 node.delete();
                 return true;
             }
