@@ -23,6 +23,7 @@ import com.shengchen.checkstyle.quickfix.coding.DefaultComesLastQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.EmptyStatementQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.ExplicitInitializationQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.FinalLocalVariableQuickFix;
+import com.shengchen.checkstyle.quickfix.coding.MagicNumberQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.MissingSwitchDefaultQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.RequireThisQuickFix;
 import com.shengchen.checkstyle.quickfix.coding.SimplifyBooleanReturnQuickFix;
@@ -77,6 +78,7 @@ public class QuickFixService implements IQuickFixService {
         quickFixMap.put(FixableCheck.ARRAY_TYPE_STYLE_CHECK.toString(), new ArrayTypeStyleQuickFix());
         quickFixMap.put(FixableCheck.SIMPLIFY_BOOLEAN_RETURN_CHECK.toString(), new SimplifyBooleanReturnQuickFix());
         quickFixMap.put(FixableCheck.STRING_LITERAL_EQUALITY.toString(), new StringLiteralEqualityQuickFix());
+        quickFixMap.put(FixableCheck.MAGIC_NUMBER_CHECK.toString(), new MagicNumberQuickFix());
     }
 
     public BaseQuickFix getQuickFix(String sourceName) {

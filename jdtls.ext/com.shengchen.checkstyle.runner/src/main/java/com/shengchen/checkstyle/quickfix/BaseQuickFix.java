@@ -98,4 +98,24 @@ public abstract class BaseQuickFix {
         }
         return false;
     }
+
+    /**
+     * Find the nearest ancestor (or self) of the given node that is an instance of the
+     * given class.
+     * @param <T> the node type
+     * @param node the node to start the search from
+     * @param ancestorClass the node class to find
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends ASTNode> T ancestor(final ASTNode node, final Class<T> ancestorClass) {
+        if (node == null) {
+            return null;
+        }
+        if (ancestorClass.isInstance(node)) {
+            return (T) node;
+        } else {
+            return ancestor(node.getParent(), ancestorClass);
+        }
+    }
 }
