@@ -40,7 +40,7 @@ public class CheckerListener implements AuditListener {
         }
         fileErrors.get(error.getFileName()).add(new CheckResult(
             error.getLine(),
-            error.getColumn(),
+            error.getLocalizedMessage().getColumnCharIndex(),
             error.getMessage(),
             severity.toString().toLowerCase(),
             error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
