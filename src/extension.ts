@@ -10,7 +10,7 @@ import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkCode } from './commands/check';
 import { setConfiguration } from './commands/config';
-import { fixCheckstyleViolation, fixAllCheckstyleViolations } from './commands/fix';
+import { fixAllCheckstyleViolations, fixCheckstyleViolation } from './commands/fix';
 import { setVersion } from './commands/version';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';

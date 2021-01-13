@@ -33,7 +33,7 @@ class QuickFixProvider implements CodeActionProvider {
                 if (!isQuickFixAvailable(diagnostic.code)) {
                     continue;
                 }
-    
+
                 if (typeof diagnostic.code === 'string') {
                     offsets.push(document.offsetAt(diagnostic.range.start));
                     diagnosticCodes.push(diagnostic.code);
@@ -41,7 +41,7 @@ class QuickFixProvider implements CodeActionProvider {
             }
 
             codeActions.push({
-                title: `Fix ${offsets.length} CheckStyle violations`,
+                title: `Fix ${offsets.length} Checkstyle violations`,
                 command: {
                     title: 'Fix the Checkstyle violation',
                     command: CheckstyleExtensionCommands.FIX_ALL_CHECKSTYLE_VIOLATIONS,
