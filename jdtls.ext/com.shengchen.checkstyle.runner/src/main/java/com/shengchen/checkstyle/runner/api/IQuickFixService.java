@@ -21,12 +21,20 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.lsp4j.WorkspaceEdit;
 
+import java.util.List;
+
 public interface IQuickFixService {
 
     public WorkspaceEdit quickFix(
         String fileToCheckUri,
         Double offset,
         String sourceName
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException;
+
+    public WorkspaceEdit quickFixAll(
+        String fileToCheckUri,
+        List<Double> offsets,
+        List<String> sourceNames
     ) throws JavaModelException, IllegalArgumentException, BadLocationException;
 
 }

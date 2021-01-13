@@ -23,6 +23,33 @@ class QuickFixProvider implements CodeActionProvider {
                 kind: CodeActionKind.QuickFix,
             });
         }
+
+        if (codeActions.length > 1) {
+            /* Add fix all */
+            const offsets: number[] = [];
+            const diagnosticCodes: string[] = [];
+
+            for (const diagnostic of context.diagnostics) {
+                if (!isQuickFixAvailable(diagnostic.code)) {
+                    continue;
+                }
+    
+                if (typeof diagnostic.code === 'string') {
+                    offsets.push(document.offsetAt(diagnostic.range.start));
+                    diagnosticCodes.push(diagnostic.code);
+                }
+            }
+
+            codeActions.push({
+                title: `Fix ${offsets.length} CheckStyle violations`,
+                command: {
+                    title: 'Fix the Checkstyle violation',
+                    command: CheckstyleExtensionCommands.FIX_ALL_CHECKSTYLE_VIOLATIONS,
+                    arguments: [document.uri, offsets, diagnosticCodes],
+                },
+                kind: CodeActionKind.QuickFix,
+            });
+        }
         return codeActions;
     }
 }

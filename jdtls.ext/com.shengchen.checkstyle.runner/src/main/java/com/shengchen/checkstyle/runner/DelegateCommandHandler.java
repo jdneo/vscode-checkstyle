@@ -110,4 +110,15 @@ public class DelegateCommandHandler implements IDelegateCommandHandler {
         }
         return quickfixService.quickFix(fileToCheckUri, offset, sourceName);
     }
+
+    protected WorkspaceEdit quickFixAll(
+        String fileToCheckUri,
+        List<Double> offsets,
+        List<String> sourceNames
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException {
+        if (quickfixService == null) {
+            quickfixService = checkstyleLoader.loadQuickFixService();
+        }
+        return quickfixService.quickFixAll(fileToCheckUri, offsets, sourceNames);
+    }
 }

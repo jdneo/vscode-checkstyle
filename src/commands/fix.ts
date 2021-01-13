@@ -22,3 +22,17 @@ export async function fixCheckstyleViolation(uri: Uri, offset: number, sourceNam
         handleErrors(error);
     }
 }
+
+export async function fixAllCheckstyleViolations(uri: Uri, offsets: number[], sourceNames: string[]): Promise<void> {
+    try {
+        const workspaceEdit: ls.WorkspaceEdit | undefined = await executeJavaLanguageServerCommand<ls.WorkspaceEdit>(
+            CheckstyleServerCommands.QUICK_FIX_ALL, uri.toString(), offsets, sourceNames);
+        if (!workspaceEdit) {
+            checkstyleChannel.appendLine('Unable to get quick fix item from Language Server.');
+            return;
+        }
+        await applyWorkspaceEdit(workspaceEdit);
+    } catch (error) {
+        handleErrors(error);
+    }
+}

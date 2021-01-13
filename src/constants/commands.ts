@@ -10,6 +10,7 @@ export namespace CheckstyleExtensionCommands {
     export const SET_CHECKSTYLE_VERSION: string = 'java.checkstyle.setVersion';
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkCode';
     export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickFix';
+    export const FIX_ALL_CHECKSTYLE_VIOLATIONS: string = 'java.checkstyle.quickFixAll';
     export const OPEN_OUTPUT_CHANNEL: string = 'java.checkstyle.open.output.channel';
 }
 
@@ -18,6 +19,7 @@ export namespace CheckstyleServerCommands {
     export const GET_VERSION: string = 'java.checkstyle.server.getVersion';
     export const CHECK_CODE: string = 'java.checkstyle.server.checkCode';
     export const QUICK_FIX: string = 'java.checkstyle.server.quickFix';
+    export const QUICK_FIX_ALL: string = 'java.checkstyle.server.quickFixAll';
 }
 
 export namespace VsCodeCommands {

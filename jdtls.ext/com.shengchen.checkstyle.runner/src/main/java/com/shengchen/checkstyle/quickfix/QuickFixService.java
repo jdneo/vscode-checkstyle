@@ -51,6 +51,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class QuickFixService implements IQuickFixService {
@@ -101,6 +102,32 @@ public class QuickFixService implements IQuickFixService {
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
         astRoot.recordModifications();
         astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset.intValue()));
+        final TextEdit edit = astRoot.rewrite(document, null);
+        return EditUtils.convertToWorkspaceEdit(unit, edit);
+    }
+
+    public WorkspaceEdit quickFixAll(
+        String fileToCheckUri,
+        List<Double> offsets,
+        List<String> sourceNames
+    ) throws JavaModelException, IllegalArgumentException, BadLocationException {
+        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
+        final Document document = new Document(unit.getSource());
+        final ASTParser astParser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
+        astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+        astParser.setSource(unit);
+        final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
+        astRoot.recordModifications();
+
+        for (int i = 0; i < offsets.size(); i++) {
+            final int offset = offsets.get(i).intValue();
+            final BaseQuickFix quickFix = getQuickFix(sourceNames.get(i));
+            if (quickFix != null) {
+                final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+                astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset));
+            }
+        }
+
         final TextEdit edit = astRoot.rewrite(document, null);
         return EditUtils.convertToWorkspaceEdit(unit, edit);
     }

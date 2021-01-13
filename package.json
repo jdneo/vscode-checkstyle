@@ -27,6 +27,7 @@
     "activationEvents": [
         "onLanguage:java",
         "onCommand:java.checkstyle.quickFix",
+        "onCommand:java.checkstyle.quickFixAll",
         "onCommand:java.checkstyle.checkCode",
         "onCommand:java.checkstyle.setConfiguration"
     ],
