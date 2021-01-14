@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jface.text.IRegion;
 
 import java.util.ArrayList;
@@ -50,6 +51,26 @@ public class MultipleVariableDeclarationsQuickFix extends BaseQuickFix {
                         }
                         
                         replacements.add(newFieldDeclaration);
+                    }
+                    
+                    replace(node, replacements);
+                }
+                return true;
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public boolean visit(VariableDeclarationStatement node) {
+                if (containsPosition(node, markerStartOffset)) {
+                    final Collection<ASTNode> replacements = new ArrayList<>();
+                    for (final VariableDeclarationFragment fragment :
+                            (List<VariableDeclarationFragment>) node.fragments()) {
+                        final VariableDeclarationStatement newVariableDeclarationStatement =
+                            node.getAST().newVariableDeclarationStatement(copy(fragment));
+                        newVariableDeclarationStatement.setType(copy(node.getType()));
+                        newVariableDeclarationStatement.modifiers().addAll(copy(node.modifiers()));
+                        
+                        replacements.add(newVariableDeclarationStatement);
                     }
                     
                     replace(node, replacements);
