@@ -39,6 +39,7 @@ import com.shengchen.checkstyle.quickfix.modifier.RedundantModifierQuickFix;
 import com.shengchen.checkstyle.quickfix.utils.EditUtils;
 import com.shengchen.checkstyle.quickfix.whitepace.ParenPadQuickFix;
 import com.shengchen.checkstyle.quickfix.whitepace.WhitespaceAfterQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.WhitespaceAroundQuickFix;
 import com.shengchen.checkstyle.runner.api.IQuickFixService;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -91,6 +92,7 @@ public class QuickFixService implements IQuickFixService {
             new MultipleVariableDeclarationsQuickFix());
         quickFixMap.put(FixableCheck.PAREN_PAD_CHECK.toString(), new ParenPadQuickFix());
         quickFixMap.put(FixableCheck.WHITESPACE_AFTER_CHECK.toString(), new WhitespaceAfterQuickFix());
+        quickFixMap.put(FixableCheck.WHITESPACE_AROUND_CHECK.toString(), new WhitespaceAroundQuickFix());
     }
 
     public IQuickFix getQuickFix(String sourceName) {

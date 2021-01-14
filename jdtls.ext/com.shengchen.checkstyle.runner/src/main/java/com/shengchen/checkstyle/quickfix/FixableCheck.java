@@ -37,6 +37,7 @@ public enum FixableCheck {
     // Whitespace
     PAREN_PAD_CHECK("ParenPadCheck"),
     WHITESPACE_AFTER_CHECK("WhitespaceAfterCheck"),
+    WHITESPACE_AROUND_CHECK("WhitespaceAroundCheck"),
 
     // Misc
     FINAL_PARAMETERS_CHECK("FinalParametersCheck"), UNCOMMENTED_MAIN_CHECK("UncommentedMainCheck"),
