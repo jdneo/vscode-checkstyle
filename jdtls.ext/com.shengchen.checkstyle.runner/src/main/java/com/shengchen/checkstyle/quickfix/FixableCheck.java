@@ -26,6 +26,7 @@ public enum FixableCheck {
     EMPTY_STATEMENT_CHECK("EmptyStatementCheck"), MISSING_SWITCH_DEFAULT_CHECK("MissingSwitchDefaultCheck"),
     EXPLICIT_INITIALIZATION_CHECK("ExplicitInitializationCheck"), REQUIRE_THIS_CHECK("RequireThisCheck"),
     SIMPLIFY_BOOLEAN_RETURN_CHECK("SimplifyBooleanReturnCheck"), STRING_LITERAL_EQUALITY("StringLiteralEqualityCheck"),
+    MAGIC_NUMBER_CHECK("MagicNumberCheck"),
 
     // Design
     DESIGN_FOR_EXTENSION_CHECK("DesignForExtensionCheck"), FINAL_CLASS_CHECK("FinalClassCheck"),
