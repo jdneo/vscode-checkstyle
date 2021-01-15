@@ -27,12 +27,6 @@ public interface IQuickFixService {
 
     public WorkspaceEdit quickFix(
         String fileToCheckUri,
-        Double offset,
-        String sourceName
-    ) throws JavaModelException, IllegalArgumentException, BadLocationException;
-
-    public WorkspaceEdit quickFixAll(
-        String fileToCheckUri,
         List<Double> offsets,
         List<String> sourceNames
     ) throws JavaModelException, IllegalArgumentException, BadLocationException;

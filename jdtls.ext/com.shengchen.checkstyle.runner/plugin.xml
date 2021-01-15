@@ -7,7 +7,6 @@
       <command id="java.checkstyle.server.getVersion"/>
       <command id="java.checkstyle.server.checkCode"/>
       <command id="java.checkstyle.server.quickFix"/>
-      <command id="java.checkstyle.server.quickFixAll"/>
     </delegateCommandHandler>
   </extension>
 </plugin>

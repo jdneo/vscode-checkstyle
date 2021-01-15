@@ -21,8 +21,8 @@ class QuickFixProvider implements CodeActionProvider {
                     diagnostics,
                     command: {
                         title: 'Fix the Checkstyle violation',
-                        command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION,
-                        arguments: [document.uri, document.offsetAt(diagnostic.range.start), diagnostic.code],
+                        command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
+                        arguments: [document.uri, [document.offsetAt(diagnostic.range.start)], [diagnostic.code]],
                     },
                     kind: CodeActionKind.QuickFix,
                 });
@@ -32,7 +32,7 @@ class QuickFixProvider implements CodeActionProvider {
                     diagnostics,
                     command: {
                         title: 'Fix the Checkstyle violation',
-                        command: CheckstyleExtensionCommands.FIX_ALL_CHECKSTYLE_VIOLATIONS,
+                        command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
                         arguments: [
                             document.uri,
                             diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
@@ -64,7 +64,7 @@ class QuickFixProvider implements CodeActionProvider {
                 title: `Fix all ${offsets.length} Checkstyle violations`,
                 command: {
                     title: 'Fix the Checkstyle violation',
-                    command: CheckstyleExtensionCommands.FIX_ALL_CHECKSTYLE_VIOLATIONS,
+                    command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
                     arguments: [document.uri, offsets, diagnosticCodes],
                 },
                 kind: CodeActionKind.QuickFix,
