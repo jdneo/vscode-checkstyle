@@ -61,7 +61,7 @@ class QuickFixProvider implements CodeActionProvider {
             }
 
             codeActions.push({
-                title: `Fix all ${offsets.length} Checkstyle violations`,
+                title: `Fix all auto-fixable Checkstyle violations`,
                 command: {
                     title: 'Fix the Checkstyle violation',
                     command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
