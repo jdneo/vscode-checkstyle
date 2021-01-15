@@ -28,7 +28,7 @@ class QuickFixProvider implements CodeActionProvider {
                 });
             } else {
                 codeActions.push({
-                    title: `Fix ${diagnostics.length} ${formatCode(code)} Checkstyle violations`,
+                    title: `Fix ${diagnostics.length} '${formatCheckstyleCheck(code)}' Checkstyle violations`,
                     diagnostics,
                     command: {
                         title: 'Fix the Checkstyle violation',
@@ -94,7 +94,7 @@ function groupIDiagnosticsByCode(diagnostics: Diagnostic[]): IDiagnosticsByCode 
 
 export const quickFixProvider: QuickFixProvider = new QuickFixProvider();
 
-function formatCode(str: string): string {
+function formatCheckstyleCheck(str: string): string {
     if (str.endsWith('Check')) {
         str = str.substring(0, str.length - 'Check'.length);
     }
