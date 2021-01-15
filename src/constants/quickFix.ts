@@ -15,6 +15,7 @@ export enum FixableCheck {
     RequireThisCheck = 'RequireThisCheck',
     SimplifyBooleanReturnCheck = 'SimplifyBooleanReturnCheck',
     StringLiteralEqualityCheck = 'StringLiteralEqualityCheck',
+    MultipleVariableDeclarationsCheck = 'MultipleVariableDeclarationsCheck',
 
     // Design
     DesignForExtensionCheck = 'DesignForExtensionCheck',
