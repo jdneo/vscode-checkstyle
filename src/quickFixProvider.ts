@@ -28,7 +28,7 @@ class QuickFixProvider implements CodeActionProvider {
                 });
             } else {
                 codeActions.push({
-                    title: `Fix ${diagnostics.length} Checkstyle ${formatCode(code)} violations`,
+                    title: `Fix ${diagnostics.length} ${formatCode(code)} Checkstyle violations`,
                     diagnostics,
                     command: {
                         title: 'Fix the Checkstyle violation',
