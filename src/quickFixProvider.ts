@@ -8,15 +8,15 @@ import { isQuickFixAvailable } from './utils/quickFixUtils';
 
 class QuickFixProvider implements CodeActionProvider {
     public provideCodeActions(document: TextDocument, _range: Range | Selection, context: CodeActionContext): CodeAction[] {
-        const diagnosticsByCode: IDiagnosticsByCode = groupIDiagnosticsByCode(context.diagnostics);
+        const diagnosticsByCheck: IDiagnosticsByCheck = groupDiagnosticsByCheck(context.diagnostics);
         const codeActions: CodeAction[] = [];
-        for (const code of Object.keys(diagnosticsByCode)) {
-            if (!isQuickFixAvailable(code)) {
+        for (const check of Object.keys(diagnosticsByCheck)) {
+            if (!isQuickFixAvailable(check)) {
                 continue;
             }
-            const diagnostics: Diagnostic[] = diagnosticsByCode[code];
+            const diagnostics: Diagnostic[] = diagnosticsByCheck[check];
             codeActions.push({
-                title: titleForDiagnostics(code, diagnostics),
+                title: titleForDiagnostics(check, diagnostics),
                 diagnostics,
                 command: {
                     title: 'Fix the Checkstyle violation',
@@ -61,12 +61,12 @@ class QuickFixProvider implements CodeActionProvider {
     }
 }
 
-interface IDiagnosticsByCode {
-    [code: string]: Diagnostic[];
+interface IDiagnosticsByCheck {
+    [check: string]: Diagnostic[];
 }
 
-function groupIDiagnosticsByCode(diagnostics: Diagnostic[]): IDiagnosticsByCode {
-    const result: IDiagnosticsByCode = {};
+function groupDiagnosticsByCheck(diagnostics: Diagnostic[]): IDiagnosticsByCheck {
+    const result: IDiagnosticsByCheck = {};
     for (const diagnostic of diagnostics) {
         if (typeof diagnostic.code !== 'string') {
             continue;
