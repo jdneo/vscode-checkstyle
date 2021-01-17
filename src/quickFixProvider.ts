@@ -15,34 +15,20 @@ class QuickFixProvider implements CodeActionProvider {
                 continue;
             }
             const diagnostics: Diagnostic[] = diagnosticsByCode[code];
-            if (diagnostics.length === 1) {
-                const diagnostic: Diagnostic = diagnostics[0];
-                codeActions.push({
-                    title: `Fix '${diagnostic.message}'`,
-                    diagnostics,
-                    command: {
-                        title: 'Fix the Checkstyle violation',
-                        command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
-                        arguments: [document.uri, [document.offsetAt(diagnostic.range.start)], [diagnostic.code]],
-                    },
-                    kind: CodeActionKind.QuickFix,
-                });
-            } else {
-                codeActions.push({
-                    title: `Fix ${diagnostics.length} '${formatCheckstyleCheck(code)}' Checkstyle violations`,
-                    diagnostics,
-                    command: {
-                        title: 'Fix the Checkstyle violation',
-                        command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
-                        arguments: [
-                            document.uri,
-                            diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
-                            diagnostics.map((diagnostic: Diagnostic) => diagnostic.code),
-                        ],
-                    },
-                    kind: CodeActionKind.QuickFix,
-                });
-            }
+            codeActions.push({
+                title: titleForDiagnostics(code, diagnostics),
+                diagnostics,
+                command: {
+                    title: 'Fix the Checkstyle violation',
+                    command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
+                    arguments: [
+                        document.uri,
+                        diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
+                        diagnostics.map((diagnostic: Diagnostic) => diagnostic.code),
+                    ],
+                },
+                kind: CodeActionKind.QuickFix,
+            });
         }
 
         if (codeActions.length > 1) {
@@ -101,4 +87,15 @@ function formatCheckstyleCheck(str: string): string {
     }
 
     return _.startCase(str);
+}
+
+/**
+ * Return the quick fix title for a group of diagnostics from a given check.
+ */
+function titleForDiagnostics(check: string, diagnostics: Diagnostic[]): string {
+    if (diagnostics.length === 1) {
+        return `Fix '${diagnostics[0].message}'`;
+    } else {
+        return `Fix ${diagnostics.length} '${formatCheckstyleCheck(check)}' Checkstyle violations`;
+    }
 }
