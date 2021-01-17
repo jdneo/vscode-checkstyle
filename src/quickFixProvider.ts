@@ -1,6 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
+import * as _ from 'lodash';
 import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Diagnostic, Range, Selection, TextDocument } from 'vscode';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { isQuickFixAvailable } from './utils/quickFixUtils';
@@ -99,20 +100,5 @@ function formatCheckstyleCheck(str: string): string {
         str = str.substring(0, str.length - 'Check'.length);
     }
 
-    let result: string = '';
-    let previousIsUpperCase: boolean = false;
-    for (const c of str) {
-        if (c >= 'A' && c <= 'Z') {
-            if (!previousIsUpperCase) {
-                if (result.length > 0) {
-                    result += ' ';
-                }
-                previousIsUpperCase = true;
-            }
-        } else {
-            previousIsUpperCase = false;
-        }
-        result += c;
-    }
-    return result;
+    return _.startCase(str);
 }
