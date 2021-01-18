@@ -39,7 +39,7 @@ public class MultipleVariableDeclarationsQuickFix extends BaseQuickFix {
             @SuppressWarnings("unchecked")
             @Override
             public boolean visit(FieldDeclaration node) {
-                if (containsPosition(node, markerStartOffset)) {
+                if (containsPosition(node, markerStartOffset) && node.fragments().size() > 1) {
                     final Collection<ASTNode> replacements = new ArrayList<>();
                     for (final VariableDeclarationFragment fragment :
                             (List<VariableDeclarationFragment>) node.fragments()) {
@@ -61,7 +61,7 @@ public class MultipleVariableDeclarationsQuickFix extends BaseQuickFix {
             @SuppressWarnings("unchecked")
             @Override
             public boolean visit(VariableDeclarationStatement node) {
-                if (containsPosition(node, markerStartOffset)) {
+                if (containsPosition(node, markerStartOffset) && node.fragments().size() > 1) {
                     final Collection<ASTNode> replacements = new ArrayList<>();
                     for (final VariableDeclarationFragment fragment :
                             (List<VariableDeclarationFragment>) node.fragments()) {
