@@ -37,6 +37,14 @@ public abstract class BaseQuickFix {
      * @return <code>true</code> if the position is within the ASTNode
      */
     protected boolean containsPosition(ASTNode node, int position) {
+        /* Check that the node has a start position, so we can detect nodes created by a quick fix that
+           don't have their start position set correctly to enable other quick fixes to find it.
+         */
+        if (node.getStartPosition() == -1) {
+            throw new IllegalStateException("Found node \"" + node.getClass().getName() + 
+                "\" without a start position");
+        }
+
         return node.getStartPosition() <= position && position <= node.getStartPosition() + node.getLength();
     }
 
@@ -71,7 +79,9 @@ public abstract class BaseQuickFix {
      */
     @SuppressWarnings("unchecked")
     protected <T extends ASTNode> T copy(final T node) {
-        return (T) ASTNode.copySubtree(node.getAST(), node);
+        final T result = (T) ASTNode.copySubtree(node.getAST(), node);
+        result.setSourceRange(node.getStartPosition(), node.getLength());
+        return result;
     }
 
     /**
@@ -98,12 +108,14 @@ public abstract class BaseQuickFix {
         if (descriptor != null) {
             if (descriptor.isChildProperty()) {
                 parent.setStructuralProperty(descriptor, replacement);
+                replacement.setSourceRange(node.getStartPosition(), node.getLength());
                 node.delete();
                 return true;
             } else if (descriptor.isChildListProperty()) {
                 @SuppressWarnings("unchecked")
                 final List<ASTNode> children = (List<ASTNode>) parent.getStructuralProperty(descriptor);
                 children.set(children.indexOf(node), replacement);
+                replacement.setSourceRange(node.getStartPosition(), node.getLength());
                 node.delete();
                 return true;
             }
@@ -129,6 +141,9 @@ public abstract class BaseQuickFix {
                 final int index = children.indexOf(node);
                 children.remove(index);
                 children.addAll(index, replacements);
+                for (final ASTNode replacement : replacements) {
+                    replacement.setSourceRange(node.getStartPosition(), node.getLength());
+                }
                 node.delete();
                 return true;
             }
