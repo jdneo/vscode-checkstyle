@@ -2,13 +2,13 @@
 // Licensed under the GNU LGPLv3 license.
 
 import * as _ from 'lodash';
-import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Diagnostic, Range, Selection, TextDocument } from 'vscode';
+import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Diagnostic, Range, Selection, TextDocument, window } from 'vscode';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { isQuickFixAvailable } from './utils/quickFixUtils';
 
 class QuickFixProvider implements CodeActionProvider {
-    public provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext): CodeAction[] {
+    public provideCodeActions(document: TextDocument, _range: Range | Selection, context: CodeActionContext): CodeAction[] {
         const diagnosticsByCheck: IDiagnosticsByCheck = groupDiagnosticsByCheck(context.diagnostics);
         const codeActions: CodeAction[] = [];
         for (const check of Object.keys(diagnosticsByCheck)) {
@@ -20,7 +20,7 @@ class QuickFixProvider implements CodeActionProvider {
         }
 
         /* Fix all in selection */
-        if (!range.isEmpty && codeActions.length > 1) {
+        if (!window.activeTextEditor?.selection?.isEmpty) {
             const diagnostics: Diagnostic[] = fixableDiagnostics(context.diagnostics);
             if (diagnostics.length) {
                 codeActions.push(createFixAllDiagnostics(document, diagnostics, 'Fix all auto-fixable Checkstyle violations in selection', false));

@@ -3,6 +3,14 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.4.0]
+### Added
+- Support quick fix for [MultipleVariableDeclarations](https://checkstyle.sourceforge.io/config_coding.html#MultipleVariableDeclarations) check ([PR#290](https://github.com/jdneo/vscode-checkstyle/pull/290))
+- Support quick fix to fix all Checkstyle violations ([#179](https://github.com/jdneo/vscode-checkstyle/issues/179))
+
+### Fixed
+- [Bugs fixed](https://github.com/jdneo/vscode-checkstyle/issues?q=is%3Aissue+is%3Aclosed+milestone%3A1.4.0+label%3Abug)
+
 ## [1.3.3]
 ### Changed
 - Update the dependencies.
