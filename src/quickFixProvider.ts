@@ -3,11 +3,12 @@
 
 import * as _ from 'lodash';
 import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Diagnostic, Range, Selection, TextDocument } from 'vscode';
+import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { isQuickFixAvailable } from './utils/quickFixUtils';
 
 class QuickFixProvider implements CodeActionProvider {
-    public provideCodeActions(document: TextDocument, _range: Range | Selection, context: CodeActionContext): CodeAction[] {
+    public provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext): CodeAction[] {
         const diagnosticsByCheck: IDiagnosticsByCheck = groupDiagnosticsByCheck(context.diagnostics);
         const codeActions: CodeAction[] = [];
         for (const check of Object.keys(diagnosticsByCheck)) {
@@ -15,47 +16,24 @@ class QuickFixProvider implements CodeActionProvider {
                 continue;
             }
             const diagnostics: Diagnostic[] = diagnosticsByCheck[check];
-            codeActions.push({
-                title: titleForDiagnostics(check, diagnostics),
-                diagnostics,
-                command: {
-                    title: 'Fix the Checkstyle violation',
-                    command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
-                    arguments: [
-                        document.uri,
-                        diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
-                        diagnostics.map((diagnostic: Diagnostic) => diagnostic.code),
-                    ],
-                },
-                kind: CodeActionKind.QuickFix,
-            });
+            codeActions.push(createFixAllDiagnostics(document, diagnostics, titleForDiagnostics(check, diagnostics), true));
         }
 
-        if (codeActions.length > 1) {
-            /* Add fix all */
-            const offsets: number[] = [];
-            const diagnosticCodes: string[] = [];
-
-            for (const diagnostic of context.diagnostics) {
-                if (!isQuickFixAvailable(diagnostic.code)) {
-                    continue;
-                }
-
-                if (typeof diagnostic.code === 'string') {
-                    offsets.push(document.offsetAt(diagnostic.range.start));
-                    diagnosticCodes.push(diagnostic.code);
-                }
+        /* Fix all in selection */
+        if (!range.isEmpty && codeActions.length > 1) {
+            const diagnostics: Diagnostic[] = fixableDiagnostics(context.diagnostics);
+            if (diagnostics.length) {
+                codeActions.push(createFixAllDiagnostics(document, diagnostics, 'Fix all auto-fixable Checkstyle violations in selection', false));
             }
+        }
 
-            codeActions.push({
-                title: `Fix all auto-fixable Checkstyle violations`,
-                command: {
-                    title: 'Fix the Checkstyle violation',
-                    command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
-                    arguments: [document.uri, offsets, diagnosticCodes],
-                },
-                kind: CodeActionKind.QuickFix,
-            });
+        /* Fix all in document */
+        const allDiagnostics: Diagnostic[] | undefined = checkstyleDiagnosticCollector.diagnostics(document.uri);
+        if (allDiagnostics && allDiagnostics.length) {
+            const diagnostics: Diagnostic[] = fixableDiagnostics(allDiagnostics);
+            if (diagnostics.length) {
+                codeActions.push(createFixAllDiagnostics(document, diagnostics, 'Fix all auto-fixable Checkstyle violations', false));
+            }
         }
         return codeActions;
     }
@@ -98,4 +76,25 @@ function titleForDiagnostics(check: string, diagnostics: Diagnostic[]): string {
     } else {
         return `Fix ${diagnostics.length} '${formatCheckstyleCheck(check)}' Checkstyle violations`;
     }
+}
+
+function fixableDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
+    return diagnostics.filter((diagnostic: Diagnostic) => isQuickFixAvailable(diagnostic.code));
+}
+
+function createFixAllDiagnostics(document: TextDocument, diagnostics: Diagnostic[], title: string, diagnosticSpecific: boolean): CodeAction {
+    return {
+        title,
+        diagnostics: diagnosticSpecific ? diagnostics : undefined,
+        command: {
+            title: 'Fix the Checkstyle violation',
+            command: CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS,
+            arguments: [
+                document.uri,
+                diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
+                diagnostics.map((diagnostic: Diagnostic) => diagnostic.code),
+            ],
+        },
+        kind: CodeActionKind.QuickFix,
+    };
 }
