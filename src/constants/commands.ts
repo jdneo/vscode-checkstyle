@@ -9,7 +9,7 @@ export namespace CheckstyleExtensionCommands {
     export const SET_CHECKSTYLE_CONFIGURATION: string = 'java.checkstyle.setConfiguration';
     export const SET_CHECKSTYLE_VERSION: string = 'java.checkstyle.setVersion';
     export const CHECK_CODE_WITH_CHECKSTYLE: string = 'java.checkstyle.checkCode';
-    export const FIX_CHECKSTYLE_VIOLATION: string = 'java.checkstyle.quickFix';
+    export const FIX_CHECKSTYLE_VIOLATIONS: string = 'java.checkstyle.quickFix';
     export const OPEN_OUTPUT_CHANNEL: string = 'java.checkstyle.open.output.channel';
 }
 

@@ -10,7 +10,7 @@ import { checkstyleDiagnosticManager } from './checkstyleDiagnosticManager';
 import { checkstyleStatusBar } from './checkstyleStatusBar';
 import { checkCode } from './commands/check';
 import { setConfiguration } from './commands/config';
-import { fixCheckstyleViolation } from './commands/fix';
+import { fixCheckstyleViolations } from './commands/fix';
 import { setVersion } from './commands/version';
 import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
@@ -49,6 +49,6 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setConfiguration(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_VERSION, async (version?: string) => await setVersion(version)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATION, async (uri: Uri, offset: number, sourceName: string) => await fixCheckstyleViolation(uri, offset, sourceName)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames)),
     );
 }
