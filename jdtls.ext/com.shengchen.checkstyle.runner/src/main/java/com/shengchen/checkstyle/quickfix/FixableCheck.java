@@ -34,6 +34,9 @@ public enum FixableCheck {
     // Modifier
     MODIFIER_ORDER_CHECK("ModifierOrderCheck"), REDUNDANT_MODIFIER_CHECK("RedundantModifierCheck"),
 
+    // Whitespace
+    PAREN_PAD_CHECK("ParenPadCheck"),
+
     // Misc
     FINAL_PARAMETERS_CHECK("FinalParametersCheck"), UNCOMMENTED_MAIN_CHECK("UncommentedMainCheck"),
     UPPER_ELL_CHECK("UpperEllCheck"), ARRAY_TYPE_STYLE_CHECK("ArrayTypeStyleCheck");

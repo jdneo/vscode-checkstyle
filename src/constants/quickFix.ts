@@ -25,6 +25,9 @@ export enum FixableCheck {
     ModifierOrderCheck = 'ModifierOrderCheck',
     RedundantModifierCheck = 'RedundantModifierCheck',
 
+    // Whitespace
+    ParenPadCheck = 'ParenPadCheck',
+
     // Misc
     FinalParametersCheck = 'FinalParametersCheck',
     UncommentedMainCheck = 'UncommentedMainCheck',

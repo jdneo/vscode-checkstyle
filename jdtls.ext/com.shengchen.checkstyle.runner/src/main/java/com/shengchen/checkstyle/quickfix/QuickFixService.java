@@ -37,6 +37,7 @@ import com.shengchen.checkstyle.quickfix.misc.UpperEllQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.ModifierOrderQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.RedundantModifierQuickFix;
 import com.shengchen.checkstyle.quickfix.utils.EditUtils;
+import com.shengchen.checkstyle.quickfix.whitepace.ParenPadQuickFix;
 import com.shengchen.checkstyle.runner.api.IQuickFixService;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -49,15 +50,20 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class QuickFixService implements IQuickFixService {
 
-    private final Map<String, BaseQuickFix> quickFixMap;
+    private final Map<String, IQuickFix> quickFixMap;
 
     public QuickFixService() {
         quickFixMap = new HashMap<>();
@@ -81,9 +87,10 @@ public class QuickFixService implements IQuickFixService {
         quickFixMap.put(FixableCheck.STRING_LITERAL_EQUALITY.toString(), new StringLiteralEqualityQuickFix());
         quickFixMap.put(FixableCheck.MULTIPLE_VARIABLE_DECLARATIONS_CHECK.toString(), 
             new MultipleVariableDeclarationsQuickFix());
+        quickFixMap.put(FixableCheck.PAREN_PAD_CHECK.toString(), new ParenPadQuickFix());
     }
 
-    public BaseQuickFix getQuickFix(String sourceName) {
+    public IQuickFix getQuickFix(String sourceName) {
         return quickFixMap.get(sourceName);
     }
 
@@ -100,16 +107,57 @@ public class QuickFixService implements IQuickFixService {
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
         astRoot.recordModifications();
 
+        final List<TextEdit> edits = new ArrayList<>();
+
         for (int i = 0; i < offsets.size(); i++) {
             final int offset = offsets.get(i).intValue();
-            final BaseQuickFix quickFix = getQuickFix(sourceNames.get(i));
-            if (quickFix != null) {
-                final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-                astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset));
+            final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+            final IQuickFix quickFix = getQuickFix(sourceNames.get(i));
+            if (quickFix instanceof BaseQuickFix) {
+                astRoot.accept(((BaseQuickFix) quickFix).getCorrectingASTVisitor(lineInfo, offset));
+            } else if (quickFix instanceof BaseEditQuickFix) {
+                final TextEdit edit = ((BaseEditQuickFix) quickFix).createTextEdit(lineInfo, offset, document);
+                if (edit != null) {
+                    addAllEdits(edits, edit);
+                }
             }
         }
 
         final TextEdit edit = astRoot.rewrite(document, null);
-        return EditUtils.convertToWorkspaceEdit(unit, edit);
+        addAllEdits(edits, edit);
+        final MultiTextEdit result = new MultiTextEdit();
+        for (final TextEdit anotherEdit : edits) {
+            result.addChild(anotherEdit.copy());
+        }
+        return EditUtils.convertToWorkspaceEdit(unit, result);
+    }
+
+    private void addAllEdits(final List<TextEdit> edits, final TextEdit edit) {
+        for (final TextEdit anEdit : allEdits(edit)) {
+            if (canAddEdit(anEdit, edits)) {
+                edits.add(anEdit);
+            }
+        }
+    }
+
+    /**
+     * Check whether we can add the given new edit to our list of existing edits. This prevents
+     * edits that might conflict or double-up.
+     */
+    private boolean canAddEdit(TextEdit edit, Collection<TextEdit> existingEdits) {
+        for (final TextEdit existingEdit : existingEdits) {
+            if (existingEdit.covers(edit) || existingEdit.getOffset() == edit.getOffset()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Iterable<TextEdit> allEdits(TextEdit edit) {
+        if (edit instanceof MultiTextEdit) {
+            return Arrays.asList(((MultiTextEdit) edit).getChildren());
+        } else {
+            return Collections.singleton(edit);
+        }
     }
 }
