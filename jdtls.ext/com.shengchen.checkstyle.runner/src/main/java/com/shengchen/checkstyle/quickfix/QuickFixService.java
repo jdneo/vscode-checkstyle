@@ -50,6 +50,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -107,7 +108,7 @@ public class QuickFixService implements IQuickFixService {
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
         astRoot.recordModifications();
 
-        final List<TextEdit> edits = new ArrayList<>();
+        final List<TextEdit> textEdits = new ArrayList<>();
 
         for (int i = 0; i < offsets.size(); i++) {
             final int offset = offsets.get(i).intValue();
@@ -118,24 +119,26 @@ public class QuickFixService implements IQuickFixService {
             } else if (quickFix instanceof BaseEditQuickFix) {
                 final TextEdit edit = ((BaseEditQuickFix) quickFix).createTextEdit(lineInfo, offset, document);
                 if (edit != null) {
-                    addAllEdits(edits, edit);
+                    addAllEdits(edit, textEdits);
                 }
             }
         }
 
-        final TextEdit edit = astRoot.rewrite(document, null);
-        addAllEdits(edits, edit);
-        final MultiTextEdit result = new MultiTextEdit();
-        for (final TextEdit anotherEdit : edits) {
-            result.addChild(anotherEdit.copy());
+        final MultiTextEdit result = (MultiTextEdit) astRoot.rewrite(document, null);
+        for (final TextEdit anotherEdit : textEdits) {
+            try {
+                result.addChild(anotherEdit);
+            } catch (MalformedTreeException e) {
+                /* Ignore text edits that can't be added; it is due to conflicts with an AST edit */
+            }
         }
         return EditUtils.convertToWorkspaceEdit(unit, result);
     }
 
-    private void addAllEdits(final List<TextEdit> edits, final TextEdit edit) {
-        for (final TextEdit anEdit : allEdits(edit)) {
-            if (canAddEdit(anEdit, edits)) {
-                edits.add(anEdit);
+    private void addAllEdits(final TextEdit source, final List<TextEdit> dest) {
+        for (final TextEdit anEdit : allEdits(source)) {
+            if (canAddEdit(anEdit, dest)) {
+                dest.add(anEdit);
             }
         }
     }
@@ -146,8 +149,14 @@ public class QuickFixService implements IQuickFixService {
      */
     private boolean canAddEdit(TextEdit edit, Collection<TextEdit> existingEdits) {
         for (final TextEdit existingEdit : existingEdits) {
-            if (existingEdit.covers(edit) || existingEdit.getOffset() == edit.getOffset()) {
-                return false;
+            if (existingEdit instanceof MultiTextEdit) {
+                if (!canAddEdit(edit, Arrays.asList(((MultiTextEdit) existingEdit).getChildren()))) {
+                    return false;
+                }
+            } else {
+                if (existingEdit.covers(edit) || existingEdit.getOffset() == edit.getOffset()) {
+                    return false;
+                }
             }
         }
         return true;
