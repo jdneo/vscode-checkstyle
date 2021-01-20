@@ -20,7 +20,7 @@ class QuickFixProvider implements CodeActionProvider {
         }
 
         /* Fix all in selection */
-        if (!window.activeTextEditor?.selection?.isEmpty) {
+        if (codeActions.length > 1 && !window.activeTextEditor?.selection?.isEmpty) {
             const diagnostics: Diagnostic[] = fixableDiagnostics(context.diagnostics);
             if (diagnostics.length) {
                 codeActions.push(createFixAllDiagnostics(document, diagnostics, 'Fix all auto-fixable Checkstyle violations in selection', false));
