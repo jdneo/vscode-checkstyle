@@ -131,7 +131,7 @@ public class QuickFixService implements IQuickFixService {
         final MultiTextEdit result = (MultiTextEdit) astRoot.rewrite(document, null);
         for (final TextEdit anotherEdit : textEdits) {
             try {
-                result.addChild(anotherEdit);
+                result.addChild(anotherEdit.copy());
             } catch (MalformedTreeException e) {
                 /* Ignore text edits that can't be added; it is due to conflicts with an AST edit */
             }
