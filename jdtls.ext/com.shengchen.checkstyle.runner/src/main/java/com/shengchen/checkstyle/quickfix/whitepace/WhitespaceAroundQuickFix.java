@@ -44,10 +44,10 @@ public class WhitespaceAroundQuickFix extends BaseEditQuickFix {
             if (marker == '{' || marker == '}') {
                 tokenLength = 1;
             } else if (OPERATORS.indexOf(marker) != -1) {
-                tokenLength = measureToken(string, c -> OPERATORS.indexOf(c) != -1);
+                tokenLength = measureToken(string, fromStartOfLine, c -> OPERATORS.indexOf(c) != -1);
             } else if (Character.isLetter(marker)) {
                 /* Literal if, else, while, do, for */
-                tokenLength  = measureToken(string, Character::isLetter);
+                tokenLength = measureToken(string, fromStartOfLine, Character::isLetter);
             } else {
                 tokenLength = 0;
             }
@@ -70,11 +70,11 @@ public class WhitespaceAroundQuickFix extends BaseEditQuickFix {
         }
     }
 
-    private int measureToken(String string, Predicate<Character> tokenPredicate) {
+    private int measureToken(String string, int start, Predicate<Character> tokenPredicate) {
         final int n = string.length();
-        for (int i = 0; i < n; i++) {
+        for (int i = start; i < n; i++) {
             if (!tokenPredicate.test(string.charAt(i))) {
-                return i;
+                return i - start;
             }
         }
         return n;
