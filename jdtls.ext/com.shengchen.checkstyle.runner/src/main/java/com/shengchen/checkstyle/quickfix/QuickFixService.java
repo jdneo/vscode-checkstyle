@@ -38,6 +38,7 @@ import com.shengchen.checkstyle.quickfix.modifier.ModifierOrderQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.RedundantModifierQuickFix;
 import com.shengchen.checkstyle.quickfix.utils.EditUtils;
 import com.shengchen.checkstyle.quickfix.whitepace.NewlineAtEndOfFileQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.NoWhitespaceAfterQuickFix;
 import com.shengchen.checkstyle.quickfix.whitepace.NoWhitespaceBeforeQuickFix;
 import com.shengchen.checkstyle.quickfix.whitepace.ParenPadQuickFix;
 import com.shengchen.checkstyle.quickfix.whitepace.WhitespaceAfterQuickFix;
@@ -95,6 +96,7 @@ public class QuickFixService implements IQuickFixService {
         quickFixMap.put(FixableCheck.PAREN_PAD_CHECK.toString(), new ParenPadQuickFix());
         quickFixMap.put(FixableCheck.WHITESPACE_AFTER_CHECK.toString(), new WhitespaceAfterQuickFix());
         quickFixMap.put(FixableCheck.WHITESPACE_AROUND_CHECK.toString(), new WhitespaceAroundQuickFix());
+        quickFixMap.put(FixableCheck.NO_WHITESPACE_AFTER_CHECK.toString(), new NoWhitespaceAfterQuickFix());
         quickFixMap.put(FixableCheck.NO_WHITESPACE_BEFORE_CHECK.toString(), new NoWhitespaceBeforeQuickFix());
         quickFixMap.put(FixableCheck.NEWLINE_AT_END_OF_FILE_CHECK.toString(), new NewlineAtEndOfFileQuickFix());
     }

@@ -29,6 +29,7 @@ export enum FixableCheck {
     ParenPadCheck = 'ParenPadCheck',
     WhitespaceAfterCheck = 'WhitespaceAfterCheck',
     WhitespaceAroundCheck = 'WhitespaceAroundCheck',
+    NoWhitespaceAfterCheck = 'NoWhitespaceAfterCheck',
     NoWhitespaceBeforeCheck = 'NoWhitespaceBeforeCheck',
     NewlineAtEndOfFileCheck = 'NewlineAtEndOfFileCheck',
 

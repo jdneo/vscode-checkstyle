@@ -38,6 +38,7 @@ public enum FixableCheck {
     PAREN_PAD_CHECK("ParenPadCheck"),
     WHITESPACE_AFTER_CHECK("WhitespaceAfterCheck"),
     WHITESPACE_AROUND_CHECK("WhitespaceAroundCheck"),
+    NO_WHITESPACE_AFTER_CHECK("NoWhitespaceAfterCheck"),
     NO_WHITESPACE_BEFORE_CHECK("NoWhitespaceBeforeCheck"),
     NEWLINE_AT_END_OF_FILE_CHECK("NewlineAtEndOfFileCheck"),
 

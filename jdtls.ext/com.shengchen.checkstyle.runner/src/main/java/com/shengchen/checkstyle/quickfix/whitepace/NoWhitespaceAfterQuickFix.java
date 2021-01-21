@@ -27,7 +27,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import java.util.function.Predicate;
 
-public class NoWhitespaceBeforeQuickFix extends BaseEditQuickFix {
+public class NoWhitespaceAfterQuickFix extends BaseEditQuickFix {
 
     @Override
     public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, Document doc) {
