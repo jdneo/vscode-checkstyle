@@ -8,7 +8,7 @@ import { CheckstyleExtensionCommands } from './constants/commands';
 import { isQuickFixAvailable } from './utils/quickFixUtils';
 
 class QuickFixProvider implements CodeActionProvider {
-    public provideCodeActions(document: TextDocument, _range: Range | Selection, context: CodeActionContext): CodeAction[] {
+    public provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext): CodeAction[] {
         const diagnosticsByCheck: IDiagnosticsByCheck = groupDiagnosticsByCheck(context.diagnostics);
         const codeActions: CodeAction[] = [];
         for (const check of Object.keys(diagnosticsByCheck)) {
@@ -20,7 +20,9 @@ class QuickFixProvider implements CodeActionProvider {
         }
 
         /* Fix all in selection */
-        if (codeActions.length > 1 && !window.activeTextEditor?.selection?.isEmpty) {
+        const selection: Selection | undefined = window.activeTextEditor?.selection;
+        if (codeActions.length > 1 && document.uri === window.activeTextEditor?.document?.uri &&
+                selection && !selection.isEmpty && range.contains(selection)) {
             const diagnostics: Diagnostic[] = fixableDiagnostics(context.diagnostics);
             if (diagnostics.length) {
                 codeActions.push(createFixAllDiagnostics(document, diagnostics, 'Fix all auto-fixable Checkstyle violations in selection', false));
