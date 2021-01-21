@@ -45,6 +45,21 @@ public class RedundantModifierQuickFix extends BaseQuickFix {
         return new ASTVisitor() {
 
             @SuppressWarnings("unchecked")
+            public boolean visit(TypeDeclaration node) {
+                if (containsPosition(node, markerStartOffset)) {
+                    List<ModifierKeyword> redundantKeyWords = Collections.emptyList();
+
+                    if (node.isInterface()) {
+                        redundantKeyWords = Arrays.asList(new ModifierKeyword[] { ModifierKeyword.ABSTRACT_KEYWORD,
+                            ModifierKeyword.STATIC_KEYWORD });
+                    }
+
+                    deleteRedundantModifiers(node.modifiers(), redundantKeyWords);
+                }
+                return true;
+            }
+
+            @SuppressWarnings("unchecked")
             @Override
             public boolean visit(MethodDeclaration node) {
 
