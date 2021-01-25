@@ -42,6 +42,7 @@ public enum FixableCheck {
     NO_WHITESPACE_BEFORE_CHECK("NoWhitespaceBeforeCheck"),
     NEWLINE_AT_END_OF_FILE_CHECK("NewlineAtEndOfFileCheck"),
     GENERIC_WHITESPACE_CHECK("GenericWhitespaceCheck"),
+    METHOD_PARAM_PAD_CHECK("MethodParamPadCheck"),
 
     // Misc
     FINAL_PARAMETERS_CHECK("FinalParametersCheck"), UNCOMMENTED_MAIN_CHECK("UncommentedMainCheck"),

@@ -33,6 +33,7 @@ export enum FixableCheck {
     NoWhitespaceBeforeCheck = 'NoWhitespaceBeforeCheck',
     NewlineAtEndOfFileCheck = 'NewlineAtEndOfFileCheck',
     GenericWhitespaceCheck = 'GenericWhitespaceCheck',
+    MethodParamPadCheck = 'MethodParamPadCheck',
 
     // Misc
     FinalParametersCheck = 'FinalParametersCheck',
