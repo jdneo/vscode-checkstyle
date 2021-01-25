@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { CodeAction, CodeActionContext, CodeActionKind, CodeActionProvider, Diagnostic, Range, Selection, TextDocument } from 'vscode';
 import { checkstyleDiagnosticCollector } from './checkstyleDiagnosticCollector';
 import { CheckstyleExtensionCommands } from './constants/commands';
+import { ICheckstyleDiagnostic } from './models';
 import { isQuickFixAvailable } from './utils/quickFixUtils';
 
 class QuickFixProvider implements CodeActionProvider {
@@ -93,6 +94,7 @@ function createFixAllDiagnostics(document: TextDocument, diagnostics: Diagnostic
                 document.uri,
                 diagnostics.map((diagnostic: Diagnostic) => document.offsetAt(diagnostic.range.start)),
                 diagnostics.map((diagnostic: Diagnostic) => diagnostic.code),
+                diagnostics.map((diagnostic: ICheckstyleDiagnostic) => diagnostic.violationKey),
             ],
         },
         kind: CodeActionKind.QuickFix,

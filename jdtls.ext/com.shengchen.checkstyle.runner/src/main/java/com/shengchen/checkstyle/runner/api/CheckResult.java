@@ -23,13 +23,15 @@ public class CheckResult {
     private String message;
     private String severity;
     private String sourceName;
+    private String key;
 
-    public CheckResult(int line, int column, String msg, String severity, String sourceName) {
+    public CheckResult(int line, int column, String msg, String severity, String sourceName, String key) {
         this.line = line;
         this.column = column;
         this.message = msg;
         this.severity = severity;
         this.sourceName = sourceName;
+        this.key = key;
     }
 
     public int getLine() {
@@ -70,6 +72,14 @@ public class CheckResult {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
 }

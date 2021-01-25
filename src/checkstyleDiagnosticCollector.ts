@@ -2,7 +2,7 @@
 // Licensed under the GNU LGPLv3 license.
 
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Range, Uri } from 'vscode';
-import { ICheckstyleResult } from './models';
+import { ICheckstyleDiagnostic, ICheckstyleResult } from './models';
 
 class CheckstyleDiagnosticCollector implements Disposable {
     private diagnosticCollection: DiagnosticCollection;
@@ -12,7 +12,7 @@ class CheckstyleDiagnosticCollector implements Disposable {
     }
 
     public addDiagnostics(uri: Uri, violations: ICheckstyleResult[]): void {
-        const diagnostics: Diagnostic[] = [];
+        const diagnostics: ICheckstyleDiagnostic[] = [];
         for (const violation of violations) {
             if (violation.severity === 'ignore') {
                 continue; // Do not report ignored diagnostics
@@ -25,6 +25,7 @@ class CheckstyleDiagnosticCollector implements Disposable {
                 severity: this.parseDiagnosticSeverity(violation.severity),
                 source: 'Checkstyle',
                 code: violation.sourceName,
+                violationKey: violation.key,
             });
         }
         this.diagnosticCollection.set(uri, diagnostics);

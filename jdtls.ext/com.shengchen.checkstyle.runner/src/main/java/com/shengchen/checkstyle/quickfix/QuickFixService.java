@@ -108,7 +108,8 @@ public class QuickFixService implements IQuickFixService {
     public WorkspaceEdit quickFix(
         String fileToCheckUri,
         List<Double> offsets,
-        List<String> sourceNames
+        List<String> sourceNames,
+        List<String> violationKeys
     ) throws JavaModelException, IllegalArgumentException, BadLocationException {
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
         final Document document = new Document(unit.getSource());
