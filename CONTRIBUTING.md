@@ -59,7 +59,13 @@ The extension has three major modules, which are listed as follow:
 > Note: If the Java code is changed by you, please run `npm run build-plugin` before you start debugging, the output jars will be generated in the folder `server/`. Or you can use the [HCR](https://code.visualstudio.com/docs/java/java-debugging#_hot-code-replacement) feature provided by the VS Code Java Debugger extension.
 
 ### Build Your Own Private Build
-If you want to build your own private build, run `npx vsce@latest package` after `npm run build-plugin`.
+If you want to build and install your own private build:
+
+```shell
+npm run build-plugin
+npx vsce@latest package
+code --install-extension vscode-checkstyle-*.vsix
+```
 
 ### Check Linting Errors:
 Run `npm run lint` to check linting errors.
