@@ -23,8 +23,12 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.TextEdit;
 
+/**
+ * Quick fix for https://checkstyle.org/apidocs/com/puppycrawl/tools/checkstyle/checks/whitespace/ParenPadCheck.html
+ */
 public class ParenPadQuickFix extends BaseEditQuickFix {
 
     @Override
@@ -33,16 +37,24 @@ public class ParenPadQuickFix extends BaseEditQuickFix {
             final int fromStartOfLine = markerStartOffset - lineInfo.getOffset();
             final char marker = doc.getChar(markerStartOffset);
             if (marker == '(') {
-                final String string = doc.get(markerStartOffset + 1, lineInfo.getLength() - fromStartOfLine - 1);
-                final int leadingWhitespace = measureLeadingWhitespace(string);
-                if (leadingWhitespace > 0) {
-                    return new DeleteEdit(markerStartOffset + 1, leadingWhitespace);
+                if ("ws.followed".equals(violationKey)) {
+                    final String string = doc.get(markerStartOffset + 1, lineInfo.getLength() - fromStartOfLine - 1);
+                    final int leadingWhitespace = measureLeadingWhitespace(string);
+                    if (leadingWhitespace > 0) {
+                        return new DeleteEdit(markerStartOffset + 1, leadingWhitespace);
+                    }
+                } else if ("ws.notFollowed".equals(violationKey)) {
+                    return new InsertEdit(markerStartOffset + 1, " ");
                 }
             } else if (marker == ')' && fromStartOfLine > 0) {
-                final String string = doc.get(lineInfo.getOffset(), fromStartOfLine);
-                final int trailingWhitespace = measureTrailingWhitespace(string);
-                if (trailingWhitespace > 0) {
-                    return new DeleteEdit(markerStartOffset - trailingWhitespace, trailingWhitespace);
+                if ("ws.preceded".equals(violationKey)) {
+                    final String string = doc.get(lineInfo.getOffset(), fromStartOfLine);
+                    final int trailingWhitespace = measureTrailingWhitespace(string);
+                    if (trailingWhitespace > 0) {
+                        return new DeleteEdit(markerStartOffset - trailingWhitespace, trailingWhitespace);
+                    }
+                } else if ("ws.notPreceded".equals(violationKey)) {
+                    return new InsertEdit(markerStartOffset, " ");
                 }
             }
 
