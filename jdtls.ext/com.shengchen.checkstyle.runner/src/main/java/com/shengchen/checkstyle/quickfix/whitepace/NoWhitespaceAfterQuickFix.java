@@ -25,8 +25,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.TextEdit;
 
-import java.util.function.Predicate;
-
 public class NoWhitespaceAfterQuickFix extends BaseEditQuickFix {
 
     @Override
@@ -45,16 +43,6 @@ public class NoWhitespaceAfterQuickFix extends BaseEditQuickFix {
         } catch (BadLocationException e) {
             return null;
         }
-    }
-
-    private int measureTokenBackwards(String string, Predicate<Character> tokenPredicate) {
-        final int n = string.length();
-        for (int i = n - 1; i >= 0; i--) {
-            if (!tokenPredicate.test(string.charAt(i))) {
-                return n - 1 - i;
-            }
-        }
-        return n;
     }
 
 }

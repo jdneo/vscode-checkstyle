@@ -21,8 +21,41 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.text.edits.TextEdit;
 
+import java.util.function.Predicate;
+
 public abstract class BaseEditQuickFix implements IQuickFix {
     
     public abstract TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc);
+
+    protected int measureToken(String string, Predicate<Character> tokenPredicate) {
+        return measureToken(string, 0, tokenPredicate);
+    }
+
+    protected int measureToken(String string, int from, Predicate<Character> tokenPredicate) {
+        final int n = string.length();
+        for (int i = from; i < n; i++) {
+            if (!tokenPredicate.test(string.charAt(i))) {
+                return i - from;
+            }
+        }
+        return n - from;
+    }
+
+    protected int measureTokenBackwards(String string, Predicate<Character> tokenPredicate) {
+        return measureTokenBackwards(string, -1, tokenPredicate);
+    }
+
+    protected int measureTokenBackwards(String string, int from, Predicate<Character> tokenPredicate) {
+        final int n = string.length();
+        if (from == -1) {
+            from = n - 1;
+        }
+        for (int i = from; i >= 0; i--) {
+            if (!tokenPredicate.test(string.charAt(i))) {
+                return from - i;
+            }
+        }
+        return from + 1;
+    }
     
 }

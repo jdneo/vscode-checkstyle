@@ -26,8 +26,6 @@ import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 
-import java.util.function.Predicate;
-
 public class WhitespaceAroundQuickFix extends BaseEditQuickFix {
 
     private static final String OPERATORS = "-=!&|^<>";
@@ -68,16 +66,6 @@ public class WhitespaceAroundQuickFix extends BaseEditQuickFix {
         } catch (BadLocationException e) {
             return null;
         }
-    }
-
-    private int measureToken(String string, int start, Predicate<Character> tokenPredicate) {
-        final int n = string.length();
-        for (int i = start; i < n; i++) {
-            if (!tokenPredicate.test(string.charAt(i))) {
-                return i - start;
-            }
-        }
-        return n;
     }
 
 }
