@@ -28,7 +28,7 @@ import org.eclipse.text.edits.TextEdit;
 public class NewlineAtEndOfFileQuickFix extends BaseEditQuickFix {
 
     @Override
-    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, Document doc) {
+    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc) {
         try {
             final String lastChar = doc.getLength() > 0 ? doc.get(doc.getLength() - 1, 1) : "";
             

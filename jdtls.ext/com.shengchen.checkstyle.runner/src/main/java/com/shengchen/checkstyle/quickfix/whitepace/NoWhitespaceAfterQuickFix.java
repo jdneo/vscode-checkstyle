@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public class NoWhitespaceAfterQuickFix extends BaseEditQuickFix {
 
     @Override
-    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, Document doc) {
+    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc) {
         try {
             final int fromStartOfLine = markerStartOffset - lineInfo.getOffset();
             /* Marker is first non-whitespace character after the problem */

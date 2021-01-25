@@ -28,7 +28,7 @@ import org.eclipse.text.edits.TextEdit;
 public class ParenPadQuickFix extends BaseEditQuickFix {
 
     @Override
-    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, Document doc) {
+    public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc) {
         try {
             final int fromStartOfLine = markerStartOffset - lineInfo.getOffset();
             final char marker = doc.getChar(markerStartOffset);

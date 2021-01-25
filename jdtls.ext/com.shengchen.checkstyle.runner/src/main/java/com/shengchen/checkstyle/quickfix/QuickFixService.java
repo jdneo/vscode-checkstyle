@@ -125,10 +125,12 @@ public class QuickFixService implements IQuickFixService {
             final int offset = offsets.get(i).intValue();
             final IRegion lineInfo = document.getLineInformationOfOffset(offset);
             final IQuickFix quickFix = getQuickFix(sourceNames.get(i));
+            final String violationKey = violationKeys.get(i);
             if (quickFix instanceof BaseQuickFix) {
                 astRoot.accept(((BaseQuickFix) quickFix).getCorrectingASTVisitor(lineInfo, offset));
             } else if (quickFix instanceof BaseEditQuickFix) {
-                final TextEdit edit = ((BaseEditQuickFix) quickFix).createTextEdit(lineInfo, offset, document);
+                final TextEdit edit = ((BaseEditQuickFix) quickFix).createTextEdit(
+                    lineInfo, offset, violationKey, document);
                 if (edit != null) {
                     addAllEdits(edit, textEdits);
                 }

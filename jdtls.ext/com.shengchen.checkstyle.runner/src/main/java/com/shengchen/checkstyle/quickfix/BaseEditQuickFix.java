@@ -23,6 +23,6 @@ import org.eclipse.text.edits.TextEdit;
 
 public abstract class BaseEditQuickFix implements IQuickFix {
     
-    public abstract TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, Document doc);
+    public abstract TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc);
     
 }
