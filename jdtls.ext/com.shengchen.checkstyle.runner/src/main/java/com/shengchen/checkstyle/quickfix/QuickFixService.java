@@ -137,14 +137,26 @@ public class QuickFixService implements IQuickFixService {
             }
         }
 
-        final MultiTextEdit result = (MultiTextEdit) astRoot.rewrite(document, null);
-        for (final TextEdit anotherEdit : textEdits) {
+        /* Add text edits before AST edits, as whitespace changes need to be applied first */
+        final MultiTextEdit result = new MultiTextEdit();
+        for (final TextEdit textEdit : textEdits) {
             try {
-                result.addChild(anotherEdit.copy());
+                result.addChild(textEdit.copy());
             } catch (MalformedTreeException e) {
-                /* Ignore text edits that can't be added; it is due to conflicts with an AST edit */
+                /* Ignore text edits that can't be added; it is due to conflicts */
             }
         }
+
+        final MultiTextEdit astEdits = (MultiTextEdit) astRoot.rewrite(document, null);
+        while (astEdits.getChildrenSize() > 0) {
+            final TextEdit astEdit = astEdits.removeChild(0);
+            try {
+                result.addChild(astEdit);
+            } catch (MalformedTreeException e) {
+                /* Ignore text edits that can't be added; it is due to conflicts */
+            }
+        }
+
         return EditUtils.convertToWorkspaceEdit(unit, result);
     }
 
