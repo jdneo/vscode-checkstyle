@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.shengchen.checkstyle.runner
 Bundle-SymbolicName: com.shengchen.checkstyle.runner;singleton:=true
-Bundle-Version: 1.3.3
+Bundle-Version: 1.4.0
 Bundle-Activator: com.shengchen.checkstyle.runner.CheckstylePlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.jdt.core,

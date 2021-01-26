@@ -62,18 +62,27 @@ public class MultipleVariableDeclarationsQuickFix extends BaseQuickFix {
             @Override
             public boolean visit(VariableDeclarationStatement node) {
                 if (containsPosition(node, markerStartOffset) && node.fragments().size() > 1) {
-                    final Collection<ASTNode> replacements = new ArrayList<>();
-                    for (final VariableDeclarationFragment fragment :
-                            (List<VariableDeclarationFragment>) node.fragments()) {
+                    final Collection<ASTNode> newVariableDeclarations = new ArrayList<>();
+                    final List<VariableDeclarationFragment> fragments =
+                        (List<VariableDeclarationFragment>) node.fragments();
+
+                    /* We keep the existing statement, as statements are associated with comments */
+                    for (int i = 1; i < fragments.size(); i++) {
+                        final VariableDeclarationFragment fragment = fragments.get(i);
                         final VariableDeclarationStatement newVariableDeclarationStatement =
                             node.getAST().newVariableDeclarationStatement(copy(fragment));
                         newVariableDeclarationStatement.setType(copy(node.getType()));
                         newVariableDeclarationStatement.modifiers().addAll(copy(node.modifiers()));
                         
-                        replacements.add(newVariableDeclarationStatement);
+                        newVariableDeclarations.add(newVariableDeclarationStatement);
+                    }
+
+                    /* Remove the additional fragments that we've duplicated */
+                    while (fragments.size() > 1) {
+                        fragments.remove(1);
                     }
                     
-                    replace(node, replacements);
+                    append(node, newVariableDeclarations);
                 }
                 return true;
             }
