@@ -59,6 +59,7 @@ interface ISyncRequests {
 // tslint:disable-next-line: max-classes-per-file
 export class FileSynchronizer implements vscode.Disposable {
 
+    private tempHash: string = crypto.createHash('md5').update((new Date()).toTimeString()).digest('hex');
     private tempStorage: string = this.getTempStorage();
     private tempFilePool: Map<string, string> = new Map(); // managed file path -> temp path
     private pendingRequests: ISyncRequests = { write: new Map(), remove: new Set() };
@@ -118,10 +119,10 @@ export class FileSynchronizer implements vscode.Disposable {
         }
     }
 
-    // Do the actual IO operartion, sending out all pending requests
+    // Do the actual IO operation, sending out all pending requests
     public async flush(): Promise<void> {
         for (const [filePath, content] of this.pendingRequests.write.entries()) {
-            this.setSyncPromise(filePath, async (tempPath: string) => { // When IO faliure occurs, temp path will be updated
+            this.setSyncPromise(filePath, async (tempPath: string) => { // When IO failure occurs, temp path will be updated
                 await fse.ensureFile(tempPath);
                 await fse.writeFile(tempPath, content);
                 this.tempFilePool.set(filePath, tempPath); // Set or update temp path mapping
@@ -163,8 +164,7 @@ export class FileSynchronizer implements vscode.Disposable {
     private ensureTempPath(realPath: string): string {
         let tempPath: string | undefined = this.tempFilePool.get(realPath);
         if (!tempPath) {
-            const tempHash: string = crypto.createHash('md5').update(realPath).digest('hex');
-            tempPath = path.join(this.tempStorage, tempHash, path.basename(realPath));
+            tempPath = path.join(this.tempStorage, this.tempHash, vscode.workspace.asRelativePath(realPath, false /*includeWorkspaceFolder*/));
         }
         return tempPath;
     }
