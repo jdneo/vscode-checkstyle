@@ -150,4 +150,28 @@ public abstract class BaseQuickFix implements IQuickFix {
         }
         return false;
     }
+
+    protected boolean append(final ASTNode node, final Collection<ASTNode> append) {
+        final ASTNode parent = node.getParent();
+        final StructuralPropertyDescriptor descriptor = node.getLocationInParent();
+        if (descriptor != null) {
+            if (descriptor.isChildListProperty()) {
+                @SuppressWarnings("unchecked")
+                final List<ASTNode> children = (List<ASTNode>) parent.getStructuralProperty(descriptor);
+                final int index = children.indexOf(node);
+
+                if (index != -1) {
+                    children.addAll(index + 1, append);
+                } else {
+                    children.addAll(append);
+                }
+
+                for (final ASTNode replacement : append) {
+                    replacement.setSourceRange(node.getStartPosition(), node.getLength());
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }
