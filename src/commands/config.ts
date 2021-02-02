@@ -14,7 +14,7 @@ import { findNonIgnoredFiles, getDefaultWorkspaceFolder, tryUseWorkspaceFolder }
 export async function setConfiguration(uri?: Uri): Promise<void> {
     if (uri) {
         if (path.extname(uri.fsPath).toLowerCase() === '.xml') {
-            setCheckstyleConfigurationPath(tryUseWorkspaceFolder(uri.fsPath), uri);
+            await setCheckstyleConfigurationPath(tryUseWorkspaceFolder(uri.fsPath), uri);
         } else {
             window.showErrorMessage('Invalid Checkstyle configuration file');
             return;
@@ -24,7 +24,7 @@ export async function setConfiguration(uri?: Uri): Promise<void> {
         if (!choice) {
             return;
         }
-        setCheckstyleConfigurationPath(choice);
+        await setCheckstyleConfigurationPath(choice);
     }
     window.showInformationMessage('Successfully set the Checkstyle configuration.');
 }

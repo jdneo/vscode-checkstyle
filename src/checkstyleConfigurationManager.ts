@@ -145,7 +145,7 @@ class CheckstyleConfigurationManager implements vscode.Disposable {
                 for await (const result of response.body as NodeJS.ReadableStream & { [Symbol.asyncIterator](): AsyncIterator<Buffer> }) {
                     if (token.isCancellationRequested) {
                         const formerVersion: string = await this.getCurrentVersion() || this.getBuiltinVersion();
-                        setCheckstyleVersionString(formerVersion); // Revert to version to before changing
+                        await setCheckstyleVersionString(formerVersion); // Revert to version to before changing
                         this.config.version = formerVersion;
                         return; // Stop downloading progress
                     }

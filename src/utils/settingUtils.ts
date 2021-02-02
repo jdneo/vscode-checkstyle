@@ -1,11 +1,11 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration } from 'vscode';
+import { ConfigurationTarget, Uri, window, workspace, WorkspaceConfiguration, WorkspaceFolder } from 'vscode';
 import { JAVA_CHECKSTYLE_AUTOCHECK, JAVA_CHECKSTYLE_CONFIGURATION, JAVA_CHECKSTYLE_MODULES, JAVA_CHECKSTYLE_PROPERTIES, JAVA_CHECKSTYLE_VERSION } from '../constants/settings';
 import { resolveVariables } from './workspaceUtils';
 
-export function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): void {
+export async function setCheckstyleConfigurationPath(fsPath: string, uri?: Uri): Promise<void> {
     setConfiguration(JAVA_CHECKSTYLE_CONFIGURATION, fsPath, uri);
 }
 
@@ -14,7 +14,7 @@ export function getCheckstyleConfigurationPath(uri?: Uri): string {
     return resolveVariables(configurationPath, uri);
 }
 
-export function setCheckstyleVersionString(version: string, uri?: Uri): void {
+export async function setCheckstyleVersionString(version: string, uri?: Uri): Promise<void> {
     setConfiguration(JAVA_CHECKSTYLE_VERSION, version, uri);
 }
 
@@ -44,9 +44,25 @@ export function getConfiguration(uri?: Uri): WorkspaceConfiguration {
     return workspace.getConfiguration(undefined, uri || null);
 }
 
-function setConfiguration(section: string, value: any, uri?: Uri): void {
-    if (!uri && window.activeTextEditor) {
-        uri = window.activeTextEditor.document.uri;
+async function setConfiguration(section: string, value: any, uri?: Uri): Promise<void> {
+    let targetWorkspace: WorkspaceFolder | undefined;
+    if (uri) {
+        targetWorkspace = workspace.getWorkspaceFolder(uri);
+    } else if (window.activeTextEditor) {
+        targetWorkspace = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
     }
-    getConfiguration(uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
+    if (!targetWorkspace) {
+        if (workspace.workspaceFolders?.length === 1) {
+            targetWorkspace = workspace.workspaceFolders?.[0];
+        } else {
+            targetWorkspace = await window.showWorkspaceFolderPick({
+                placeHolder: 'Select which workspace folder you would like apply to',
+                ignoreFocusOut: true,
+            });
+            if (!targetWorkspace) {
+                return;
+            }
+        }
+    }
+    getConfiguration(targetWorkspace.uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
 }

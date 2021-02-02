@@ -52,6 +52,16 @@
                     "when": "!explorerResourceIsFolder && resourceLangId == xml",
                     "group": "Checkstyle@2"
                 }
+            ],
+            "commandPalette": [
+                {
+                    "command": "java.checkstyle.setConfiguration",
+                    "when": "workspaceFolderCount > 0"
+                },
+                {
+                    "command": "java.checkstyle.setVersion",
+                    "when": "workspaceFolderCount > 0"
+                }
             ]
         },
         "commands": [

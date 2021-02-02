@@ -12,7 +12,7 @@ export async function setVersion(version?: string): Promise<void> {
     if (!version) {
         return;
     }
-    setCheckstyleVersionString(version);
+    await setCheckstyleVersionString(version);
 }
 
 async function queryForVersion(): Promise<string | undefined> {
