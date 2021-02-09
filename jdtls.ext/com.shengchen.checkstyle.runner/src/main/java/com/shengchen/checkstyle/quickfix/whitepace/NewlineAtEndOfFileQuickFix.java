@@ -31,9 +31,11 @@ public class NewlineAtEndOfFileQuickFix extends BaseEditQuickFix {
     public TextEdit createTextEdit(IRegion lineInfo, int markerStartOffset, String violationKey, Document doc) {
         try {
             final String lastChar = doc.getLength() > 0 ? doc.get(doc.getLength() - 1, 1) : "";
-            
-            if (lastChar.isEmpty() || !"\n".equals(lastChar)) {
-                return new InsertEdit(doc.getLength(), "\n");
+
+            /* By default NewlineAtEndOfFileCheck looks for any of CR LF or CRLF */
+            if (!"\n".equals(lastChar) && !"\r".equals(lastChar)) {
+                /* By default we add the platform-specific line separator. */
+                return new InsertEdit(doc.getLength(), System.getProperty("line.separator"));
             }
 
             return null;
