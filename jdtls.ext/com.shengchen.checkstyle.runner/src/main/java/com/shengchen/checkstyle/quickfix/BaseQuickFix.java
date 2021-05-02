@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class BaseQuickFix {
+public abstract class BaseQuickFix implements IQuickFix {
     public abstract ASTVisitor getCorrectingASTVisitor(IRegion lineInfo, int markerStartOffset);
 
     /**

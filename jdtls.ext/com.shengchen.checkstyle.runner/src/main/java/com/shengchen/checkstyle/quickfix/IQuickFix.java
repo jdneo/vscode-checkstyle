@@ -15,21 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.shengchen.checkstyle.runner.api;
+package com.shengchen.checkstyle.quickfix;
 
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.lsp4j.WorkspaceEdit;
-
-import java.util.List;
-
-public interface IQuickFixService {
-
-    public WorkspaceEdit quickFix(
-        String fileToCheckUri,
-        List<Double> offsets,
-        List<String> sourceNames,
-        List<String> violationKeys
-    ) throws JavaModelException, IllegalArgumentException, BadLocationException;
+public interface IQuickFix {
 
 }

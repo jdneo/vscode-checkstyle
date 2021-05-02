@@ -49,6 +49,6 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setConfiguration(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_VERSION, async (version?: string) => await setVersion(version)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames)),
+        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[], violationKeys: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames, violationKeys)),
     );
 }
