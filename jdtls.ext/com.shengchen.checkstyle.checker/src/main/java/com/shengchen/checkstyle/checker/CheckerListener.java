@@ -40,9 +40,6 @@ public class CheckerListener implements AuditListener {
         if (severity.equals(SeverityLevel.IGNORE)) {
             return;
         }
-
-        
-
         fileErrors.get(error.getFileName()).add(new CheckResult(
             error.getLine(),
             this.backCompatColumnIndex(error) + 1,
