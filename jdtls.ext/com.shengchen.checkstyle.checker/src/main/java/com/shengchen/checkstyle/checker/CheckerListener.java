@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import com.shengchen.checkstyle.runner.api.CheckResult;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +40,12 @@ public class CheckerListener implements AuditListener {
         if (severity.equals(SeverityLevel.IGNORE)) {
             return;
         }
+
+        
+
         fileErrors.get(error.getFileName()).add(new CheckResult(
             error.getLine(),
-            error.getViolation().getColumnCharIndex() + 1,
+            this.backCompatColumnIndex(error) + 1,
             error.getMessage(),
             severity.toString().toLowerCase(),
             error.getSourceName().substring(error.getSourceName().lastIndexOf('.') + 1)));
@@ -78,5 +83,25 @@ public class CheckerListener implements AuditListener {
             result.put(fileName, fileErrors.get(fileName));
         }
         return result;
+    }
+
+    private int backCompatColumnIndex(final AuditEvent error) {
+        // To keep backwards compatibility:
+        try {
+            // Try to use LocalizedMessage for Checkstyle versions <= v8.41.1
+            final Method getLocalizedMessage = error.getClass().getMethod("getLocalizedMessage");
+            final Object localizedMessage = getLocalizedMessage.invoke(error);
+            final Method getColumnCharIndex = localizedMessage.getClass().getMethod("getColumnCharIndex");
+
+            return (int) getColumnCharIndex.invoke(localizedMessage);
+        } catch (NoSuchMethodException |
+            SecurityException |
+            IllegalAccessException |
+            IllegalArgumentException |
+            InvocationTargetException e1
+        ) {
+            // If LocalizedMessage does not exist, Checkstyle version >= v8.42 is used
+            return error.getViolation().getColumnCharIndex();
+        }
     }
 }
