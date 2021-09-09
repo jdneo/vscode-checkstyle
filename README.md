@@ -6,8 +6,8 @@
   <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/resources/icon_checkstyle.png" alt="">
 </p>
 <p align="center">
-  <a href="https://travis-ci.org/jdneo/vscode-checkstyle">
-    <img src="https://img.shields.io/travis/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  <a href="https://github.com/jdneo/vscode-checkstyle/actions?query=workflow%3ACI+branch%3Amaster">
+    <img src="https://img.shields.io/github/workflow/status/jdneo/vscode-checkstyle/CI/master?style=flat-square" alt="">
   </a>
   <a href="https://lgtm.com/projects/g/jdneo/vscode-checkstyle/alerts">
     <img src="https://img.shields.io/lgtm/alerts/g/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
