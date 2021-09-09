@@ -3,6 +3,13 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.4.1]
+### Fixed
+- Generate temp files according to the folder structure [#275](https://github.com/jdneo/vscode-checkstyle/issues/275)
+- Remove redundant modifiers on interface declarations [PR#302](https://github.com/jdneo/vscode-checkstyle/pull/302)
+- Fix MultipleVariableDeclarationsQuickFix comment handling [PR#304](https://github.com/jdneo/vscode-checkstyle/pull/304)
+- Fix compatibility for Checkstyle v8.42+ [PR#323](https://github.com/jdneo/vscode-checkstyle/pull/323)
+
 ## [1.4.0]
 ### Added
 - Support quick fix for [MultipleVariableDeclarations](https://checkstyle.sourceforge.io/config_coding.html#MultipleVariableDeclarations) check ([PR#290](https://github.com/jdneo/vscode-checkstyle/pull/290))
