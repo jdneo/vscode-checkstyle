@@ -64,7 +64,7 @@ async function getLatestVersion(): Promise<string> {
 }
 
 async function getAllSupportedVersions(): Promise<string[]> {
-    const tags: Array<{ ref: string }> = await checkstyleConfigurationManager.fetchApiData('/git/refs/tags');
+    const tags: { ref: string }[] = await checkstyleConfigurationManager.fetchApiData('/git/refs/tags');
     const versions: string[] = [];
     for (const { ref } of tags) {
         const match: RegExpMatchArray | null = ref.match(/checkstyle-([\d.]+)/);

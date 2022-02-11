@@ -3,7 +3,7 @@
 
 import { FixableCheck } from '../constants/quickFix';
 
-export function isQuickFixAvailable(violationSourceName: string | number | undefined): boolean {
+export function isQuickFixAvailable(violationSourceName: any): boolean {
     if (violationSourceName && violationSourceName in FixableCheck) {
         return true;
     }

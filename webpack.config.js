@@ -9,15 +9,12 @@ const path = require('path');
 
 /**@type {import('webpack').Configuration}*/
 const config = {
-    // 📖 -> https://webpack.js.org/configuration/node/
     target: 'node',
     node: {
         __dirname: false,
         __filename: false,
     },
-    // 📖 -> https://webpack.js.org/configuration/entry-context/
     entry: './src/extension.ts',
-    // 📖 -> https://webpack.js.org/configuration/output/
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'extension.js',
@@ -25,11 +22,10 @@ const config = {
         devtoolModuleFilenameTemplate: "../[resource-path]",
     },
     externals: {
-        // 📖 -> https://webpack.js.org/configuration/externals/
+        'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics',
         vscode: "commonjs vscode",
     },
     devtool: 'source-map',
-    // 📖 -> https://github.com/TypeStrong/ts-loader
     resolve: {
         extensions: ['.ts', '.js'],
     },

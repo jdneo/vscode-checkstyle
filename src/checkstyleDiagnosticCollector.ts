@@ -30,7 +30,7 @@ class CheckstyleDiagnosticCollector implements Disposable {
         this.diagnosticCollection.set(uri, diagnostics);
     }
 
-    public diagnostics(uri: Uri): Diagnostic[] | undefined {
+    public diagnostics(uri: Uri): readonly Diagnostic[] | undefined {
         return this.diagnosticCollection.get(uri);
     }
 

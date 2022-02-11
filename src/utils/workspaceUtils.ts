@@ -8,12 +8,11 @@ import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { checkstyleChannel } from '../checkstyleChannel';
 
 export function getDefaultWorkspaceFolder(): WorkspaceFolder | undefined {
-    const workspaceFolders: WorkspaceFolder[] | undefined = workspace.workspaceFolders;
-    if (workspaceFolders === undefined) {
+    if (workspace.workspaceFolders === undefined) {
         return undefined;
     }
-    if (workspaceFolders.length === 1) {
-        return workspaceFolders[0];
+    if (workspace.workspaceFolders.length === 1) {
+        return workspace.workspaceFolders[0];
     }
     if (window.activeTextEditor) {
         const activeWorkspaceFolder: WorkspaceFolder | undefined = workspace.getWorkspaceFolder(window.activeTextEditor.document.uri);
