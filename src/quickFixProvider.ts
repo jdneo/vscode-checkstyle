@@ -30,7 +30,7 @@ class QuickFixProvider implements CodeActionProvider {
         }
 
         /* Fix all in document */
-        const allDiagnostics: Diagnostic[] | undefined = checkstyleDiagnosticCollector.diagnostics(document.uri);
+        const allDiagnostics: readonly Diagnostic[] | undefined = checkstyleDiagnosticCollector.diagnostics(document.uri);
         if (allDiagnostics && allDiagnostics.length) {
             const diagnostics: Diagnostic[] = fixableDiagnostics(allDiagnostics);
             if (diagnostics.length) {
@@ -45,7 +45,7 @@ interface IDiagnosticsByCheck {
     [check: string]: Diagnostic[];
 }
 
-function groupDiagnosticsByCheck(diagnostics: Diagnostic[]): IDiagnosticsByCheck {
+function groupDiagnosticsByCheck(diagnostics: readonly Diagnostic[]): IDiagnosticsByCheck {
     const result: IDiagnosticsByCheck = {};
     for (const diagnostic of diagnostics) {
         if (typeof diagnostic.code !== 'string') {
@@ -80,7 +80,7 @@ function titleForDiagnostics(check: string, diagnostics: Diagnostic[]): string {
     }
 }
 
-function fixableDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
+function fixableDiagnostics(diagnostics: readonly Diagnostic[]): Diagnostic[] {
     return diagnostics.filter((diagnostic: Diagnostic) => isQuickFixAvailable(diagnostic.code));
 }
 
