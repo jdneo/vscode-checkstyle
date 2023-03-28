@@ -6,11 +6,8 @@
   <img src="https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/resources/icon_checkstyle.png" alt="">
 </p>
 <p align="center">
-  <a href="https://github.com/jdneo/vscode-checkstyle/actions?query=workflow%3ACI+branch%3Amaster">
-    <img src="https://img.shields.io/github/workflow/status/jdneo/vscode-checkstyle/CI/master?style=flat-square" alt="">
-  </a>
-  <a href="https://lgtm.com/projects/g/jdneo/vscode-checkstyle/alerts">
-    <img src="https://img.shields.io/lgtm/alerts/g/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  <a href="https://github.com/jdneo/vscode-checkstyle/actions/workflows/build.yml?query=branch%3Amaster">
+    <img src="https://img.shields.io/github/actions/workflow/status/jdneo/vscode-checkstyle/build.yml?style=flat-square" alt="">
   </a>
   <a href="https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle">
     <img src="https://img.shields.io/visual-studio-marketplace/d/shengchen.vscode-checkstyle.svg?style=flat-square" alt="">
@@ -19,8 +16,6 @@
     <img src="https://img.shields.io/gitter/room/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
   </a>
 </p>
-
-> Note: Start from `1.0.0`, the extension is not back compatible with the previous version (before 0.5.2). Click [here](https://github.com/jdneo/vscode-checkstyle/tree/v0.5.2) if you want to check the previous documents.
 
 ## Requirements
 - JDK (version 1.8.0 or later)

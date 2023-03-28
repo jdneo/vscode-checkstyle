@@ -39,7 +39,7 @@ The extension has three major modules, which are listed as follow:
 - [The Checkstyle runner](https://github.com/jdneo/vscode-checkstyle/tree/master/jdtls.ext/com.shengchen.checkstyle.runner) written in Java - The OSGi bundle loaded into the Java Language Server and interact with the extension client.
 
 ### Setup
-0. Make sure you have JDK 8, Node.js, VS Code and [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) installed.
+0. Make sure you have latest LTS JDK, Node.js, VS Code and [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) installed.
 1. Fork and clone the repository: `git clone https://github.com/jdneo/vscode-checkstyle.git`
 2. `cd vscode-checkstyle`
 3. Install the node dependencies: `npm install`
@@ -48,7 +48,7 @@ The extension has three major modules, which are listed as follow:
 7. Install the [Eclipse PDE Support extension](https://marketplace.visualstudio.com/items?itemName=yaozheng.vscode-pde) in your VS Code
 8. Open a Java file and wait until 👍 shows in the right-bottom of the status bar
     > Note: Sometimes, if you find the code navigation is not working in the Java code, please try: 
-    > - right click the [target.target](https://github.com/jdneo/vscode-checkstyle/blob/master/jdtls.ext/com.shengchen.checkstyle.runner/target.target) file and select `Reload Target Platform`.
+    > - right click the [target.target](https://github.com/jdneo/vscode-checkstyle/blob/master/jdtls.ext/com.shengchen.checkstyle.target/target.target) file and select `Reload Target Platform`.
     > - Reload your VS Code.
 
 ### Debugging
