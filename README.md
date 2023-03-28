@@ -43,6 +43,8 @@
 
 - You can use the command `Checkstyle: Set the Checkstyle Version` to manually set the Checkstyle version according to your project preferences. The extension will automatically download the required jar files if they do not exist locally.
 
+> Note: If you don't know which `Checkstlye` version is used by `Maven Checkstyle Plugin`, check [this table](https://maven.apache.org/plugins/maven-checkstyle-plugin/history.html).
+
 ### Check the Style and Fix the Violations
 
 ![demo](https://raw.githubusercontent.com/jdneo/vscode-checkstyle/master/docs/gifs/liveLinting.gif)

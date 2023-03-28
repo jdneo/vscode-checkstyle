@@ -87,7 +87,7 @@
                 "java.checkstyle.version": {
                     "type": "string",
                     "description": "%configuration.java.checkstyle.version.description%",
-                    "default": "8.18",
+                    "default": "9.3",
                     "scope": "resource"
                 },
                 "java.checkstyle.modules": {
