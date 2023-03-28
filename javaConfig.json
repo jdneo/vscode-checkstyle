@@ -2,5 +2,5 @@
     "projects": [
         "./jdtls.ext/com.shengchen.checkstyle.runner"
     ],
-    "targetPlatform": "./jdtls.ext/com.shengchen.checkstyle.runner/target.target"
+    "targetPlatform": "./jdtls.ext/com.shengchen.checkstyle.target/target.target"
 }

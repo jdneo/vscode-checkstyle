@@ -9,12 +9,13 @@
     <properties>
         <base.name>Java Checkstyle Runner</base.name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tycho-version>1.5.1</tycho-version>
+        <tycho-version>2.7.2</tycho-version>
         <checkstyle-version>9.0</checkstyle-version>
     </properties>
     <modules>
         <module>com.shengchen.checkstyle.runner</module>
         <module>com.shengchen.checkstyle.checker</module>
+        <module>com.shengchen.checkstyle.target</module>
     </modules>
     <build>
         <pluginManagement>
@@ -44,30 +45,38 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <?m2e execute onConfiguration?>
-                            <id>get-libs</id>
-                            <goals>
-                                <goal>copy</goal>
-                            </goals>
-                            <phase>validate</phase>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <skip>false</skip>
-                        <outputDirectory>${basedir}/lib/</outputDirectory>
-                        <!-- baseVersion is to avoid SNAPSHOT dependencies
-                            being copied with ever daily changing timestamp -->
-                        <useBaseVersion>true</useBaseVersion>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>target-platform-configuration</artifactId>
                     <version>${tycho-version}</version>
+                    <configuration>
+                        <resolver>p2</resolver>
+                        <target>
+                            <artifact>
+                                <groupId>com.shengchen.checkstyle</groupId>
+                                <artifactId>com.shengchen.checkstyle.target</artifactId>
+                                <version>${project.version}</version>
+                            </artifact>
+                        </target>
+                        <environments>
+                            <environment>
+                                <os>linux</os>
+                                <ws>gtk</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                            <environment>
+                                <os>win32</os>
+                                <ws>win32</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                            <environment>
+                                <os>macosx</os>
+                                <ws>cocoa</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                        </environments>
+                        <dependency-resolution>
+                        </dependency-resolution>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -98,34 +107,22 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-maven-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
     </build>
     <repositories>
-        <repository>
-            <id>202112</id>
-            <layout>p2</layout>
-            <url>https://download.eclipse.org/releases/2021-12/202112081000/</url>
-        </repository>
         <repository>
             <id>oss.sonatype.org</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>LSP4J</id>
-            <layout>p2</layout>
-            <url>https://archive.eclipse.org/lsp4j/updates/releases/0.11.0/</url>
-        </repository>
-        <repository>
-            <id>JDT.LS</id>
-            <layout>p2</layout>
-            <url>https://download.eclipse.org/jdtls/snapshots/repository/latest/</url>
-        </repository>
-        <repository>
-            <id>JBOSS.TOOLS</id>
-            <layout>p2</layout>
-            <url>https://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt/1.5.3-2019-11-08_11-04-22-H22/</url>
         </repository>
     </repositories>
 </project>
