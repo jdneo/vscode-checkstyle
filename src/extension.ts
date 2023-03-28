@@ -1,7 +1,7 @@
 // Copyright (c) jdneo. All rights reserved.
 // Licensed under the GNU LGPLv3 license.
 
-import { ConfigurationChangeEvent, ExtensionContext, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
+import { ConfigurationChangeEvent, Extension, ExtensionContext, extensions, FileSystemWatcher, languages, Uri, workspace } from 'vscode';
 import { dispose as disposeTelemetryWrapper, initializeFromJsonFile, instrumentOperation, instrumentOperationAsVsCodeCommand } from 'vscode-extension-telemetry-wrapper';
 import { checkstyleChannel } from './checkstyleChannel';
 import { checkstyleConfigurationManager } from './checkstyleConfigurationManager';
@@ -25,6 +25,8 @@ export async function deactivate(): Promise<void> {
 }
 
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
+    await waitForLsReady();
+
     checkstyleDiagnosticManager.initialize(context);
     await checkstyleConfigurationManager.initialize(context);
 
@@ -51,4 +53,18 @@ async function doActivate(_operationId: string, context: ExtensionContext): Prom
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
         instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames)),
     );
+}
+
+async function waitForLsReady(): Promise<void> {
+    const javaLanguageSupport: Extension<any> | undefined = extensions.getExtension('redhat.java');
+    if (javaLanguageSupport?.isActive) {
+        const extensionApi: any = javaLanguageSupport.exports;
+        if (!extensionApi) {
+            throw new Error('Failed to get the extension API from redhat.java');
+        }
+
+        return extensionApi.serverReady();
+    }
+
+    throw new Error('redhat.java is not installed or activated');
 }
