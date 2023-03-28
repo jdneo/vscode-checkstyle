@@ -3,6 +3,12 @@ All notable changes to the "vscode-checkstyle" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.4.2]
+### Changed
+- Update the default Checkstyle version to `9.3`.
+### Fixed
+- Does not work on VS Code start until setting.json modified. [#341](https://github.com/jdneo/vscode-checkstyle/issues/341)
+
 ## [1.4.1]
 ### Fixed
 - Generate temp files according to the folder structure [#275](https://github.com/jdneo/vscode-checkstyle/issues/275)

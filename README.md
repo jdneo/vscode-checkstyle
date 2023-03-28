@@ -56,6 +56,7 @@
 ## Settings
 | Setting Name | Description | Default Value |
 |---|---|---|
+| `java.checkstyle.version` | Specify the Checkstyle Version. | `9.3` |
 | `java.checkstyle.configuration` | Specify the path of the Checkstyle configuration file. The path can either be a local file path or a URL. | `""` |
 | `java.checkstyle.properties` | Specify the customized properties used in the Checkstyle configuration. | `{}` |
 | `java.checkstyle.modules` | Specify the third-party modules used for Checkstyle. | `[]` |
