@@ -15,3 +15,5 @@ docs
 gulpfile.js
 jdtls.ext
 .github/**
+javaConfig.json
+scripts/**
