@@ -12,8 +12,8 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle">
     <img src="https://img.shields.io/visual-studio-marketplace/d/shengchen.vscode-checkstyle.svg?style=flat-square" alt="">
   </a>
-  <a href="https://gitter.im/vscode-checkstyle/Lobby">
-    <img src="https://img.shields.io/gitter/room/jdneo/vscode-checkstyle.svg?style=flat-square" alt="">
+  <a href="https://github.com/jdneo/vscode-checkstyle/discussions">
+    <img src="https://img.shields.io/github/discussions/jdneo/vscode-checkstyle?style=flat-square" alt="">
   </a>
 </p>
 
