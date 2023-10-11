@@ -25,6 +25,16 @@ export enum FixableCheck {
     ModifierOrderCheck = 'ModifierOrderCheck',
     RedundantModifierCheck = 'RedundantModifierCheck',
 
+    // Whitespace
+    ParenPadCheck = 'ParenPadCheck',
+    WhitespaceAfterCheck = 'WhitespaceAfterCheck',
+    WhitespaceAroundCheck = 'WhitespaceAroundCheck',
+    NoWhitespaceAfterCheck = 'NoWhitespaceAfterCheck',
+    NoWhitespaceBeforeCheck = 'NoWhitespaceBeforeCheck',
+    NewlineAtEndOfFileCheck = 'NewlineAtEndOfFileCheck',
+    GenericWhitespaceCheck = 'GenericWhitespaceCheck',
+    MethodParamPadCheck = 'MethodParamPadCheck',
+
     // Misc
     FinalParametersCheck = 'FinalParametersCheck',
     UncommentedMainCheck = 'UncommentedMainCheck',

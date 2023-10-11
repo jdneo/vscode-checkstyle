@@ -37,6 +37,14 @@ import com.shengchen.checkstyle.quickfix.misc.UpperEllQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.ModifierOrderQuickFix;
 import com.shengchen.checkstyle.quickfix.modifier.RedundantModifierQuickFix;
 import com.shengchen.checkstyle.quickfix.utils.EditUtils;
+import com.shengchen.checkstyle.quickfix.whitepace.GenericWhitespaceQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.MethodParamPadQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.NewlineAtEndOfFileQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.NoWhitespaceAfterQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.NoWhitespaceBeforeQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.ParenPadQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.WhitespaceAfterQuickFix;
+import com.shengchen.checkstyle.quickfix.whitepace.WhitespaceAroundQuickFix;
 import com.shengchen.checkstyle.runner.api.IQuickFixService;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -49,15 +57,21 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class QuickFixService implements IQuickFixService {
 
-    private final Map<String, BaseQuickFix> quickFixMap;
+    private final Map<String, IQuickFix> quickFixMap;
 
     public QuickFixService() {
         quickFixMap = new HashMap<>();
@@ -81,16 +95,25 @@ public class QuickFixService implements IQuickFixService {
         quickFixMap.put(FixableCheck.STRING_LITERAL_EQUALITY.toString(), new StringLiteralEqualityQuickFix());
         quickFixMap.put(FixableCheck.MULTIPLE_VARIABLE_DECLARATIONS_CHECK.toString(), 
             new MultipleVariableDeclarationsQuickFix());
+        quickFixMap.put(FixableCheck.PAREN_PAD_CHECK.toString(), new ParenPadQuickFix());
+        quickFixMap.put(FixableCheck.WHITESPACE_AFTER_CHECK.toString(), new WhitespaceAfterQuickFix());
+        quickFixMap.put(FixableCheck.WHITESPACE_AROUND_CHECK.toString(), new WhitespaceAroundQuickFix());
+        quickFixMap.put(FixableCheck.NO_WHITESPACE_AFTER_CHECK.toString(), new NoWhitespaceAfterQuickFix());
+        quickFixMap.put(FixableCheck.NO_WHITESPACE_BEFORE_CHECK.toString(), new NoWhitespaceBeforeQuickFix());
+        quickFixMap.put(FixableCheck.NEWLINE_AT_END_OF_FILE_CHECK.toString(), new NewlineAtEndOfFileQuickFix());
+        quickFixMap.put(FixableCheck.GENERIC_WHITESPACE_CHECK.toString(), new GenericWhitespaceQuickFix());
+        quickFixMap.put(FixableCheck.METHOD_PARAM_PAD_CHECK.toString(), new MethodParamPadQuickFix());
     }
 
-    public BaseQuickFix getQuickFix(String sourceName) {
+    public IQuickFix getQuickFix(String sourceName) {
         return quickFixMap.get(sourceName);
     }
 
     public WorkspaceEdit quickFix(
         String fileToCheckUri,
         List<Double> offsets,
-        List<String> sourceNames
+        List<String> sourceNames,
+        List<String> violationKeys
     ) throws JavaModelException, IllegalArgumentException, BadLocationException {
         final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(fileToCheckUri);
         final Document document = new Document(unit.getSource());
@@ -100,16 +123,83 @@ public class QuickFixService implements IQuickFixService {
         final CompilationUnit astRoot = (CompilationUnit) astParser.createAST(null);
         astRoot.recordModifications();
 
+        final List<TextEdit> textEdits = new ArrayList<>();
+
         for (int i = 0; i < offsets.size(); i++) {
+            final IQuickFix quickFix = getQuickFix(sourceNames.get(i));
+            if (quickFix == null) {
+                continue;
+            }
+            
             final int offset = offsets.get(i).intValue();
-            final BaseQuickFix quickFix = getQuickFix(sourceNames.get(i));
-            if (quickFix != null) {
-                final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-                astRoot.accept(quickFix.getCorrectingASTVisitor(lineInfo, offset));
+            final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+            final String violationKey = violationKeys.get(i);
+            if (quickFix instanceof BaseQuickFix) {
+                astRoot.accept(((BaseQuickFix) quickFix).getCorrectingASTVisitor(lineInfo, offset));
+            } else if (quickFix instanceof BaseEditQuickFix) {
+                final TextEdit edit = ((BaseEditQuickFix) quickFix).createTextEdit(
+                    lineInfo, offset, violationKey, document);
+                if (edit != null) {
+                    addAllEdits(edit, textEdits);
+                }
             }
         }
 
-        final TextEdit edit = astRoot.rewrite(document, null);
-        return EditUtils.convertToWorkspaceEdit(unit, edit);
+        /* Add text edits before AST edits, as whitespace changes need to be applied first */
+        final MultiTextEdit result = new MultiTextEdit();
+        for (final TextEdit textEdit : textEdits) {
+            try {
+                result.addChild(textEdit.copy());
+            } catch (MalformedTreeException e) {
+                /* Ignore text edits that can't be added; it is due to conflicts */
+            }
+        }
+
+        final MultiTextEdit astEdits = (MultiTextEdit) astRoot.rewrite(document, null);
+        while (astEdits.getChildrenSize() > 0) {
+            final TextEdit astEdit = astEdits.removeChild(0);
+            try {
+                result.addChild(astEdit);
+            } catch (MalformedTreeException e) {
+                /* Ignore text edits that can't be added; it is due to conflicts */
+            }
+        }
+
+        return EditUtils.convertToWorkspaceEdit(unit, result);
+    }
+
+    private void addAllEdits(final TextEdit source, final List<TextEdit> dest) {
+        for (final TextEdit anEdit : allEdits(source)) {
+            if (canAddEdit(anEdit, dest)) {
+                dest.add(anEdit);
+            }
+        }
+    }
+
+    /**
+     * Check whether we can add the given new edit to our list of existing edits. This prevents
+     * edits that might conflict or double-up.
+     */
+    private boolean canAddEdit(TextEdit edit, Collection<TextEdit> existingEdits) {
+        for (final TextEdit existingEdit : existingEdits) {
+            if (existingEdit instanceof MultiTextEdit) {
+                if (!canAddEdit(edit, Arrays.asList(((MultiTextEdit) existingEdit).getChildren()))) {
+                    return false;
+                }
+            } else {
+                if (existingEdit.covers(edit) || existingEdit.getOffset() == edit.getOffset()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private Iterable<TextEdit> allEdits(TextEdit edit) {
+        if (edit instanceof MultiTextEdit) {
+            return Arrays.asList(((MultiTextEdit) edit).getChildren());
+        } else {
+            return Collections.singleton(edit);
+        }
     }
 }

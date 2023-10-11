@@ -9,10 +9,10 @@ import { applyWorkspaceEdit } from '../utils/editUtils';
 import { handleErrors } from '../utils/errorUtils';
 import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
-export async function fixCheckstyleViolations(uri: Uri, offsets: number[], sourceNames: string[]): Promise<void> {
+export async function fixCheckstyleViolations(uri: Uri, offsets: number[], sourceNames: string[], violationKeys: string[]): Promise<void> {
     try {
         const workspaceEdit: ls.WorkspaceEdit | undefined = await executeJavaLanguageServerCommand<ls.WorkspaceEdit>(
-            CheckstyleServerCommands.QUICK_FIX, uri.toString(), offsets, sourceNames);
+            CheckstyleServerCommands.QUICK_FIX, uri.toString(), offsets, sourceNames, violationKeys);
         if (!workspaceEdit) {
             checkstyleChannel.appendLine('Unable to get quick fix item from Language Server.');
             return;

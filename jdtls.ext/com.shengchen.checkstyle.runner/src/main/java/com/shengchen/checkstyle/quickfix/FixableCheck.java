@@ -34,6 +34,16 @@ public enum FixableCheck {
     // Modifier
     MODIFIER_ORDER_CHECK("ModifierOrderCheck"), REDUNDANT_MODIFIER_CHECK("RedundantModifierCheck"),
 
+    // Whitespace
+    PAREN_PAD_CHECK("ParenPadCheck"),
+    WHITESPACE_AFTER_CHECK("WhitespaceAfterCheck"),
+    WHITESPACE_AROUND_CHECK("WhitespaceAroundCheck"),
+    NO_WHITESPACE_AFTER_CHECK("NoWhitespaceAfterCheck"),
+    NO_WHITESPACE_BEFORE_CHECK("NoWhitespaceBeforeCheck"),
+    NEWLINE_AT_END_OF_FILE_CHECK("NewlineAtEndOfFileCheck"),
+    GENERIC_WHITESPACE_CHECK("GenericWhitespaceCheck"),
+    METHOD_PARAM_PAD_CHECK("MethodParamPadCheck"),
+
     // Misc
     FINAL_PARAMETERS_CHECK("FinalParametersCheck"), UNCOMMENTED_MAIN_CHECK("UncommentedMainCheck"),
     UPPER_ELL_CHECK("UpperEllCheck"), ARRAY_TYPE_STYLE_CHECK("ArrayTypeStyleCheck");
