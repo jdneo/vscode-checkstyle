@@ -18,7 +18,7 @@
 </p>
 
 ## Requirements
-- JDK (version 1.8.0 or later)
+- JDK (version 17 or later)
 - VS Code (version 1.30.0 or later)
 - [Language Support for Java by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java)
 

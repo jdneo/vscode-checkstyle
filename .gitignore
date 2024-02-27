@@ -27,11 +27,6 @@ hs_err_pid*
 # build
 target/
 
-# Eclipse
-.classpath
-.project
-.settings
-
 # Checkstyle
 **/.checkstyle
 
