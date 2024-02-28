@@ -16,55 +16,55 @@ import { CheckstyleExtensionCommands } from './constants/commands';
 import { quickFixProvider } from './quickFixProvider';
 
 export async function activate(context: ExtensionContext): Promise<void> {
-    await initializeFromJsonFile(context.asAbsolutePath('./package.json'), { firstParty: true });
-    await instrumentOperation('activation', doActivate)(context);
+  await initializeFromJsonFile(context.asAbsolutePath('./package.json'), { firstParty: true });
+  await instrumentOperation('activation', doActivate)(context);
 }
 
 export async function deactivate(): Promise<void> {
-    await disposeTelemetryWrapper();
+  await disposeTelemetryWrapper();
 }
 
 async function doActivate(_operationId: string, context: ExtensionContext): Promise<void> {
-    await waitForLsReady();
+  await waitForLsReady();
 
-    checkstyleDiagnosticManager.initialize(context);
-    await checkstyleConfigurationManager.initialize(context);
+  checkstyleDiagnosticManager.initialize(context);
+  await checkstyleConfigurationManager.initialize(context);
 
-    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
-        checkstyleDiagnosticManager.onDidChangeConfiguration(e);
-        checkstyleConfigurationManager.onDidChangeConfiguration(e);
-    });
+  workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+    checkstyleDiagnosticManager.onDidChangeConfiguration(e);
+    checkstyleConfigurationManager.onDidChangeConfiguration(e);
+  });
 
-    const codeWatcher: FileSystemWatcher = workspace.createFileSystemWatcher('**/*.{[jJ][aA][vV][aA]}', true /* ignoreCreateEvents */);
-    codeWatcher.onDidDelete((uri: Uri) => {
-        checkstyleDiagnosticCollector.delete(uri);
-    }, null, context.subscriptions);
+  const codeWatcher: FileSystemWatcher = workspace.createFileSystemWatcher('**/*.{[jJ][aA][vV][aA]}', true /* ignoreCreateEvents */);
+  codeWatcher.onDidDelete((uri: Uri) => {
+    checkstyleDiagnosticCollector.delete(uri);
+  }, null, context.subscriptions);
 
-    context.subscriptions.push(
-        checkstyleChannel,
-        checkstyleStatusBar,
-        checkstyleDiagnosticManager,
-        checkstyleConfigurationManager,
-        codeWatcher,
-        languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setConfiguration(uri)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_VERSION, async (version?: string) => await setVersion(version)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
-        instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames)),
-    );
+  context.subscriptions.push(
+    checkstyleChannel,
+    checkstyleStatusBar,
+    checkstyleDiagnosticManager,
+    checkstyleConfigurationManager,
+    codeWatcher,
+    languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, quickFixProvider),
+    instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.OPEN_OUTPUT_CHANNEL, () => checkstyleChannel.show()),
+    instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_CONFIGURATION, async (uri?: Uri) => await setConfiguration(uri)),
+    instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.SET_CHECKSTYLE_VERSION, async (version?: string) => await setVersion(version)),
+    instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.CHECK_CODE_WITH_CHECKSTYLE, async (uri?: Uri) => await checkCode(uri)),
+    instrumentOperationAsVsCodeCommand(CheckstyleExtensionCommands.FIX_CHECKSTYLE_VIOLATIONS, async (uri: Uri, offsets: number[], sourceNames: string[]) => await fixCheckstyleViolations(uri, offsets, sourceNames)),
+  );
 }
 
 async function waitForLsReady(): Promise<void> {
-    const javaLanguageSupport: Extension<any> | undefined = extensions.getExtension('redhat.java');
-    if (javaLanguageSupport?.isActive) {
-        const extensionApi: any = javaLanguageSupport.exports;
-        if (!extensionApi) {
-            throw new Error('Failed to get the extension API from redhat.java');
-        }
-
-        return extensionApi.serverReady();
+  const javaLanguageSupport: Extension<any> | undefined = extensions.getExtension('redhat.java');
+  if (javaLanguageSupport?.isActive) {
+    const extensionApi: any = javaLanguageSupport.exports;
+    if (!extensionApi) {
+      throw new Error('Failed to get the extension API from redhat.java');
     }
 
-    throw new Error('redhat.java is not installed or activated');
+    return extensionApi.serverReady();
+  }
+
+  throw new Error('redhat.java is not installed or activated');
 }
