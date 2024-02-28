@@ -40,13 +40,14 @@ The extension has three major modules, which are listed as follow:
 
 ### Setup
 0. Make sure you have latest LTS JDK, Node.js, VS Code and [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) installed.
-1. Fork and clone the repository: `git clone https://github.com/jdneo/vscode-checkstyle.git`
-2. `cd vscode-checkstyle`
-3. Install the node dependencies: `npm install`
-4. Build the Java modules: `npm run build-plugin`
-6. Open the directory `vscode-checkstyle` in VS Code
-7. Install the [Eclipse PDE Support extension](https://marketplace.visualstudio.com/items?itemName=yaozheng.vscode-pde) in your VS Code
-8. Open a Java file and wait until 👍 shows in the right-bottom of the status bar
+1. Fork and clone the repository: `git clone https://github.com/jdneo/vscode-checkstyle.git`.
+2. `cd vscode-checkstyle`.
+3. Install the node dependencies: `npm install`.
+4. Build the Java modules: `npm run build-plugin`.
+6. Open the directory `vscode-checkstyle` in VS Code.
+7. Install the [Eclipse PDE Support extension](https://marketplace.visualstudio.com/items?itemName=yaozheng.vscode-pde) in your VS Code.
+8. Install the [TypeScript + Webpack Problem Matchers](https://marketplace.visualstudio.com/items?itemName=amodio.tsl-problem-matcher) in your VS Code.
+9. Open a Java file and wait until 👍 shows in the right-bottom of the status bar
     > Note: Sometimes, if you find the code navigation is not working in the Java code, please try: 
     > - right click the [target.target](https://github.com/jdneo/vscode-checkstyle/blob/master/jdtls.ext/com.shengchen.checkstyle.target/target.target) file and select `Reload Target Platform`.
     > - Reload your VS Code.
