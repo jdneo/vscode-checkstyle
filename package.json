@@ -109,7 +109,7 @@
     "vscode:prepublish": "webpack --mode production",
     "compile": "tsc -p ./",
     "watch": "webpack --mode development --watch",
-    "lint": "eslint 'src/**/*.{ts}' --format stylish",
+    "lint": "eslint 'src/**/*.ts' --format stylish",
     "build-plugin": "node scripts/build.js"
   },
   "extensionDependencies": [
@@ -121,6 +121,7 @@
     "@types/node": "^14.18.9",
     "@types/node-fetch": "^2.5.12",
     "@types/vscode": "1.64.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
