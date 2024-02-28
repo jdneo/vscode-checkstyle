@@ -1,18 +1,38 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "files.exclude": {
-        "out": false // set this to true to hide the "out" folder with the compiled JS files
-    },
-    "search.exclude": {
-        "out": true // set this to false to include "out" folder in search results
-    },
-    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-    "typescript.tsc.autoDetect": "off",
-    // Use workspace's typescript version to provide correct language service
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "java.checkstyle.configuration": "${workspaceFolder}/jdtls.ext/config/checkstyle.xml",
-    "java.checkstyle.properties": {
-        "checkstyle.header.file": "${workspaceFolder}/jdtls.ext/config/java.header"
-    },
-    "java.configuration.updateBuildConfiguration": "automatic",
+  "files.exclude": {
+    "out": false // set this to true to hide the "out" folder with the compiled JS files
+  },
+  "search.exclude": {
+    "out": true // set this to false to include "out" folder in search results
+  },
+  // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+  "typescript.tsc.autoDetect": "off",
+  // Use workspace's typescript version to provide correct language service
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "java.checkstyle.configuration": "${workspaceFolder}/jdtls.ext/config/checkstyle.xml",
+  "java.checkstyle.properties": {
+    "checkstyle.header.file": "${workspaceFolder}/jdtls.ext/config/java.header"
+  },
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "files.eol": "\n",
+  "editor.formatOnType": false,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "[java]": {
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "[ts]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "[xml]": {
+    "editor.tabSize": 2
+  }
 }
