@@ -4,6 +4,7 @@
   "recommendations": [
     "yaozheng.vscode-pde",
     "dbaeumer.vscode-eslint",
-    "rvest.vs-code-prettier-eslint"
+    "rvest.vs-code-prettier-eslint",
+    "amodio.tsl-problem-matcher"
   ]
 }

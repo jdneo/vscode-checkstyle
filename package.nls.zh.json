@@ -1,11 +1,11 @@
 {
-    "description": "提供实时的 Checkstyle 代码检测结果，并帮助用户修改代码",
-    "contributes.commands.java.checkstyle.setConfiguration.title": "设置 Checkstyle 配置文件",
-    "contributes.commands.java.checkstyle.setVersion.title": "设置 Chekcstyle 版本",
-    "contributes.commands.java.checkstyle.checkCode.title": "检查代码",
-    "configuration.java.checkstyle.configuration.description": "Checkstyle 配置文件所在路径",
-    "configuration.java.checkstyle.version.description": "使用的 Checkstyle 版本",
-    "configuration.java.checkstyle.modules.description": "使用的第三方 Checkstyle 模块",
-    "configuration.java.checkstyle.properties.description": "自定义 Checkstyle 配置文件中所用到的 Properties",
-    "configuration.java.checkstyle.autocheck.description": "是否启用自动检查"
+  "description": "提供实时的 Checkstyle 代码检测结果，并帮助用户修改代码",
+  "contributes.commands.java.checkstyle.setConfiguration.title": "设置 Checkstyle 配置文件",
+  "contributes.commands.java.checkstyle.setVersion.title": "设置 Chekcstyle 版本",
+  "contributes.commands.java.checkstyle.checkCode.title": "检查代码",
+  "configuration.java.checkstyle.configuration.description": "Checkstyle 配置文件所在路径",
+  "configuration.java.checkstyle.version.description": "使用的 Checkstyle 版本",
+  "configuration.java.checkstyle.modules.description": "使用的第三方 Checkstyle 模块",
+  "configuration.java.checkstyle.properties.description": "自定义 Checkstyle 配置文件中所用到的 Properties",
+  "configuration.java.checkstyle.autocheck.description": "是否启用自动检查"
 }
