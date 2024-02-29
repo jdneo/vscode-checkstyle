@@ -109,7 +109,7 @@
     "vscode:prepublish": "webpack --mode production",
     "compile": "tsc -p ./",
     "watch": "webpack --mode development --watch",
-    "lint": "eslint 'src/**/*.ts' 'scripts/**.js' 'webpack.config.js' --format stylish",
+    "lint": "eslint 'src/**/*.ts' 'scripts/build.js' 'webpack.config.js' --format stylish",
     "build-plugin": "node scripts/build.js"
   },
   "extensionDependencies": [
