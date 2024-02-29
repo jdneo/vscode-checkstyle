@@ -20,19 +20,15 @@
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
+  "editor.tabSize": 2,
   "[java]": {
     "editor.tabSize": 4,
     "editor.defaultFormatter": "redhat.java"
   },
   "[json]": {
-    "editor.tabSize": 2,
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "[ts]": {
-    "editor.tabSize": 2,
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-  },
-  "[xml]": {
-    "editor.tabSize": 2
   }
 }

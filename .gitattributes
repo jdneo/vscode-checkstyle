@@ -11,6 +11,7 @@
 *.txt text eol=lf
 */.classpath text eol=lf
 */.project text eol=lf
+*.yml text eol=lf
 
 *.gif binary
 *.jar binary

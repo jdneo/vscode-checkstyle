@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   linux:
@@ -12,90 +12,90 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Setup Build Environment
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libxkbfile-dev pkg-config libsecret-1-dev libxss1 dbus xvfb libgtk-3-0 libgbm1
-        sudo /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        sleep 3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbfile-dev pkg-config libsecret-1-dev libxss1 dbus xvfb libgtk-3-0 libgbm1
+          sudo /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14
-        
-    - name: Install Node.js modules
-      run: npm install
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
 
-    - name: Lint
-      run: npm run lint
+      - name: Install Node.js modules
+        run: npm install
 
-    - name: Build OSGi bundle
-      run: npm run build-plugin
+      - name: Lint
+        run: npm run lint
 
-    - name: Build .vsix
-      run: npx vsce@latest package
+      - name: Build OSGi bundle
+        run: npm run build-plugin
+
+      - name: Build .vsix
+        run: npx vsce@latest package
 
   windows:
     name: Windows
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14
-        
-    - name: Install Node.js modules
-      run: npm install
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
 
-    - name: Lint
-      run: npm run lint
+      - name: Install Node.js modules
+        run: npm install
 
-    - name: Build OSGi bundle
-      run: npm run build-plugin
+      - name: Lint
+        run: npm run lint
 
-    - name: Build .vsix
-      run: npx vsce@latest package
+      - name: Build OSGi bundle
+        run: npm run build-plugin
+
+      - name: Build .vsix
+        run: npx vsce@latest package
 
   darwin:
     name: macOS
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
 
-    - name: Install Node.js modules
-      run: npm install
+      - name: Install Node.js modules
+        run: npm install
 
-    - name: Lint
-      run: npm run lint
+      - name: Lint
+        run: npm run lint
 
-    - name: Build OSGi bundle
-      run: npm run build-plugin
+      - name: Build OSGi bundle
+        run: npm run build-plugin
 
-    - name: Build .vsix
-      run: npx vsce@latest package
+      - name: Build .vsix
+        run: npx vsce@latest package
