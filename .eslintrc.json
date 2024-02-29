@@ -8,18 +8,22 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "sort-keys": "off",
+    "sort-keys": 0,
     "indent": ["error", 2],
     "@typescript-eslint/no-namespace": "off",
+    "no-inner-declarations": "off",
     "max-len": ["off", 120],
     "@typescript-eslint/typedef": [
-      "error",
+      "warn",
       {
         "arrowParameter": true,
         "variableDeclaration": true,
         "memberVariableDeclaration": true
       }
     ],
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "quotes": ["error", "single", { "avoidEscape": true }],
     "camelcase": "off",
     "@typescript-eslint/naming-convention": "off"
