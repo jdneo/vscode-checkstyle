@@ -3,43 +3,37 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Launch Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}"
-			],
-			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceRoot}/dist/**/*.js"
-			],
-			"preLaunchTask": "npm: watch"
-		},
-		{
-			"name": "Extension Tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
-			],
-			"preLaunchTask": "npm: watch"
-		},
-		{
-			"projectName": "com.shengchen.checkstyle.runner",
-			"type": "java",
-			"name": "Attach to Checkstyle Plugin",
-			"request": "attach",
-			"hostName": "localhost",
-			"port": 1044
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceRoot}/dist/**/*.js"],
+      "preLaunchTask": "npm: watch"
+    },
+    {
+      "name": "Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "npm: watch"
+    },
+    {
+      "projectName": "com.shengchen.checkstyle.runner",
+      "type": "java",
+      "name": "Attach to Checkstyle Plugin",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 1044
+    }
+  ]
 }

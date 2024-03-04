@@ -1,0 +1,18 @@
+* text=auto eol=lf
+
+*.java text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.ts text eol=lf
+*.md text eol=lf
+*.MF text eol=lf
+*.prefs text eol=lf
+*.target text eol=lf
+*.txt text eol=lf
+*/.classpath text eol=lf
+*/.project text eol=lf
+*.yml text eol=lf
+
+*.gif binary
+*.jar binary
+*.png binary

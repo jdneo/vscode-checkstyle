@@ -1,139 +1,142 @@
 {
-    "name": "vscode-checkstyle",
-    "displayName": "Checkstyle for Java",
-    "description": "%description%",
-    "version": "1.4.2",
-    "author": "Sheng Chen",
-    "publisher": "shengchen",
-    "license": "GNU LGPL V3.0",
-    "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
-    "icon": "resources/icon_checkstyle.png",
-    "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jdneo/vscode-checkstyle"
-    },
-    "engines": {
-        "vscode": "^1.64.0"
-    },
-    "categories": [
-        "Programming Languages",
-        "Linters"
+  "name": "vscode-checkstyle",
+  "displayName": "Checkstyle for Java",
+  "description": "%description%",
+  "version": "1.4.2",
+  "author": "Sheng Chen",
+  "publisher": "shengchen",
+  "license": "GNU LGPL V3.0",
+  "aiKey": "0558bc67-cc55-4730-9f4a-64b8f71393cb",
+  "icon": "resources/icon_checkstyle.png",
+  "homepage": "https://github.com/jdneo/vscode-checkstyle/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jdneo/vscode-checkstyle"
+  },
+  "engines": {
+    "vscode": "^1.64.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "java",
+    "checkstyle"
+  ],
+  "activationEvents": [
+    "onLanguage:java",
+    "onCommand:java.checkstyle.quickFix",
+    "onCommand:java.checkstyle.checkCode",
+    "onCommand:java.checkstyle.setConfiguration"
+  ],
+  "main": "./dist/extension",
+  "contributes": {
+    "javaExtensions": [
+      "./server/com.shengchen.checkstyle.runner.jar"
     ],
-    "keywords": [
-        "java",
-        "checkstyle"
-    ],
-    "activationEvents": [
-        "onLanguage:java",
-        "onCommand:java.checkstyle.quickFix",
-        "onCommand:java.checkstyle.checkCode",
-        "onCommand:java.checkstyle.setConfiguration"
-    ],
-    "main": "./dist/extension",
-    "contributes": {
-        "javaExtensions": [
-            "./server/com.shengchen.checkstyle.runner.jar"
-        ],
-        "menus": {
-            "explorer/context": [
-                {
-                    "command": "java.checkstyle.checkCode",
-                    "when": "resourceLangId == java",
-                    "group": "Checkstyle@1"
-                },
-                {
-                    "command": "java.checkstyle.checkCode",
-                    "when": "explorerResourceIsFolder",
-                    "group": "Checkstyle@1"
-                },
-                {
-                    "command": "java.checkstyle.setConfiguration",
-                    "when": "!explorerResourceIsFolder && resourceLangId == xml",
-                    "group": "Checkstyle@2"
-                }
-            ]
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "java.checkstyle.checkCode",
+          "when": "resourceLangId == java",
+          "group": "Checkstyle@1"
         },
-        "commands": [
-            {
-                "command": "java.checkstyle.checkCode",
-                "title": "%contributes.commands.java.checkstyle.checkCode.title%",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "java.checkstyle.setConfiguration",
-                "title": "%contributes.commands.java.checkstyle.setConfiguration.title%",
-                "category": "Checkstyle"
-            },
-            {
-                "command": "java.checkstyle.setVersion",
-                "title": "%contributes.commands.java.checkstyle.setVersion.title%",
-                "category": "Checkstyle"
-            }
-        ],
-        "configuration": {
-            "title": "Checkstyle",
-            "properties": {
-                "java.checkstyle.configuration": {
-                    "type": "string",
-                    "description": "%configuration.java.checkstyle.configuration.description%",
-                    "scope": "resource"
-                },
-                "java.checkstyle.properties": {
-                    "type": "object",
-                    "description": "%configuration.java.checkstyle.properties.description%",
-                    "scope": "resource"
-                },
-                "java.checkstyle.version": {
-                    "type": "string",
-                    "description": "%configuration.java.checkstyle.version.description%",
-                    "default": "9.3",
-                    "scope": "resource"
-                },
-                "java.checkstyle.modules": {
-                    "type": "array",
-                    "description": "%configuration.java.checkstyle.modules.description%",
-                    "default": [],
-                    "scope": "resource"
-                },
-                "java.checkstyle.autocheck": {
-                    "type": "boolean",
-                    "description": "%configuration.java.checkstyle.autocheck.description%",
-                    "scope": "application",
-                    "default": true
-                }
-            }
+        {
+          "command": "java.checkstyle.checkCode",
+          "when": "explorerResourceIsFolder",
+          "group": "Checkstyle@1"
+        },
+        {
+          "command": "java.checkstyle.setConfiguration",
+          "when": "!explorerResourceIsFolder && resourceLangId == xml",
+          "group": "Checkstyle@2"
         }
+      ]
     },
-    "scripts": {
-        "vscode:prepublish": "webpack --mode production",
-        "compile": "tsc -p ./",
-        "watch": "webpack --mode development --watch",
-        "lint": "tslint -t verbose --project tsconfig.json",
-        "build-plugin": "node scripts/build.js"
-    },
-    "extensionDependencies": [
-        "redhat.java"
+    "commands": [
+      {
+        "command": "java.checkstyle.checkCode",
+        "title": "%contributes.commands.java.checkstyle.checkCode.title%",
+        "category": "Checkstyle"
+      },
+      {
+        "command": "java.checkstyle.setConfiguration",
+        "title": "%contributes.commands.java.checkstyle.setConfiguration.title%",
+        "category": "Checkstyle"
+      },
+      {
+        "command": "java.checkstyle.setVersion",
+        "title": "%contributes.commands.java.checkstyle.setVersion.title%",
+        "category": "Checkstyle"
+      }
     ],
-    "devDependencies": {
-        "@types/fs-extra": "^9.0.13",
-        "@types/lodash": "^4.14.178",
-        "@types/node": "^14.18.9",
-        "@types/node-fetch": "^2.5.12",
-        "@types/vscode": "1.64.0",
-        "native-ext-loader": "^2.3.0",
-        "ts-loader": "^9.2.6",
-        "tslint": "^6.1.3",
-        "typescript": "^4.5.5",
-        "webpack": "^5.76.0",
-        "webpack-cli": "^4.9.2"
-    },
-    "dependencies": {
-        "fs-extra": "^10.0.0",
-        "lodash": "^4.17.21",
-        "node-fetch": "^2.6.7",
-        "vscode-extension-telemetry-wrapper": "^0.11.1",
-        "vscode-languageclient": "^6.1.3",
-        "xml-js": "^1.6.11"
+    "configuration": {
+      "title": "Checkstyle",
+      "properties": {
+        "java.checkstyle.configuration": {
+          "type": "string",
+          "description": "%configuration.java.checkstyle.configuration.description%",
+          "scope": "resource"
+        },
+        "java.checkstyle.properties": {
+          "type": "object",
+          "description": "%configuration.java.checkstyle.properties.description%",
+          "scope": "resource"
+        },
+        "java.checkstyle.version": {
+          "type": "string",
+          "description": "%configuration.java.checkstyle.version.description%",
+          "default": "9.3",
+          "scope": "resource"
+        },
+        "java.checkstyle.modules": {
+          "type": "array",
+          "description": "%configuration.java.checkstyle.modules.description%",
+          "default": [],
+          "scope": "resource"
+        },
+        "java.checkstyle.autocheck": {
+          "type": "boolean",
+          "description": "%configuration.java.checkstyle.autocheck.description%",
+          "scope": "application",
+          "default": true
+        }
+      }
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "webpack --mode production",
+    "compile": "tsc -p ./",
+    "watch": "webpack --mode development --watch",
+    "lint": "cross-env eslint 'src/**/*.ts' './scripts/build.js' './webpack.config.js' --format stylish",
+    "build-plugin": "node scripts/build.js"
+  },
+  "extensionDependencies": [
+    "redhat.java"
+  ],
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^14.18.9",
+    "@types/node-fetch": "^2.5.12",
+    "@types/vscode": "^1.64.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "native-ext-loader": "^2.3.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.7",
+    "vscode-extension-telemetry-wrapper": "^0.11.1",
+    "vscode-languageclient": "^6.1.3",
+    "xml-js": "^1.6.11"
+  }
 }

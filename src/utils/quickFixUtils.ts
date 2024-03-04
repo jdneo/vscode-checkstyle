@@ -4,8 +4,8 @@
 import { FixableCheck } from '../constants/quickFix';
 
 export function isQuickFixAvailable(violationSourceName: any): boolean {
-    if (violationSourceName && violationSourceName in FixableCheck) {
-        return true;
-    }
-    return false;
+  if (violationSourceName && violationSourceName in FixableCheck) {
+    return true;
+  }
+  return false;
 }

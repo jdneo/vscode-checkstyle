@@ -7,16 +7,16 @@ export enum BuiltinConfiguration {
 }
 
 export const checkstyleDoctypeIds: string[] = [
-    '-//Checkstyle//DTD Configuration 1.0//EN',
-    '-//Checkstyle//DTD Configuration 1.1//EN',
-    '-//Checkstyle//DTD Configuration 1.2//EN',
-    '-//Checkstyle//DTD Configuration 1.3//EN',
-    '-//Checkstyle//DTD Checkstyle Configuration 1.0//EN',
-    '-//Checkstyle//DTD Checkstyle Configuration 1.1//EN',
-    '-//Checkstyle//DTD Checkstyle Configuration 1.2//EN',
-    '-//Checkstyle//DTD Checkstyle Configuration 1.3//EN',
-    '-//Puppy Crawl//DTD Check Configuration 1.0//EN',
-    '-//Puppy Crawl//DTD Check Configuration 1.1//EN',
-    '-//Puppy Crawl//DTD Check Configuration 1.2//EN',
-    '-//Puppy Crawl//DTD Check Configuration 1.3//EN',
+  '-//Checkstyle//DTD Configuration 1.0//EN',
+  '-//Checkstyle//DTD Configuration 1.1//EN',
+  '-//Checkstyle//DTD Configuration 1.2//EN',
+  '-//Checkstyle//DTD Configuration 1.3//EN',
+  '-//Checkstyle//DTD Checkstyle Configuration 1.0//EN',
+  '-//Checkstyle//DTD Checkstyle Configuration 1.1//EN',
+  '-//Checkstyle//DTD Checkstyle Configuration 1.2//EN',
+  '-//Checkstyle//DTD Checkstyle Configuration 1.3//EN',
+  '-//Puppy Crawl//DTD Check Configuration 1.0//EN',
+  '-//Puppy Crawl//DTD Check Configuration 1.1//EN',
+  '-//Puppy Crawl//DTD Check Configuration 1.2//EN',
+  '-//Puppy Crawl//DTD Check Configuration 1.3//EN',
 ];

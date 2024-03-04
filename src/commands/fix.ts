@@ -10,15 +10,15 @@ import { handleErrors } from '../utils/errorUtils';
 import { executeJavaLanguageServerCommand } from './executeJavaLanguageServerCommand';
 
 export async function fixCheckstyleViolations(uri: Uri, offsets: number[], sourceNames: string[]): Promise<void> {
-    try {
-        const workspaceEdit: ls.WorkspaceEdit | undefined = await executeJavaLanguageServerCommand<ls.WorkspaceEdit>(
-            CheckstyleServerCommands.QUICK_FIX, uri.toString(), offsets, sourceNames);
-        if (!workspaceEdit) {
-            checkstyleChannel.appendLine('Unable to get quick fix item from Language Server.');
-            return;
-        }
-        await applyWorkspaceEdit(workspaceEdit);
-    } catch (error) {
-        handleErrors(error);
+  try {
+    const workspaceEdit: ls.WorkspaceEdit | undefined = await executeJavaLanguageServerCommand<ls.WorkspaceEdit>(
+      CheckstyleServerCommands.QUICK_FIX, uri.toString(), offsets, sourceNames);
+    if (!workspaceEdit) {
+      checkstyleChannel.appendLine('Unable to get quick fix item from Language Server.');
+      return;
     }
+    await applyWorkspaceEdit(workspaceEdit);
+  } catch (error) {
+    handleErrors(error);
+  }
 }
